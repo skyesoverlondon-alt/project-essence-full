@@ -1,0 +1,3793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Essence Crown: Shard Wars - Ultimate Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg-primary: #0a0a12;
+  --bg-secondary: #12121f;
+  --bg-tertiary: #1a1a2e;
+  --bg-card: #16162a;
+  --text-primary: #f0e6ff;
+  --text-secondary: #b8a8d4;
+  --text-muted: #6b5b7a;
+  --accent-primary: #9d4edd;
+  --accent-secondary: #c77dff;
+  --accent-gold: #ffd700;
+  --accent-glow: #ffcc00;
+  --glow-color: #ffd700;
+  --void-color: #7b2cbf;
+  --gray-color: #6c757d;
+  --essence-color: #00ff88;
+  --danger-color: #ff4757;
+  --success-color: #2ed573;
+  --border-color: rgba(157, 78, 221, 0.3);
+  --border-glow: rgba(255, 215, 0, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(26, 26, 46, 0.85);
+  --glass-border: rgba(157, 78, 221, 0.2);
+  --card-width: 120px;
+  --card-height: 168px;
+  --card-width-lg: 180px;
+  --card-height-lg: 252px;
+  --animation-speed: 1;
+  --transition-fast: calc(0.15s * var(--animation-speed));
+  --transition-normal: calc(0.3s * var(--animation-speed));
+  --transition-slow: calc(0.5s * var(--animation-speed));
+}
+
+[data-theme="bright-solar"] {
+  --bg-primary: #fef9e7;
+  --bg-secondary: #fdf2d0;
+  --bg-tertiary: #fce8b2;
+  --bg-card: #fff8e7;
+  --text-primary: #2c1810;
+  --text-secondary: #5c4033;
+  --text-muted: #8b7355;
+  --accent-primary: #ff8c00;
+  --accent-secondary: #ffa500;
+  --accent-gold: #daa520;
+  --accent-glow: #ffcc00;
+  --glow-color: #ff8c00;
+  --void-color: #8b0000;
+  --gray-color: #696969;
+  --border-color: rgba(255, 140, 0, 0.3);
+  --border-glow: rgba(255, 165, 0, 0.5);
+  --shadow-color: rgba(139, 69, 19, 0.3);
+  --glass-bg: rgba(255, 248, 231, 0.9);
+  --glass-border: rgba(255, 140, 0, 0.2);
+}
+
+[data-theme="gray-court"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3d3d3d;
+  --bg-card: #252525;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #606060;
+  --accent-primary: #808080;
+  --accent-secondary: #a0a0a0;
+  --accent-gold: #c0c0c0;
+  --accent-glow: #d4d4d4;
+  --glow-color: #c0c0c0;
+  --void-color: #4a4a4a;
+  --gray-color: #707070;
+  --border-color: rgba(128, 128, 128, 0.3);
+  --border-glow: rgba(192, 192, 192, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --glass-bg: rgba(45, 45, 45, 0.9);
+  --glass-border: rgba(128, 128, 128, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Exo 2', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  z-index: 10;
+}
+
+.screen.active {
+  display: flex;
+}
+
+#particles-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo-container {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.game-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-secondary) 50%, var(--accent-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 60px rgba(255, 215, 0, 0.5);
+  letter-spacing: 0.1em;
+  animation: shimmer 3s linear infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.game-subtitle {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--text-secondary);
+  letter-spacing: 0.5em;
+  margin-top: -0.5rem;
+}
+
+.fullscreen-notice {
+  font-size: 1.2rem;
+  color: var(--accent-gold);
+  padding: 1rem 2rem;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--accent-gold);
+  border-radius: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+  50% { opacity: 0.8; box-shadow: 0 0 40px rgba(255, 215, 0, 0.5); }
+}
+
+.welcome-buttons {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(157, 78, 221, 0.6);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-secondary);
+}
+
+.btn-glow {
+  animation: btn-glow 2s ease-in-out infinite;
+}
+
+@keyframes btn-glow {
+  0%, 100% { box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4), 0 0 30px rgba(255, 215, 0, 0.2); }
+  50% { box-shadow: 0 4px 25px rgba(157, 78, 221, 0.6), 0 0 50px rgba(255, 215, 0, 0.4); }
+}
+
+.btn-icon {
+  font-size: 1.2em;
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}
+
+.btn-phase {
+  background: var(--bg-tertiary);
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-phase:hover {
+  background: rgba(255, 215, 0, 0.2);
+}
+
+.btn-godcode {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-primary) 100%);
+  color: var(--bg-primary);
+  font-weight: 700;
+}
+
+.btn-godcode:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.welcome-footer {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 2rem;
+}
+
+.screen-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.screen-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 2.5rem;
+  color: var(--accent-gold);
+  margin-bottom: 0.5rem;
+}
+
+.screen-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.deity-selection-container {
+  display: flex;
+  gap: 2rem;
+  width: 95%;
+  max-width: 1800px;
+  height: 65vh;
+  align-items: stretch;
+}
+
+.player-selection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.player-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  color: var(--accent-gold);
+  text-align: center;
+}
+
+.deity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  overflow-y: auto;
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.deity-card-option {
+  aspect-ratio: 455/637;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+  border: 3px solid transparent;
+  position: relative;
+}
+
+.deity-card-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.deity-card-option:hover {
+  transform: scale(1.05);
+  border-color: var(--accent-secondary);
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+}
+
+.deity-card-option.selected {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+}
+
+.selected-deity-preview {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  min-height: 150px;
+}
+
+.deity-preview-card {
+  width: 100px;
+  aspect-ratio: 455/637;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.deity-preview-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.deity-preview-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.deity-preview-info .deity-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: var(--accent-gold);
+}
+
+.deity-preview-info .deity-passive,
+.deity-preview-info .deity-godcode {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.vs-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  color: var(--accent-gold);
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.selection-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.deck-builder-container {
+  display: flex;
+  gap: 1.5rem;
+  width: 95%;
+  max-width: 1800px;
+  height: 65vh;
+}
+
+.card-library {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.library-header h3 {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--accent-gold);
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-bar select {
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Exo 2', sans-serif;
+  cursor: pointer;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+  overflow-y: auto;
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.library-card {
+  aspect-ratio: 455/637;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition-fast) ease;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.library-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.library-card:hover {
+  transform: scale(1.08);
+  border-color: var(--accent-secondary);
+  z-index: 10;
+}
+
+.library-card .card-cost {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--accent-primary);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.deck-panels {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.deck-panel {
+  flex: 1;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.deck-panel h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  color: var(--accent-gold);
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.deck-count {
+  color: var(--text-secondary);
+}
+
+.deck-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-content: flex-start;
+}
+
+.deck-card-mini {
+  width: 40px;
+  height: 56px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition-fast) ease;
+}
+
+.deck-card-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.deck-card-mini:hover {
+  transform: scale(1.1);
+}
+
+.deck-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+#game-screen {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg-primary);
+  background-image: 
+    radial-gradient(ellipse at top, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+  position: relative;
+  overflow: hidden;
+}
+
+#game-screen.active {
+  display: flex;
+}
+
+.fullscreen-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  color: var(--accent-gold);
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all var(--transition-fast) ease;
+}
+
+.fullscreen-toggle:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.settings-panel {
+  position: fixed;
+  top: 60px;
+  right: 10px;
+  width: 320px;
+  max-height: 80vh;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  z-index: 999;
+  backdrop-filter: blur(15px);
+  overflow-y: auto;
+  box-shadow: 0 10px 40px var(--shadow-color);
+}
+
+.settings-panel.hidden {
+  display: none;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-header h3 {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--accent-gold);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.close-btn:hover {
+  color: var(--danger-color);
+}
+
+.settings-section {
+  margin-bottom: 1.5rem;
+}
+
+.settings-section h4 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.theme-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.theme-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all var(--transition-fast);
+}
+
+.theme-btn:hover,
+.theme-btn.active {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.toggle-label input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 44px;
+  height: 24px;
+  background: var(--bg-tertiary);
+  border-radius: 12px;
+  position: relative;
+  transition: background var(--transition-fast);
+}
+
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.toggle-label input:checked + .toggle-slider {
+  background: var(--accent-primary);
+}
+
+.toggle-label input:checked + .toggle-slider::after {
+  left: 22px;
+  background: white;
+}
+
+.player-area {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+}
+
+.player-area.opponent {
+  flex-direction: column-reverse;
+}
+
+.deity-panel {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.deity-card {
+  width: 100px;
+  aspect-ratio: 455/637;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--accent-gold);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.deity-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.deity-stats {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.stat.essence .stat-value {
+  color: var(--essence-color);
+}
+
+.stat.kl .stat-value {
+  color: var(--accent-secondary);
+}
+
+.stat.overflow .stat-value {
+  color: var(--void-color);
+}
+
+.stat.god-code .stat-value {
+  color: var(--accent-gold);
+}
+
+.stat-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.stat-btn:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.essence-bar {
+  width: 100%;
+  max-width: 150px;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.essence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--essence-color), #00cc6a);
+  border-radius: 4px;
+  transition: width var(--transition-normal);
+}
+
+.kl-orbs {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  max-width: 150px;
+}
+
+.kl-orb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--accent-secondary);
+  transition: all var(--transition-fast);
+}
+
+.kl-orb.filled {
+  background: var(--accent-secondary);
+  box-shadow: 0 0 8px var(--accent-secondary);
+}
+
+.zones-row {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.zone {
+  background: var(--glass-bg);
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-height: 100px;
+  transition: all var(--transition-fast);
+}
+
+.zone.drag-over {
+  border-color: var(--accent-gold);
+  background: rgba(255, 215, 0, 0.1);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.zone-label {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-primary);
+  padding: 0 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.zone-count {
+  position: absolute;
+  bottom: 5px;
+  right: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.deck-zone, .discard-zone, .exile-zone {
+  width: 90px;
+}
+
+.domain-zone {
+  width: 120px;
+}
+
+.new-earth {
+  flex: 1;
+  max-width: 600px;
+  min-width: 300px;
+}
+
+.card-slots {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 80px;
+  padding: 0.25rem;
+}
+
+.card-stack {
+  position: relative;
+  width: 60px;
+  height: 84px;
+}
+
+.card-stack .card {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.hand-zone {
+  padding: 0.5rem 1rem;
+  min-height: 120px;
+}
+
+.hand-cards {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+}
+
+.card {
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition-fast) ease;
+  position: relative;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  border: 2px solid transparent;
+  transform-style: preserve-3d;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.05);
+  z-index: 100;
+  box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.card.tapped {
+  transform: rotate(90deg);
+}
+
+.card.tapped:hover {
+  transform: rotate(90deg) scale(1.05);
+}
+
+.card.face-down img {
+  filter: brightness(0.3);
+}
+
+.card.selected {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+}
+
+.card.attacking {
+  animation: attack-pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes attack-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); }
+}
+
+.card.can-attack {
+  border-color: var(--success-color);
+}
+
+.card.targetable {
+  border-color: var(--danger-color);
+  animation: target-pulse 1s ease-in-out infinite;
+}
+
+@keyframes target-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.7); }
+}
+
+.card .card-stats {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.card .card-attack {
+  color: #ff6b6b;
+}
+
+.card .card-health {
+  color: #4ecdc4;
+}
+
+.card .card-cost-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.card .aspect-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.card .aspect-indicator.glow {
+  background: radial-gradient(circle, #ffd700, #ff8c00);
+  box-shadow: 0 0 10px #ffd700;
+}
+
+.card .aspect-indicator.void {
+  background: radial-gradient(circle, #9d4edd, #7b2cbf);
+  box-shadow: 0 0 10px #9d4edd;
+}
+
+.card .aspect-indicator.gray {
+  background: radial-gradient(circle, #a0a0a0, #606060);
+  box-shadow: 0 0 10px #a0a0a0;
+}
+
+#middle-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(90deg, transparent, var(--glass-bg), transparent);
+  position: relative;
+}
+
+.phase-bar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.phase {
+  padding: 0.5rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.phase.active {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+}
+
+.phase.completed {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.turn-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.turn-indicator {
+  text-align: center;
+}
+
+#current-turn {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+#current-player {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+}
+
+.phase-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-settings {
+  position: absolute;
+  right: 60px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-settings:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.game-log {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 300px;
+  max-height: 200px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.log-header h4 {
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+}
+
+.log-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.log-entry {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  animation: log-fade-in 0.3s ease;
+}
+
+@keyframes log-fade-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.log-entry.helper {
+  color: var(--accent-secondary);
+}
+
+.log-entry.damage {
+  color: var(--danger-color);
+}
+
+.log-entry.heal {
+  color: var(--essence-color);
+}
+
+.log-entry.phase {
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+#zoom-card-image {
+  max-width: 400px;
+  max-height: 70vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.zoom-card-info {
+  background: var(--glass-bg);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.zoom-card-info h3 {
+  font-family: 'Cinzel', serif;
+  color: var(--accent-gold);
+  margin-bottom: 0.5rem;
+}
+
+.zoom-card-info p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  min-width: 180px;
+  z-index: 3000;
+  box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.context-menu.hidden {
+  display: none;
+}
+
+.menu-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  font-size: 0.9rem;
+}
+
+.menu-item:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.25rem 0;
+}
+
+.combat-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.combat-overlay.hidden {
+  display: none;
+}
+
+.combat-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.combat-content h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 2.5rem;
+  color: var(--danger-color);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(255, 71, 87, 0.5);
+}
+
+.combat-instruction {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.combat-selections {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.attacker-section, .target-section {
+  text-align: center;
+}
+
+.attacker-section h3, .target-section h3 {
+  color: var(--accent-gold);
+  margin-bottom: 1rem;
+}
+
+.combat-card {
+  width: 150px;
+  height: 210px;
+  border: 3px dashed var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.combat-card.has-card {
+  border-style: solid;
+  border-color: var(--accent-primary);
+}
+
+.combat-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.combat-arrow {
+  font-size: 3rem;
+  color: var(--danger-color);
+  animation: arrow-pulse 1s ease-in-out infinite;
+}
+
+@keyframes arrow-pulse {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(10px); opacity: 0.7; }
+}
+
+.combat-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.animation-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.fx-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.phase-announcement {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1200;
+  pointer-events: none;
+}
+
+.phase-announcement.hidden {
+  display: none;
+}
+
+.phase-text {
+  font-family: 'Cinzel', serif;
+  font-size: 4rem;
+  color: var(--accent-gold);
+  text-shadow: 0 0 60px rgba(255, 215, 0, 0.8);
+  animation: phase-announce 1.5s ease-out forwards;
+}
+
+@keyframes phase-announce {
+  0% { opacity: 0; transform: scale(0.5); }
+  20% { opacity: 1; transform: scale(1.1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+.damage-number {
+  position: fixed;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 1100;
+  text-shadow: 0 0 20px currentColor;
+  animation: damage-float 1.5s ease-out forwards;
+}
+
+.damage-number.damage {
+  color: var(--danger-color);
+}
+
+.damage-number.heal {
+  color: var(--essence-color);
+}
+
+.damage-number.draw {
+  color: var(--accent-secondary);
+}
+
+@keyframes damage-float {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+}
+
+.flying-card {
+  position: fixed;
+  z-index: 1050;
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.flying-card img {
+  width: 120px;
+  height: 168px;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.impact-effect {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+  z-index: 1100;
+  animation: impact 0.5s ease-out forwards;
+}
+
+@keyframes impact {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+.screen-shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px) rotate(-1deg); }
+  40% { transform: translateX(10px) rotate(1deg); }
+  60% { transform: translateX(-10px) rotate(-1deg); }
+  80% { transform: translateX(10px) rotate(1deg); }
+}
+
+.victory-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.victory-screen.hidden {
+  display: none;
+}
+
+.victory-content {
+  text-align: center;
+}
+
+.victory-title {
+  font-family: 'Cinzel', serif;
+  font-size: 4rem;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  animation: victory-glow 2s ease-in-out infinite;
+}
+
+@keyframes victory-glow {
+  0%, 100% { text-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+  50% { text-shadow: 0 0 60px rgba(255, 215, 0, 0.8); }
+}
+
+.victory-subtitle {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
+}
+
+@media (max-width: 1200px) {
+  .deity-selection-container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .vs-divider {
+    padding: 1rem 0;
+  }
+  
+  .deck-builder-container {
+    flex-direction: column;
+  }
+  
+  .deck-panels {
+    flex-direction: row;
+  }
+  
+  .deity-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .game-title {
+    font-size: 2.5rem;
+  }
+  
+  .game-subtitle {
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+  }
+  
+  .deity-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .zones-row {
+    flex-wrap: wrap;
+  }
+  
+  .game-log {
+    width: 200px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="welcome-screen" class="screen active">
+      <canvas id="particles-bg"></canvas>
+      <div class="welcome-content">
+        <div class="logo-container">
+          <h1 class="game-title">ESSENCE CROWN</h1>
+          <h2 class="game-subtitle">SHARD WARS</h2>
+        </div>
+        <p class="fullscreen-notice">For optimal enjoyment, please use fullscreen mode</p>
+        <div class="welcome-buttons">
+          <button id="btn-fullscreen" class="btn btn-primary btn-glow">
+            <span class="btn-icon">&#x26F6;</span>
+            Enter Fullscreen
+          </button>
+          <button id="btn-start" class="btn btn-secondary">
+            <span class="btn-icon">&#x25B6;</span>
+            Start Game
+          </button>
+        </div>
+        <div class="welcome-footer">
+          <span>SOLEnterprises / SOLARA Storyworks</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="deity-selection-screen" class="screen">
+      <div class="screen-header">
+        <h1>Choose Your Deity</h1>
+        <p>Select a Deity for each player to begin the Shard War</p>
+      </div>
+      <div class="deity-selection-container">
+        <div class="player-selection" id="p1-selection">
+          <h2 class="player-label">Player 1</h2>
+          <div class="deity-grid" id="p1-deity-grid"></div>
+          <div class="selected-deity-preview" id="p1-preview">
+            <div class="deity-preview-card"></div>
+            <div class="deity-preview-info">
+              <h3 class="deity-name">Select a Deity</h3>
+              <p class="deity-passive"></p>
+              <p class="deity-godcode"></p>
+            </div>
+          </div>
+        </div>
+        <div class="vs-divider">
+          <span>VS</span>
+        </div>
+        <div class="player-selection" id="p2-selection">
+          <h2 class="player-label">Player 2</h2>
+          <div class="deity-grid" id="p2-deity-grid"></div>
+          <div class="selected-deity-preview" id="p2-preview">
+            <div class="deity-preview-card"></div>
+            <div class="deity-preview-info">
+              <h3 class="deity-name">Select a Deity</h3>
+              <p class="deity-passive"></p>
+              <p class="deity-godcode"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="selection-actions">
+        <button id="btn-back-welcome" class="btn btn-secondary">Back</button>
+        <button id="btn-deck-setup" class="btn btn-primary" disabled>Setup Decks</button>
+      </div>
+    </div>
+
+    <div id="deck-builder-screen" class="screen">
+      <div class="screen-header">
+        <h1>Deck Builder</h1>
+        <p>Build decks for both players (minimum 20 cards for quick play)</p>
+      </div>
+      <div class="deck-builder-container">
+        <div class="card-library">
+          <div class="library-header">
+            <h3>Card Library</h3>
+            <div class="filter-bar">
+              <select id="filter-type">
+                <option value="all">All Types</option>
+                <option value="Avatar">Avatars</option>
+                <option value="Spell">Spells</option>
+                <option value="Domain">Domains</option>
+              </select>
+              <select id="filter-aspect">
+                <option value="all">All Aspects</option>
+                <option value="Glow">Glow</option>
+                <option value="Void">Void</option>
+                <option value="Gray">Gray</option>
+              </select>
+              <select id="filter-cost">
+                <option value="all">All Costs</option>
+                <option value="0-2">0-2 KL</option>
+                <option value="3-5">3-5 KL</option>
+                <option value="6-8">6-8 KL</option>
+                <option value="9+">9+ KL</option>
+              </select>
+            </div>
+          </div>
+          <div class="library-grid" id="library-grid"></div>
+        </div>
+        <div class="deck-panels">
+          <div class="deck-panel" id="p1-deck-panel">
+            <h3>Player 1 Deck <span class="deck-count">(0/20)</span></h3>
+            <div class="deck-list" id="p1-deck-list"></div>
+            <div class="deck-actions">
+              <button class="btn btn-small" onclick="autoFillDeck(1)">Auto-Fill</button>
+              <button class="btn btn-small" onclick="clearDeck(1)">Clear</button>
+            </div>
+          </div>
+          <div class="deck-panel" id="p2-deck-panel">
+            <h3>Player 2 Deck <span class="deck-count">(0/20)</span></h3>
+            <div class="deck-list" id="p2-deck-list"></div>
+            <div class="deck-actions">
+              <button class="btn btn-small" onclick="autoFillDeck(2)">Auto-Fill</button>
+              <button class="btn btn-small" onclick="clearDeck(2)">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="selection-actions">
+        <button id="btn-back-deity" class="btn btn-secondary">Back</button>
+        <button id="btn-start-game" class="btn btn-primary btn-glow" disabled>Begin Shard War</button>
+      </div>
+    </div>
+
+    <div id="game-screen" class="screen">
+      <button id="btn-fullscreen-toggle" class="fullscreen-toggle" title="Toggle Fullscreen">
+        <span class="fs-icon">&#x26F6;</span>
+      </button>
+
+      <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-header">
+          <h3>Settings</h3>
+          <button class="close-btn" onclick="toggleSettings()">&times;</button>
+        </div>
+        <div class="settings-content">
+          <div class="settings-section">
+            <h4>Theme</h4>
+            <div class="theme-selector">
+              <button class="theme-btn active" data-theme="dark-void">Dark Void</button>
+              <button class="theme-btn" data-theme="bright-solar">Bright Solar</button>
+              <button class="theme-btn" data-theme="gray-court">Gray Court</button>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h4>Rules Helper</h4>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-rules-helper" checked>
+              <span class="toggle-slider"></span>
+              Enable Rules Helper
+            </label>
+          </div>
+          <div class="settings-section helper-options">
+            <h4>Helper Options</h4>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-auto-wake" checked>
+              <span class="toggle-slider"></span>
+              Auto Wake Phase
+            </label>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-auto-aspect" checked>
+              <span class="toggle-slider"></span>
+              Auto Aspect Triggers
+            </label>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-auto-kl" checked>
+              <span class="toggle-slider"></span>
+              Auto KL Payment
+            </label>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-auto-combat" checked>
+              <span class="toggle-slider"></span>
+              Auto Combat Resolution
+            </label>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-auto-overflow" checked>
+              <span class="toggle-slider"></span>
+              Auto Overflow → Crown
+            </label>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-helper-log" checked>
+              <span class="toggle-slider"></span>
+              Show Helper Log
+            </label>
+          </div>
+          <div class="settings-section">
+            <h4>Animation Speed</h4>
+            <input type="range" id="animation-speed" min="0.5" max="2" step="0.25" value="1">
+            <span id="speed-label">1x</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="opponent-area" class="player-area opponent">
+        <div class="deity-panel">
+          <div class="deity-card" id="p2-deity-display"></div>
+          <div class="deity-stats">
+            <div class="stat essence">
+              <span class="stat-label">Essence</span>
+              <div class="stat-value">
+                <button class="stat-btn minus" onclick="modifyStat(2, 'essence', -1)">-</button>
+                <span id="p2-essence">23</span>
+                <button class="stat-btn plus" onclick="modifyStat(2, 'essence', 1)">+</button>
+              </div>
+              <div class="essence-bar"><div class="essence-fill" id="p2-essence-bar"></div></div>
+            </div>
+            <div class="stat kl">
+              <span class="stat-label">KL</span>
+              <div class="stat-value">
+                <button class="stat-btn minus" onclick="modifyStat(2, 'kl', -1)">-</button>
+                <span id="p2-kl">3</span>/<span id="p2-kl-max">3</span>
+                <button class="stat-btn plus" onclick="modifyStat(2, 'kl', 1)">+</button>
+              </div>
+              <div class="kl-orbs" id="p2-kl-orbs"></div>
+            </div>
+            <div class="stat overflow">
+              <span class="stat-label">Overflow</span>
+              <div class="stat-value">
+                <button class="stat-btn minus" onclick="modifyStat(2, 'overflow', -1)">-</button>
+                <span id="p2-overflow">0</span>/13
+                <button class="stat-btn plus" onclick="modifyStat(2, 'overflow', 1)">+</button>
+              </div>
+            </div>
+            <div class="stat god-code">
+              <span class="stat-label">God Code</span>
+              <div class="stat-value">
+                <span id="p2-godcode">1</span>/2
+                <button class="btn btn-small btn-godcode" id="p2-godcode-btn" onclick="activateGodCode(2)">Activate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="zones-row">
+          <div class="zone deck-zone" id="p2-deck" data-zone="deck" data-player="2">
+            <span class="zone-label">Deck</span>
+            <div class="card-stack"></div>
+            <span class="zone-count">0</span>
+          </div>
+          <div class="zone domain-zone" id="p2-domain" data-zone="domain" data-player="2">
+            <span class="zone-label">Domain</span>
+          </div>
+          <div class="zone new-earth" id="p2-new-earth" data-zone="newEarth" data-player="2">
+            <span class="zone-label">New Earth</span>
+            <div class="card-slots"></div>
+          </div>
+          <div class="zone discard-zone" id="p2-discard" data-zone="discard" data-player="2">
+            <span class="zone-label">Discard</span>
+            <div class="card-stack"></div>
+            <span class="zone-count">0</span>
+          </div>
+          <div class="zone exile-zone" id="p2-exile" data-zone="exile" data-player="2">
+            <span class="zone-label">Exile</span>
+            <div class="card-stack"></div>
+            <span class="zone-count">0</span>
+          </div>
+        </div>
+        <div class="hand-zone" id="p2-hand" data-zone="hand" data-player="2">
+          <span class="zone-label">Opponent's Hand</span>
+          <div class="hand-cards"></div>
+        </div>
+      </div>
+
+      <div id="middle-area">
+        <div class="phase-bar">
+          <div class="phase" data-phase="wake">Wake</div>
+          <div class="phase" data-phase="main1">Main I</div>
+          <div class="phase" data-phase="breach">Breach</div>
+          <div class="phase" data-phase="main2">Main II</div>
+          <div class="phase" data-phase="fade">Fade</div>
+        </div>
+        <div class="turn-controls">
+          <div class="turn-indicator">
+            <span id="current-turn">Turn 1</span>
+            <span id="current-player">Player 1's Turn</span>
+          </div>
+          <div class="phase-controls">
+            <button class="btn btn-phase" id="btn-next-phase">Next Phase</button>
+            <button class="btn btn-phase" id="btn-end-turn">End Turn</button>
+          </div>
+        </div>
+        <button class="btn btn-settings" id="btn-settings" onclick="toggleSettings()">&#x2699;</button>
+      </div>
+
+      <div id="player-area" class="player-area player">
+        <div class="hand-zone" id="p1-hand" data-zone="hand" data-player="1">
+          <span class="zone-label">Your Hand</span>
+          <div class="hand-cards"></div>
+        </div>
+        <div class="zones-row">
+          <div class="zone deck-zone" id="p1-deck" data-zone="deck" data-player="1">
+            <span class="zone-label">Deck</span>
+            <div class="card-stack"></div>
+            <span class="zone-count">0</span>
+          </div>
+          <div class="zone domain-zone" id="p1-domain" data-zone="domain" data-player="1">
+            <span class="zone-label">Domain</span>
+          </div>
+          <div class="zone new-earth" id="p1-new-earth" data-zone="newEarth" data-player="1">
+            <span class="zone-label">New Earth</span>
+            <div class="card-slots"></div>
+          </div>
+          <div class="zone discard-zone" id="p1-discard" data-zone="discard" data-player="1">
+            <span class="zone-label">Discard</span>
+            <div class="card-stack"></div>
+            <span class="zone-count">0</span>
+          </div>
+          <div class="zone exile-zone" id="p1-exile" data-zone="exile" data-player="1">
+            <span class="zone-label">Exile</span>
+            <div class="card-stack"></div>
+            <span class="zone-count">0</span>
+          </div>
+        </div>
+        <div class="deity-panel">
+          <div class="deity-card" id="p1-deity-display"></div>
+          <div class="deity-stats">
+            <div class="stat essence">
+              <span class="stat-label">Essence</span>
+              <div class="stat-value">
+                <button class="stat-btn minus" onclick="modifyStat(1, 'essence', -1)">-</button>
+                <span id="p1-essence">23</span>
+                <button class="stat-btn plus" onclick="modifyStat(1, 'essence', 1)">+</button>
+              </div>
+              <div class="essence-bar"><div class="essence-fill" id="p1-essence-bar"></div></div>
+            </div>
+            <div class="stat kl">
+              <span class="stat-label">KL</span>
+              <div class="stat-value">
+                <button class="stat-btn minus" onclick="modifyStat(1, 'kl', -1)">-</button>
+                <span id="p1-kl">3</span>/<span id="p1-kl-max">3</span>
+                <button class="stat-btn plus" onclick="modifyStat(1, 'kl', 1)">+</button>
+              </div>
+              <div class="kl-orbs" id="p1-kl-orbs"></div>
+            </div>
+            <div class="stat overflow">
+              <span class="stat-label">Overflow</span>
+              <div class="stat-value">
+                <button class="stat-btn minus" onclick="modifyStat(1, 'overflow', -1)">-</button>
+                <span id="p1-overflow">0</span>/13
+                <button class="stat-btn plus" onclick="modifyStat(1, 'overflow', 1)">+</button>
+              </div>
+            </div>
+            <div class="stat god-code">
+              <span class="stat-label">God Code</span>
+              <div class="stat-value">
+                <span id="p1-godcode">1</span>/2
+                <button class="btn btn-small btn-godcode" id="p1-godcode-btn" onclick="activateGodCode(1)">Activate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="game-log" class="game-log">
+        <div class="log-header">
+          <h4>Game Log</h4>
+          <button class="btn btn-small" onclick="clearLog()">Clear</button>
+        </div>
+        <div class="log-content" id="log-content"></div>
+      </div>
+
+      <div id="card-zoom-modal" class="modal hidden">
+        <div class="modal-backdrop" onclick="closeCardZoom()"></div>
+        <div class="modal-content">
+          <img id="zoom-card-image" src="" alt="Card">
+          <div class="zoom-card-info" id="zoom-card-info"></div>
+          <button class="close-btn" onclick="closeCardZoom()">&times;</button>
+        </div>
+      </div>
+
+      <div id="context-menu" class="context-menu hidden">
+        <div class="menu-item" data-action="tap">Tap/Untap</div>
+        <div class="menu-item" data-action="flip">Flip Face</div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" data-action="to-hand">Move to Hand</div>
+        <div class="menu-item" data-action="to-new-earth">Move to New Earth</div>
+        <div class="menu-item" data-action="to-discard">Move to Discard</div>
+        <div class="menu-item" data-action="to-exile">Move to Exile</div>
+        <div class="menu-item" data-action="to-deck-top">To Top of Deck</div>
+        <div class="menu-item" data-action="to-deck-bottom">To Bottom of Deck</div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" data-action="attack">Attack</div>
+      </div>
+
+      <div id="combat-overlay" class="combat-overlay hidden">
+        <div class="combat-content">
+          <h2>BREACH PHASE</h2>
+          <p class="combat-instruction">Select an attacker or skip combat</p>
+          <div class="combat-selections">
+            <div class="attacker-section">
+              <h3>Attacker</h3>
+              <div class="combat-card" id="combat-attacker"></div>
+            </div>
+            <div class="combat-arrow">&#x2794;</div>
+            <div class="target-section">
+              <h3>Target</h3>
+              <div class="combat-card" id="combat-target"></div>
+            </div>
+          </div>
+          <div class="combat-actions">
+            <button class="btn btn-secondary" onclick="cancelCombat()">Cancel</button>
+            <button class="btn btn-primary" id="btn-confirm-attack" disabled onclick="confirmAttack()">Confirm Attack</button>
+            <button class="btn btn-secondary" onclick="skipCombat()">Skip Combat</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="animation-layer" class="animation-layer"></div>
+      <canvas id="fx-canvas" class="fx-canvas"></canvas>
+
+      <div id="phase-announcement" class="phase-announcement hidden">
+        <div class="phase-text"></div>
+      </div>
+
+      <div id="damage-indicators"></div>
+
+      <div id="victory-screen" class="victory-screen hidden">
+        <div class="victory-content">
+          <h1 class="victory-title"></h1>
+          <p class="victory-subtitle"></p>
+          <button class="btn btn-primary btn-glow" onclick="restartGame()">Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+
+  <script>
+const CARD_BACK_URL = 'https://www.solenterprises.org/wp-content/uploads/go-x/u/cca0f184-db77-4b70-ac13-940de58d8625/image-455x637.png';
+
+const ALL_CARDS = [
+  { id: 'CORE-001', name: 'Solara, The Radiant Dawn', type: 'Deity', aspect: 'Glow', cost: 0, attack: 0, health: 23, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/cca0f184-db77-4b70-ac13-940de58d8625/image-455x637.png', passive: 'Glow cards you play restore 2 Essence instead of 1.', godCode: 'Solar Flare: Deal 5 damage to all enemy Avatars.', godCodeCost: 5 },
+  { id: 'CORE-002', name: 'Nyx, The Void Sovereign', type: 'Deity', aspect: 'Void', cost: 0, attack: 0, health: 23, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ef7bc288-c613-4138-afd6-88d949e2f33c/image-455x637.png', passive: 'Void cards you play drain 2 Essence instead of 1.', godCode: 'Abyssal Rift: Destroy target Avatar and deal 3 damage to its controller.', godCodeCost: 4 },
+  { id: 'CORE-003', name: 'Erebus, The Gray Arbiter', type: 'Deity', aspect: 'Gray', cost: 0, attack: 0, health: 23, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/5ee737e1-9a55-430a-9d4d-4462d5997808/image-455x637.png', passive: 'Gray cards you play draw 2 cards instead of 1.', godCode: 'Judgment of Balance: Each player discards their hand and draws 5 cards.', godCodeCost: 6 },
+  { id: 'CORE-004', name: 'Lumina, Shard Keeper', type: 'Deity', aspect: 'Glow', cost: 0, attack: 0, health: 23, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/78729242-9c61-4684-93d2-cf1dfc0a1d40/image-455x637.png', passive: 'Your Avatars with Glow aspect have +1 Attack.', godCode: 'Shard Burst: Deal damage equal to your current KL to target.', godCodeCost: 3 },
+  { id: 'CORE-005', name: 'Thanatos, The End Bringer', type: 'Deity', aspect: 'Void', cost: 0, attack: 0, health: 23, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/d431d552-88d5-4154-a415-378c3fb9b48a/image-455x637.png', passive: 'When an enemy Avatar is destroyed, gain 1 Overflow.', godCode: 'Death\'s Embrace: Destroy all Avatars with 3 or less Health.', godCodeCost: 5 },
+  { id: 'CORE-006', name: 'Aether, The Cosmic Weaver', type: 'Deity', aspect: 'Gray', cost: 0, attack: 0, health: 23, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/f0be2b7f-1266-4e46-b229-4c382160d9e7/image-455x637.png', passive: 'At the start of your Wake, if you have 3+ cards, gain 1 KL.', godCode: 'Cosmic Realignment: Return all cards from your discard to your deck and shuffle.', godCodeCost: 7 },
+  { id: 'CORE-007', name: 'Radiant Guardian', type: 'Avatar', aspect: 'Glow', cost: 3, attack: 3, health: 4, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ffa0aca1-d5bf-4bc3-9bb6-d3c7d78adffc/image-455x637.png', effect: 'On Enter: Gain 1 Essence.' },
+  { id: 'CORE-008', name: 'Void Stalker', type: 'Avatar', aspect: 'Void', cost: 2, attack: 3, health: 2, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/7250db43-29e8-4d16-8b8f-e56071f0c6cc/image-455x637.png', effect: 'Breach: Target opponent loses 1 Essence.' },
+  { id: 'CORE-009', name: 'Gray Scholar', type: 'Avatar', aspect: 'Gray', cost: 2, attack: 2, health: 3, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a7c805d6-5a5b-473d-8682-800612accabb/image-455x637.png', effect: 'On Enter: Draw 1 card.' },
+  { id: 'CORE-010', name: 'Solar Knight', type: 'Avatar', aspect: 'Glow', cost: 4, attack: 4, health: 5, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/5e8723f8-1f23-4975-986e-604866b7eded/image-455x637.png', effect: 'When this attacks, gain 1 Essence.' },
+  { id: 'CORE-011', name: 'Shadow Assassin', type: 'Avatar', aspect: 'Void', cost: 3, attack: 5, health: 2, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/0b756870-3e2f-47a6-95b0-0763b1eda513/image-455x637.png', effect: 'Breach: Deal 2 damage to target Avatar.' },
+  { id: 'CORE-012', name: 'Neutral Arbiter', type: 'Avatar', aspect: 'Gray', cost: 3, attack: 3, health: 4, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/1934c551-8a26-4618-8058-3423c1b37743/image-455x637.png', effect: 'At the start of your Wake, draw 1 card.' },
+  { id: 'CORE-013', name: 'Dawn Herald', type: 'Avatar', aspect: 'Glow', cost: 5, attack: 5, health: 6, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a7f11775-9274-41b7-8673-4522aa9b1e89/image-455x637.png', effect: 'On Enter: All your Avatars gain +1/+1.' },
+  { id: 'CORE-014', name: 'Abyss Devourer', type: 'Avatar', aspect: 'Void', cost: 5, attack: 6, health: 4, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/8eea507e-d684-4990-b3da-1245a08f3df6/image-455x637.png', effect: 'When this destroys an Avatar, gain 2 Overflow.' },
+  { id: 'CORE-015', name: 'Balance Keeper', type: 'Avatar', aspect: 'Gray', cost: 4, attack: 4, health: 5, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/f461cc07-a43a-4fca-bf03-9079c0861216/image-455x637.png', effect: 'On Enter: If you have fewer cards than opponent, draw until equal.' },
+  { id: 'CORE-016', name: 'Celestial Champion', type: 'Avatar', aspect: 'Glow', cost: 7, attack: 7, health: 8, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/fee6a4bb-cb83-4df8-afff-ea1883ed5341/image-455x637.png', effect: 'On Enter: Gain 3 Essence. Breach: Gain 2 Essence.' },
+  { id: 'CORE-017', name: 'Void Titan', type: 'Avatar', aspect: 'Void', cost: 7, attack: 8, health: 6, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/b75ceff3-3200-4f21-aa3a-fd7747d535a7/image-455x637.png', effect: 'On Enter: Opponent loses 3 Essence. Breach: Opponent loses 2 Essence.' },
+  { id: 'CORE-018', name: 'Cosmic Oracle', type: 'Avatar', aspect: 'Gray', cost: 6, attack: 5, health: 7, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/c4dec5d1-9026-4e4b-91ff-0c4b52135ce2/image-455x637.png', effect: 'On Enter: Draw 3 cards. At end of turn, discard 1 card.' },
+  { id: 'CORE-019', name: 'Light Wisp', type: 'Avatar', aspect: 'Glow', cost: 1, attack: 1, health: 2, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/00540960-6996-49fc-85a5-dfee7986fcee/image-455x637.png', effect: '' },
+  { id: 'CORE-020', name: 'Dark Wisp', type: 'Avatar', aspect: 'Void', cost: 1, attack: 2, health: 1, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/25906cff-2030-4658-8f89-0aca62254bc2/image-455x637.png', effect: '' },
+  { id: 'CORE-021', name: 'Gray Wisp', type: 'Avatar', aspect: 'Gray', cost: 1, attack: 1, health: 1, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/61bad795-426d-4213-940b-2f772a8dc38d/image-455x637.png', effect: 'On Enter: Draw 1 card.' },
+  { id: 'CORE-022', name: 'Sunfire Elemental', type: 'Avatar', aspect: 'Glow', cost: 4, attack: 4, health: 3, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/6f675a0a-857b-4a95-86ff-4f8edf12c95b/image-455x637.png', effect: 'Breach: Deal 1 damage to all enemy Avatars.' },
+  { id: 'CORE-023', name: 'Nightshade Wraith', type: 'Avatar', aspect: 'Void', cost: 4, attack: 3, health: 4, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/c929756b-2c77-4a98-b899-dec520d68c48/image-455x637.png', effect: 'When an enemy Avatar dies, gain 1 Overflow.' },
+  { id: 'CORE-024', name: 'Twilight Sage', type: 'Avatar', aspect: 'Gray', cost: 5, attack: 4, health: 5, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/4e0c0c99-ccf6-4c73-a018-bb28344debfe/image-455x637.png', effect: 'When you draw a card, this gains +1 Attack until end of turn.' },
+  { id: 'CORE-025', name: 'Radiant Seraph', type: 'Avatar', aspect: 'Glow', cost: 6, attack: 5, health: 6, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/0b2aecce-4567-4447-8407-aff25efb7761/image-455x637.png', effect: 'On Enter: Restore 2 Essence. All your Glow Avatars gain +1 Health.' },
+  { id: 'CORE-026', name: 'Void Leviathan', type: 'Avatar', aspect: 'Void', cost: 8, attack: 9, health: 7, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/36d9e021-291b-43ca-83e9-c87e7a6e7441/image-455x637.png', effect: 'On Enter: Destroy target Avatar with 4 or less Health.' },
+  { id: 'CORE-027', name: 'Cosmic Arbiter', type: 'Avatar', aspect: 'Gray', cost: 8, attack: 7, health: 8, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/78fc1490-ec66-4bdb-ae7c-c47142962df5/image-455x637.png', effect: 'On Enter: Draw cards equal to the number of Avatars on New Earth.' },
+  { id: 'CORE-028', name: 'Solar Burst', type: 'Spell', aspect: 'Glow', cost: 2, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/2540d190-f170-4724-9c8d-94d66c3a1a3e/image-455x637.png', effect: 'Deal 3 damage to target Avatar.' },
+  { id: 'CORE-029', name: 'Void Drain', type: 'Spell', aspect: 'Void', cost: 2, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/727d61d8-80e9-44f9-9512-e034497fa609/image-455x637.png', effect: 'Target opponent loses 2 Essence. You gain 1 Overflow.' },
+  { id: 'CORE-030', name: 'Gray Insight', type: 'Spell', aspect: 'Gray', cost: 1, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a8c68212-94a5-4a64-b72e-676e13a9ed2e/image-455x637.png', effect: 'Draw 2 cards.' },
+  { id: 'CORE-031', name: 'Radiant Shield', type: 'Spell', aspect: 'Glow', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/fac8186e-35ff-4be3-b6a7-2e26c3e5464f/image-455x637.png', effect: 'Give target Avatar +0/+4 until end of turn. Gain 2 Essence.' },
+  { id: 'CORE-032', name: 'Shadow Strike', type: 'Spell', aspect: 'Void', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/d7bdce56-0bad-4e44-a5c0-2cb1751ac33d/image-455x637.png', effect: 'Deal 4 damage to target Avatar. If it dies, gain 2 Overflow.' },
+  { id: 'CORE-033', name: 'Balanced Exchange', type: 'Spell', aspect: 'Gray', cost: 2, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/1253ac4a-3e53-4323-8918-b587a08dd073/image-455x637.png', effect: 'Draw 2 cards. Opponent draws 1 card.' },
+  { id: 'CORE-034', name: 'Divine Wrath', type: 'Spell', aspect: 'Glow', cost: 5, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/5284d953-2c7f-4e83-8261-ef77ad3d338c/image-455x637.png', effect: 'Deal 3 damage to all enemy Avatars. Gain 1 Essence for each Avatar destroyed.' },
+  { id: 'CORE-035', name: 'Abyssal Consumption', type: 'Spell', aspect: 'Void', cost: 5, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/456ce495-3697-4ff4-8ada-8c3cfcb9482a/image-455x637.png', effect: 'Destroy target Avatar. Gain Overflow equal to its cost.' },
+  { id: 'CORE-036', name: 'Cosmic Revelation', type: 'Spell', aspect: 'Gray', cost: 4, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/bf729be9-49e3-4093-b0d2-cc44957a7887/image-455x637.png', effect: 'Draw 4 cards. Discard 2 cards.' },
+  { id: 'CORE-037', name: 'Solar Annihilation', type: 'Spell', aspect: 'Glow', cost: 8, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/25849335-d337-4bfd-a98f-d1d19a91dba6/image-455x637.png', effect: 'Deal 6 damage to target Deity. Gain 3 Essence.' },
+  { id: 'CORE-038', name: 'Void Apocalypse', type: 'Spell', aspect: 'Void', cost: 8, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/38af64e7-7a6e-45e8-bc01-5f8fda3ef2ab/image-455x637.png', effect: 'Destroy all Avatars. Gain 1 Overflow for each Avatar destroyed.' },
+  { id: 'CORE-039', name: 'Cosmic Reset', type: 'Spell', aspect: 'Gray', cost: 7, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/77b0f58e-8bb3-4600-8e48-f8d25d066ef7/image-455x637.png', effect: 'Both players shuffle all cards from all zones into their decks and draw 7 cards.' },
+  { id: 'CORE-040', name: 'Sanctuary of Light', type: 'Domain', aspect: 'Glow', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a95eab05-acfd-4431-b26b-521159fc37b0/image-455x637.png', effect: 'At the start of your Wake, gain 1 Essence.' },
+  { id: 'CORE-041', name: 'Void Nexus', type: 'Domain', aspect: 'Void', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/79eaebe1-6b22-4eb1-a424-50a1554716c5/image-455x637.png', effect: 'At the start of your Wake, opponent loses 1 Essence.' },
+  { id: 'CORE-042', name: 'Library of Ages', type: 'Domain', aspect: 'Gray', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/fe17f5a8-202a-4b21-9e65-d26a52e3fdd5/image-455x637.png', effect: 'At the start of your Wake, draw an additional card.' },
+  { id: 'CORE-043', name: 'Temple of the Sun', type: 'Domain', aspect: 'Glow', cost: 5, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/fcb0d486-953c-4994-ad39-0b0a62239e34/image-455x637.png', effect: 'Your Glow Avatars have +1/+1. At Wake, gain 1 Essence.' },
+  { id: 'CORE-044', name: 'Abyssal Throne', type: 'Domain', aspect: 'Void', cost: 5, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/3f1f85f0-8323-41bf-9e6c-210f60126448/image-455x637.png', effect: 'Your Void Avatars have +2 Attack. At Wake, opponent loses 1 Essence.' },
+  { id: 'CORE-045', name: 'Cosmic Sanctum', type: 'Domain', aspect: 'Gray', cost: 5, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/e0d25797-dc98-4547-8787-621f0c1e5f66/image-455x637.png', effect: 'At Wake, draw 1 card. When you draw a card, gain 1 KL (max once per turn).' },
+  { id: 'CORE-046', name: 'Radiant Fortress', type: 'Domain', aspect: 'Glow', cost: 7, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/45825f47-bf1c-41fc-b68d-06151efba573/image-455x637.png', effect: 'Your Deity takes 2 less damage from Breach. At Wake, gain 2 Essence.' },
+  { id: 'CORE-047', name: 'Void Citadel', type: 'Domain', aspect: 'Void', cost: 7, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/b4af6602-522e-425d-9b38-f2c8adb0fd78/image-455x637.png', effect: 'When an enemy Avatar is destroyed, gain 2 Overflow. At Wake, opponent loses 2 Essence.' },
+  { id: 'CORE-048', name: 'Nexus of All', type: 'Domain', aspect: 'Gray', cost: 7, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/b9b3cb00-2f11-4832-bfea-3912524769ec/image-455x637.png', effect: 'At Wake, draw 2 cards and gain 1 KL. Your hand has no maximum size.' },
+  { id: 'CORE-049', name: 'Ember Sprite', type: 'Avatar', aspect: 'Glow', cost: 2, attack: 2, health: 2, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/9ba6bcb2-eb36-460b-9324-3f42ea82ff67/image-455x637.png', effect: 'Breach: Gain 1 Essence.' },
+  { id: 'CORE-050', name: 'Shadow Imp', type: 'Avatar', aspect: 'Void', cost: 2, attack: 2, health: 2, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/5b483424-a745-4860-bffc-565bbf9d9ceb/image-455x637.png', effect: 'Breach: Opponent loses 1 Essence.' },
+  { id: 'CORE-051', name: 'Dusk Wanderer', type: 'Avatar', aspect: 'Gray', cost: 2, attack: 2, health: 2, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/24ee728e-08be-4f72-b57a-a80476ca4ebb/image-455x637.png', effect: 'Breach: Draw 1 card.' },
+  { id: 'CORE-052', name: 'Solar Priest', type: 'Avatar', aspect: 'Glow', cost: 3, attack: 2, health: 4, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/e723195a-755f-4434-9051-008f579a029e/image-455x637.png', effect: 'When you gain Essence, this gains +1 Attack until end of turn.' },
+  { id: 'CORE-053', name: 'Void Cultist', type: 'Avatar', aspect: 'Void', cost: 3, attack: 4, health: 2, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/756a6331-fa47-4b73-b5c3-e0d6e8a51f08/image-455x637.png', effect: 'When opponent loses Essence, gain 1 Overflow.' },
+  { id: 'CORE-054', name: 'Gray Merchant', type: 'Avatar', aspect: 'Gray', cost: 3, attack: 3, health: 3, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/8fcc71ef-8b49-4f08-92e9-e01c4e21b170/image-455x637.png', effect: 'On Enter: You may discard a card to draw 2 cards.' },
+  { id: 'CORE-055', name: 'Aurora Phoenix', type: 'Avatar', aspect: 'Glow', cost: 6, attack: 5, health: 5, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/784eedb0-6fc5-4c60-bb92-083083cb18ae/image-455x637.png', effect: 'When this is destroyed, return it to your hand at end of turn.' },
+  { id: 'CORE-056', name: 'Nightmare Specter', type: 'Avatar', aspect: 'Void', cost: 6, attack: 6, health: 4, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/df2b9bdf-c8f9-42d9-b6bc-10052ebdd260/image-455x637.png', effect: 'When this enters, opponent discards a card.' },
+  { id: 'CORE-057', name: 'Fate Weaver', type: 'Avatar', aspect: 'Gray', cost: 6, attack: 4, health: 6, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/1bcb5abb-f1d1-4de9-aa30-e2e57acaa3f0/image-455x637.png', effect: 'When you draw a card, you may look at the top card of your deck.' },
+  { id: 'CORE-058', name: 'Sunblade Warrior', type: 'Avatar', aspect: 'Glow', cost: 5, attack: 5, health: 4, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/99af5e4c-e00b-44be-b017-b14d7b2672a6/image-455x637.png', effect: 'When this attacks, deal 1 damage to target Avatar.' },
+  { id: 'CORE-059', name: 'Void Reaper', type: 'Avatar', aspect: 'Void', cost: 5, attack: 4, health: 5, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/3bbff02a-6c1a-4bec-b34e-afe8f88529e1/image-455x637.png', effect: 'When this destroys an Avatar, opponent loses 2 Essence.' },
+  { id: 'CORE-060', name: 'Chronicle Keeper', type: 'Avatar', aspect: 'Gray', cost: 5, attack: 3, health: 6, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ded02875-c0ad-42a8-9e44-bf52303057a2/image-455x637.png', effect: 'At end of turn, if you drew 2+ cards this turn, gain +2/+2.' },
+  { id: 'CORE-061', name: 'Blazing Inferno', type: 'Spell', aspect: 'Glow', cost: 4, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/8f780b82-f9d1-4f80-b6b8-341308bcee75/image-455x637.png', effect: 'Deal 2 damage to all Avatars.' },
+  { id: 'CORE-062', name: 'Essence Siphon', type: 'Spell', aspect: 'Void', cost: 4, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/1079484d-1a1f-4771-8cdf-4312908bccab/image-455x637.png', effect: 'Opponent loses 3 Essence. You gain 2 Essence.' },
+  { id: 'CORE-063', name: 'Mind Sync', type: 'Spell', aspect: 'Gray', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/987267e8-9c01-46de-bdfe-9309db8c79cc/image-455x637.png', effect: 'Draw 3 cards. Put 1 card from your hand on top of your deck.' },
+  { id: 'CORE-064', name: 'Healing Light', type: 'Spell', aspect: 'Glow', cost: 2, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/9748fb6d-91fc-4773-9b91-467351e80ff8/image-455x637.png', effect: 'Gain 4 Essence.' },
+  { id: 'CORE-065', name: 'Dark Pact', type: 'Spell', aspect: 'Void', cost: 1, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/6f96bcc6-e1df-4609-ad84-ce1430e1a4c2/image-455x637.png', effect: 'Pay 2 Essence. Gain 3 Overflow.' },
+  { id: 'CORE-066', name: 'Equilibrium', type: 'Spell', aspect: 'Gray', cost: 5, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/d110040e-1ac0-4a72-9e74-9ce9e6fecc62/image-455x637.png', effect: 'Set both players\' Essence to the average of their current Essence (rounded down).' },
+  { id: 'CORE-067', name: 'Righteous Fury', type: 'Spell', aspect: 'Glow', cost: 6, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ce1b3364-7cda-4c91-b178-e783c4a98311/image-455x637.png', effect: 'Deal 5 damage to target. If your Essence is lower than opponent\'s, deal 7 instead.' },
+  { id: 'CORE-068', name: 'Soul Crush', type: 'Spell', aspect: 'Void', cost: 6, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a8e9c34e-e382-4435-a1a1-b0b36fd564f5/image-455x637.png', effect: 'Destroy target Avatar. Its controller loses Essence equal to its cost.' },
+  { id: 'CORE-069', name: 'Temporal Shift', type: 'Spell', aspect: 'Gray', cost: 6, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/7bad3016-4cf3-4819-8b80-60831a005005/image-455x637.png', effect: 'Take an extra Main Phase after this one. Draw 2 cards.' },
+  { id: 'CORE-070', name: 'Crystal Guardian', type: 'Avatar', aspect: 'Glow', cost: 4, attack: 2, health: 6, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/0134bdf1-0426-408d-8b12-222524d47ea6/image-455x637.png', effect: 'Your Deity takes 1 less damage from Breach while this is on New Earth.' },
+  { id: 'CORE-071', name: 'Phantom Blade', type: 'Avatar', aspect: 'Void', cost: 4, attack: 5, health: 3, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/af2ac667-1c45-466f-b3fb-ee43b0dbe011/image-455x637.png', effect: 'When this attacks a Deity, deal 1 extra damage.' },
+  { id: 'CORE-072', name: 'Lore Master', type: 'Avatar', aspect: 'Gray', cost: 4, attack: 3, health: 4, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/36736978-d790-4018-8d71-f726d59a3069/image-455x637.png', effect: 'When you play a Spell, draw 1 card.' },
+  { id: 'CORE-073', name: 'Starfall Mage', type: 'Avatar', aspect: 'Glow', cost: 5, attack: 4, health: 4, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/bef63e06-da60-4f7b-8add-a3606c1c3c2e/image-455x637.png', effect: 'On Enter: Deal 2 damage to target Avatar.' },
+  { id: 'CORE-074', name: 'Abyssal Horror', type: 'Avatar', aspect: 'Void', cost: 7, attack: 7, health: 5, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/0764930c-4be6-464a-8b59-24b0c1b590c0/image-455x637.png', effect: 'On Enter: Each opponent discards 2 cards. Breach: Opponent loses 3 Essence.' },
+  { id: 'CORE-075', name: 'Infinity Watcher', type: 'Avatar', aspect: 'Gray', cost: 7, attack: 5, health: 7, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/bcbe887c-aad8-4203-9b10-9288a8ef8555/image-455x637.png', effect: 'At the start of your Wake, draw 2 cards. You may play an extra card this turn.' },
+  { id: 'CORE-076', name: 'Divine Intervention', type: 'Spell', aspect: 'Glow', cost: 4, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/b195b8b5-3fd7-418a-9184-9120254c3d68/image-455x637.png', effect: 'Prevent all damage that would be dealt to your Deity this turn. Gain 3 Essence.' },
+  { id: 'CORE-077', name: 'Oblivion Gate', type: 'Spell', aspect: 'Void', cost: 7, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/5866ae66-08f9-478d-911c-eebbac330a74/image-455x637.png', effect: 'Exile all Avatars. Gain 2 Overflow for each Avatar exiled this way.' },
+  { id: 'CORE-078', name: 'Knowledge is Power', type: 'Spell', aspect: 'Gray', cost: 5, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/2c1686cb-12ce-42af-b0d6-aebd4fe39a4a/image-455x637.png', effect: 'Draw cards equal to the number of cards in your hand.' },
+  { id: 'CORE-079', name: 'Garden of Eternity', type: 'Domain', aspect: 'Glow', cost: 4, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a7430516-0979-4553-8fda-9e6eadcca03b/image-455x637.png', effect: 'When you play a Glow card, gain 1 extra Essence. At Wake, gain 1 Essence.' },
+  { id: 'CORE-080', name: 'Rift of Despair', type: 'Domain', aspect: 'Void', cost: 4, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/fa089caa-154b-4627-9f68-f9bff9eae77b/image-455x637.png', effect: 'When you play a Void card, opponent loses 1 extra Essence. At Wake, opponent loses 1 Essence.' },
+  { id: 'CORE-081', name: 'Archive of Infinity', type: 'Domain', aspect: 'Gray', cost: 4, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/504253d1-3243-455e-a80f-3a4894cb98f2/image-455x637.png', effect: 'When you play a Gray card, draw 1 extra card. No maximum hand size.' },
+  { id: 'CORE-082', name: 'Prism Knight', type: 'Avatar', aspect: 'Glow', cost: 6, attack: 6, health: 5, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/7e69cd12-9579-4867-bc19-d6ab6e188c6d/image-455x637.png', effect: 'On Enter: Choose Glow, Void, or Gray. This gains that aspect\'s trigger effect when attacking.' },
+  { id: 'CORE-083', name: 'Entropy Weaver', type: 'Avatar', aspect: 'Void', cost: 6, attack: 5, health: 5, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/42a05590-a971-46af-b1f1-e99d00c0aced/image-455x637.png', effect: 'When opponent loses Essence, gain that much Overflow.' },
+  { id: 'CORE-084', name: 'Reality Anchor', type: 'Avatar', aspect: 'Gray', cost: 6, attack: 4, health: 7, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/acf411a9-6426-4c57-b860-bcbd9a25d258/image-455x637.png', effect: 'Domains cannot be replaced while this is on New Earth.' },
+  { id: 'CORE-085', name: 'Solaris Prime', type: 'Avatar', aspect: 'Glow', cost: 9, attack: 8, health: 9, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/5160f80d-eb30-45a3-9dc3-f96e8e11958a/image-455x637.png', effect: 'On Enter: Gain 5 Essence. Your Glow cards cost 1 less KL. Breach: Gain 3 Essence.' },
+  { id: 'CORE-086', name: 'Nyx Incarnate', type: 'Avatar', aspect: 'Void', cost: 9, attack: 9, health: 8, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/f2fc8550-e011-40a6-9674-6ba1d53506ac/image-455x637.png', effect: 'On Enter: Opponent loses 5 Essence. Your Void cards cost 1 less KL. Breach: Opponent loses 3 Essence.' },
+  { id: 'CORE-087', name: 'Omniscient One', type: 'Avatar', aspect: 'Gray', cost: 9, attack: 7, health: 10, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/bc94c546-7f88-46e5-bc73-20888ca376ea/image-455x637.png', effect: 'On Enter: Draw 5 cards. Your Gray cards cost 1 less KL. At Wake, draw 2 extra cards.' },
+  { id: 'CORE-088', name: 'Spark of Creation', type: 'Spell', aspect: 'Glow', cost: 1, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/9d73261e-be94-464d-b669-2d2ee409ed51/image-455x637.png', effect: 'Gain 2 Essence.' },
+  { id: 'CORE-089', name: 'Touch of Void', type: 'Spell', aspect: 'Void', cost: 1, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/4fb7bf1c-7194-43a0-9553-b8fbdbc73add/image-455x637.png', effect: 'Deal 2 damage to target Avatar.' },
+  { id: 'CORE-090', name: 'Quick Study', type: 'Spell', aspect: 'Gray', cost: 0, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ea5cc979-2cc1-44f2-a02f-f87eaa898eea/image-455x637.png', effect: 'Draw 1 card.' },
+  { id: 'CORE-091', name: 'Blessing of the Sun', type: 'Spell', aspect: 'Glow', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/95cc1d97-13ba-4fad-a195-8a869a42237d/image-455x637.png', effect: 'Give target Avatar +2/+2. Gain 2 Essence.' },
+  { id: 'CORE-092', name: 'Curse of Shadows', type: 'Spell', aspect: 'Void', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/2c4ab895-0025-4db2-b0d7-d04b08fab654/image-455x637.png', effect: 'Give target Avatar -3/-3 until end of turn.' },
+  { id: 'CORE-093', name: 'Shared Vision', type: 'Spell', aspect: 'Gray', cost: 2, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ce33360e-8a3f-45ae-9c61-641cb6b4e4d4/image-455x637.png', effect: 'Both players draw 2 cards.' },
+  { id: 'CORE-094', name: 'Corona Blast', type: 'Spell', aspect: 'Glow', cost: 7, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a1e2705b-ba5d-4496-b31e-b383272bd315/image-455x637.png', effect: 'Deal 4 damage to all enemies (Avatars and Deity). Gain 2 Essence.' },
+  { id: 'CORE-095', name: 'Total Eclipse', type: 'Spell', aspect: 'Void', cost: 9, attack: 0, health: 0, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/5586f55f-3057-4087-b1d7-b204ddecf2fe/image-455x637.png', effect: 'Destroy all Avatars. Opponent loses 1 Essence for each Avatar destroyed. Gain 3 Overflow.' },
+  { id: 'CORE-096', name: 'Infinite Library', type: 'Spell', aspect: 'Gray', cost: 8, attack: 0, health: 0, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/c0e17e40-b777-4ba0-90b4-37abb4ad09e2/image-455x637.png', effect: 'Draw 7 cards. Your maximum hand size is increased by 5 for the rest of the game.' },
+  { id: 'CORE-097', name: 'Solar Conduit', type: 'Avatar', aspect: 'Glow', cost: 3, attack: 2, health: 3, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/b1a643d4-46f3-464a-8b8e-01b1ade5de2d/image-455x637.png', effect: 'When you gain Essence from a card effect, gain 1 extra Essence.' },
+  { id: 'CORE-098', name: 'Void Conduit', type: 'Avatar', aspect: 'Void', cost: 3, attack: 3, health: 2, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/b798bd37-2e20-4604-ad8e-160d7c16b959/image-455x637.png', effect: 'When opponent loses Essence from a card effect, they lose 1 extra Essence.' },
+  { id: 'CORE-099', name: 'Gray Conduit', type: 'Avatar', aspect: 'Gray', cost: 3, attack: 2, health: 3, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/dfd82006-fc64-4688-8aea-a367942266e7/image-455x637.png', effect: 'When you draw a card from a card effect, draw 1 extra card.' },
+  { id: 'CORE-100', name: 'Aspect Shifter', type: 'Avatar', aspect: 'Gray', cost: 4, attack: 3, health: 4, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/50b7379b-502c-4508-b70d-ec3f4ff85b1b/image-455x637.png', effect: 'On Enter: Choose Glow or Void. This gains that aspect in addition to Gray.' },
+  { id: 'CORE-101', name: 'Crown Seeker', type: 'Avatar', aspect: 'Gray', cost: 5, attack: 4, health: 4, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/72cb638c-2090-44ef-b713-2b575582966e/image-455x637.png', effect: 'When you gain a God Code charge, this gains +3/+3.' },
+  { id: 'CORE-102', name: 'Overflow Channeler', type: 'Avatar', aspect: 'Void', cost: 4, attack: 3, health: 4, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ca9986b1-42bc-4582-8bb7-e65ad82783a4/image-455x637.png', effect: 'At the end of your turn, gain 1 Overflow.' },
+  { id: 'CORE-103', name: 'KL Amplifier', type: 'Avatar', aspect: 'Glow', cost: 4, attack: 3, health: 3, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a4dc7d6a-ca8e-4bc7-b669-e400638bbe9d/image-455x637.png', effect: 'At the start of your Wake, if your KL Max is less than 13, gain 1 extra KL Max.' },
+  { id: 'CORE-104', name: 'Shard Collector', type: 'Avatar', aspect: 'Gray', cost: 5, attack: 4, health: 5, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/8056efc8-f081-4967-b7b9-f360d80ecc07/image-455x637.png', effect: 'When you play a card of each aspect in a single turn, gain 1 God Code charge (max 2).' },
+  { id: 'CORE-105', name: 'Essence Thief', type: 'Avatar', aspect: 'Void', cost: 5, attack: 4, health: 4, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/24c4dca5-0fb0-4b18-af85-24bf0695e515/image-455x637.png', effect: 'Breach: Steal 2 Essence from opponent (they lose 2, you gain 2).' },
+  { id: 'CORE-106', name: 'Light Bringer', type: 'Avatar', aspect: 'Glow', cost: 5, attack: 4, health: 5, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/d04f49fa-ea21-4ff4-9421-1c824d7d5d55/image-455x637.png', effect: 'On Enter: All friendly Glow Avatars heal 2 Health.' },
+  { id: 'CORE-107', name: 'Dual Aspect Sage', type: 'Avatar', aspect: 'Gray', cost: 6, attack: 5, health: 5, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/593a2696-c27c-4513-9e5f-5edd43e5faf8/image-455x637.png', effect: 'This has all three aspects. When played, trigger all three aspect effects.' },
+  { id: 'CORE-108', name: 'Overflow Bomb', type: 'Spell', aspect: 'Void', cost: 4, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/50ff0eed-c978-4cb0-8a81-f26ffc8b86a2/image-455x637.png', effect: 'Deal damage to target equal to your current Overflow. Reset Overflow to 0.' },
+  { id: 'CORE-109', name: 'Crown Charge', type: 'Spell', aspect: 'Gray', cost: 10, attack: 0, health: 0, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/f7d0f1e3-5ce6-40d3-baf3-a2dd9a2adc56/image-455x637.png', effect: 'Gain 1 God Code charge (max 2). Draw 3 cards.' },
+  { id: 'CORE-110', name: 'Essence Transfer', type: 'Spell', aspect: 'Glow', cost: 3, attack: 0, health: 0, rarity: 'Uncommon', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/c1eaaa54-2a8d-469f-b06b-37b350796c4f/image-455x637.png', effect: 'Move up to 3 Essence from your Deity to target friendly Avatar as +0/+3.' },
+  { id: 'CORE-111', name: 'Void Passage', type: 'Spell', aspect: 'Void', cost: 2, attack: 0, health: 0, rarity: 'Common', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/2859615e-1970-4016-8078-3997cbfcb717/image-455x637.png', effect: 'Return target Avatar to its owner\'s hand.' },
+  { id: 'CORE-112', name: 'Knowledge Cascade', type: 'Spell', aspect: 'Gray', cost: 4, attack: 0, health: 0, rarity: 'Rare', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/113a4526-2ba0-4263-a047-8238a0e32a69/image-455x637.png', effect: 'Draw 1 card for each card you\'ve drawn this turn.' },
+  { id: 'CORE-113', name: 'Unified Domain', type: 'Domain', aspect: 'Gray', cost: 6, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a18cfa6d-7df0-439e-aadb-95943a5578dd/image-455x637.png', effect: 'All your cards count as all three aspects. At Wake, gain 1 Essence, opponent loses 1 Essence, draw 1 card.' },
+  { id: 'CORE-114', name: 'Celestial Observatory', type: 'Domain', aspect: 'Glow', cost: 6, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/4bd5d222-9f96-4520-bed5-ed7f985ae58f/image-455x637.png', effect: 'At Wake, gain 2 Essence. When you gain Essence, you may pay 1 KL to draw a card.' },
+  { id: 'CORE-115', name: 'Heart of the Void', type: 'Domain', aspect: 'Void', cost: 6, attack: 0, health: 0, rarity: 'Epic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/c6157b02-2c5e-4a6f-a2ac-7a4b35db948f/image-455x637.png', effect: 'At Wake, opponent loses 2 Essence. When opponent loses Essence, gain 1 Overflow.' },
+  { id: 'CORE-116', name: 'Primordial Dawn', type: 'Avatar', aspect: 'Glow', cost: 10, attack: 10, health: 10, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/22c614d5-b741-43f4-bae0-8e128795b3e5/image-455x637.png', effect: 'On Enter: Gain 10 Essence. All damage dealt to your Deity is reduced by half (rounded up).' },
+  { id: 'CORE-117', name: 'Primordial Void', type: 'Avatar', aspect: 'Void', cost: 10, attack: 11, health: 9, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/a15b1ee6-27b0-4636-9de7-cab4f0fa94bc/image-455x637.png', effect: 'On Enter: Opponent loses 10 Essence. Breach: Opponent loses Essence equal to this Avatar\'s Attack.' },
+  { id: 'CORE-118', name: 'Primordial Gray', type: 'Avatar', aspect: 'Gray', cost: 10, attack: 8, health: 12, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/d4592ebd-1338-44f9-ac46-a9dcda7f5b2d/image-455x637.png', effect: 'On Enter: Draw 10 cards. You may play cards from your hand without paying KL costs this turn.' },
+  { id: 'CORE-119', name: 'Genesis Wave', type: 'Spell', aspect: 'Glow', cost: 10, attack: 0, health: 0, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/ea3ffc8b-7e87-4644-8a8c-92e97d21533e/image-455x637.png', effect: 'Set your Essence to 23. All your Avatars gain +3/+3.' },
+  { id: 'CORE-120', name: 'Apocalypse Wave', type: 'Spell', aspect: 'Void', cost: 10, attack: 0, health: 0, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/e5f5064f-502d-4fc6-84b1-cea1f2e207b0/image-455x637.png', effect: 'Set opponent\'s Essence to 10. Destroy all their Avatars. Gain 5 Overflow.' },
+  { id: 'CORE-121', name: 'Cosmic Wave', type: 'Spell', aspect: 'Gray', cost: 10, attack: 0, health: 0, rarity: 'Mythic', image: 'https://www.solenterprises.org/wp-content/uploads/go-x/u/137c3d21-ec70-4add-8239-2988222c5bcc/image-455x637.png', effect: 'Draw 10 cards. Gain 1 God Code charge (max 2). Take an extra turn after this one.' }
+];
+
+const DEITIES = ALL_CARDS.filter(card => card.type === 'Deity');
+const AVATARS = ALL_CARDS.filter(card => card.type === 'Avatar');
+const SPELLS = ALL_CARDS.filter(card => card.type === 'Spell');
+const DOMAINS = ALL_CARDS.filter(card => card.type === 'Domain');
+
+function getCardById(id) {
+  return ALL_CARDS.find(card => card.id === id);
+}
+
+function getCardsByType(type) {
+  return ALL_CARDS.filter(card => card.type === type);
+}
+
+function getCardsByAspect(aspect) {
+  return ALL_CARDS.filter(card => card.aspect === aspect);
+}
+
+function getCardsByRarity(rarity) {
+  return ALL_CARDS.filter(card => card.rarity === rarity);
+}
+
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+  </script>
+  <script>
+const GameState = {
+  currentScreen: 'welcome',
+  theme: localStorage.getItem('essence-crown-theme') || 'dark-void',
+  animationSpeed: parseFloat(localStorage.getItem('essence-crown-animation-speed')) || 1,
+  rulesHelper: {
+    enabled: true,
+    autoWake: true,
+    autoAspect: true,
+    autoKL: true,
+    autoCombat: true,
+    autoOverflow: true,
+    showLog: true
+  },
+  players: {
+    1: {
+      deity: null,
+      deck: [],
+      hand: [],
+      newEarth: [],
+      domain: null,
+      discard: [],
+      exile: [],
+      essence: 23,
+      klMax: 3,
+      kl: 3,
+      overflow: 0,
+      godCodeCharges: 1,
+      godCodeUsed: 0
+    },
+    2: {
+      deity: null,
+      deck: [],
+      hand: [],
+      newEarth: [],
+      domain: null,
+      discard: [],
+      exile: [],
+      essence: 23,
+      klMax: 3,
+      kl: 3,
+      overflow: 0,
+      godCodeCharges: 1,
+      godCodeUsed: 0
+    }
+  },
+  currentPlayer: 1,
+  turnNumber: 1,
+  currentPhase: 'wake',
+  phases: ['wake', 'main1', 'breach', 'main2', 'fade'],
+  selectedCard: null,
+  combatState: {
+    attacker: null,
+    target: null,
+    isSelecting: false
+  },
+  cardStates: new Map(),
+  gameStarted: false,
+  gameOver: false
+};
+
+let fxCanvas, fxCtx;
+let particles = [];
+let animationFrameId;
+
+function init() {
+  applyTheme(GameState.theme);
+  setupEventListeners();
+  initParticleBackground();
+  initFXCanvas();
+  
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const theme = btn.dataset.theme;
+      applyTheme(theme);
+      GameState.theme = theme;
+      localStorage.setItem('essence-crown-theme', theme);
+    });
+  });
+}
+
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+}
+
+function setupEventListeners() {
+  document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
+  document.getElementById('btn-fullscreen-toggle').addEventListener('click', toggleFullscreen);
+  document.getElementById('btn-start').addEventListener('click', () => showScreen('deity-selection'));
+  document.getElementById('btn-back-welcome').addEventListener('click', () => showScreen('welcome'));
+  document.getElementById('btn-deck-setup').addEventListener('click', () => {
+    showScreen('deck-builder');
+    populateCardLibrary();
+  });
+  document.getElementById('btn-back-deity').addEventListener('click', () => showScreen('deity-selection'));
+  document.getElementById('btn-start-game').addEventListener('click', startGame);
+  document.getElementById('btn-next-phase').addEventListener('click', nextPhase);
+  document.getElementById('btn-end-turn').addEventListener('click', endTurn);
+
+  document.getElementById('filter-type').addEventListener('change', filterLibrary);
+  document.getElementById('filter-aspect').addEventListener('change', filterLibrary);
+  document.getElementById('filter-cost').addEventListener('change', filterLibrary);
+
+  document.getElementById('toggle-rules-helper').addEventListener('change', (e) => {
+    GameState.rulesHelper.enabled = e.target.checked;
+    document.querySelector('.helper-options').style.opacity = e.target.checked ? '1' : '0.5';
+  });
+  
+  document.getElementById('toggle-auto-wake').addEventListener('change', (e) => GameState.rulesHelper.autoWake = e.target.checked);
+  document.getElementById('toggle-auto-aspect').addEventListener('change', (e) => GameState.rulesHelper.autoAspect = e.target.checked);
+  document.getElementById('toggle-auto-kl').addEventListener('change', (e) => GameState.rulesHelper.autoKL = e.target.checked);
+  document.getElementById('toggle-auto-combat').addEventListener('change', (e) => GameState.rulesHelper.autoCombat = e.target.checked);
+  document.getElementById('toggle-auto-overflow').addEventListener('change', (e) => GameState.rulesHelper.autoOverflow = e.target.checked);
+  document.getElementById('toggle-helper-log').addEventListener('change', (e) => {
+    GameState.rulesHelper.showLog = e.target.checked;
+    document.getElementById('game-log').style.display = e.target.checked ? 'flex' : 'none';
+  });
+
+  document.getElementById('animation-speed').addEventListener('input', (e) => {
+    const speed = parseFloat(e.target.value);
+    GameState.animationSpeed = speed;
+    document.getElementById('speed-label').textContent = speed + 'x';
+    document.documentElement.style.setProperty('--animation-speed', speed);
+    localStorage.setItem('essence-crown-animation-speed', speed);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.context-menu')) {
+      hideContextMenu();
+    }
+  });
+
+  document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', handleContextMenuAction);
+  });
+
+  setupDeitySelection();
+  setupDragAndDrop();
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      console.log('Fullscreen error:', err);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+function showScreen(screenName) {
+  document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+  document.getElementById(screenName + '-screen').classList.add('active');
+  GameState.currentScreen = screenName;
+  
+  if (screenName === 'deity-selection') {
+    populateDeityGrids();
+  }
+}
+
+function toggleSettings() {
+  document.getElementById('settings-panel').classList.toggle('hidden');
+}
+
+function initParticleBackground() {
+  const canvas = document.getElementById('particles-bg');
+  const ctx = canvas.getContext('2d');
+  
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const stars = [];
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 2 + 0.5,
+      speed: Math.random() * 0.5 + 0.1,
+      opacity: Math.random()
+    });
+  }
+
+  function animate() {
+    ctx.fillStyle = 'rgba(10, 10, 18, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    stars.forEach(star => {
+      star.opacity += (Math.random() - 0.5) * 0.02;
+      star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+      
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 215, 0, ${star.opacity * 0.5})`;
+      ctx.fill();
+      
+      star.y += star.speed;
+      if (star.y > canvas.height) {
+        star.y = 0;
+        star.x = Math.random() * canvas.width;
+      }
+    });
+    
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+function initFXCanvas() {
+  fxCanvas = document.getElementById('fx-canvas');
+  fxCtx = fxCanvas.getContext('2d');
+  
+  function resize() {
+    fxCanvas.width = window.innerWidth;
+    fxCanvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  animateFX();
+}
+
+function animateFX() {
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+  
+  particles = particles.filter(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    p.size *= 0.98;
+    
+    if (p.life <= 0) return false;
+    
+    fxCtx.beginPath();
+    fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    fxCtx.fillStyle = p.color.replace(')', `, ${p.life})`).replace('rgb', 'rgba');
+    fxCtx.fill();
+    
+    return true;
+  });
+  
+  animationFrameId = requestAnimationFrame(animateFX);
+}
+
+function createParticles(x, y, color, count = 20) {
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+    const speed = Math.random() * 5 + 2;
+    particles.push({
+      x: x,
+      y: y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: Math.random() * 8 + 4,
+      color: color,
+      life: 1,
+      decay: 0.02 + Math.random() * 0.02
+    });
+  }
+}
+
+function createAspectParticles(x, y, aspect) {
+  const colors = {
+    'Glow': 'rgb(255, 215, 0)',
+    'Void': 'rgb(157, 78, 221)',
+    'Gray': 'rgb(192, 192, 192)'
+  };
+  createParticles(x, y, colors[aspect] || colors['Gray'], 30);
+}
+
+function populateDeityGrids() {
+  const deities = DEITIES;
+  
+  ['p1', 'p2'].forEach(player => {
+    const grid = document.getElementById(`${player}-deity-grid`);
+    grid.innerHTML = '';
+    
+    deities.forEach(deity => {
+      const card = document.createElement('div');
+      card.className = 'deity-card-option';
+      card.dataset.deityId = deity.id;
+      card.innerHTML = `<img src="${deity.image}" alt="${deity.name}" loading="lazy">`;
+      card.addEventListener('click', () => selectDeity(player, deity));
+      grid.appendChild(card);
+    });
+  });
+}
+
+function selectDeity(player, deity) {
+  const playerNum = player === 'p1' ? 1 : 2;
+  GameState.players[playerNum].deity = deity;
+  
+  const grid = document.getElementById(`${player}-deity-grid`);
+  grid.querySelectorAll('.deity-card-option').forEach(card => {
+    card.classList.toggle('selected', card.dataset.deityId === deity.id);
+  });
+  
+  const preview = document.getElementById(`${player}-preview`);
+  preview.querySelector('.deity-preview-card').innerHTML = `<img src="${deity.image}" alt="${deity.name}">`;
+  preview.querySelector('.deity-name').textContent = deity.name;
+  preview.querySelector('.deity-passive').innerHTML = `<strong>Passive:</strong> ${deity.passive || 'None'}`;
+  preview.querySelector('.deity-godcode').innerHTML = `<strong>God Code:</strong> ${deity.godCode || 'None'}`;
+  
+  checkDeitySelectionComplete();
+}
+
+function checkDeitySelectionComplete() {
+  const p1Selected = GameState.players[1].deity !== null;
+  const p2Selected = GameState.players[2].deity !== null;
+  document.getElementById('btn-deck-setup').disabled = !(p1Selected && p2Selected);
+}
+
+function setupDeitySelection() {
+  populateDeityGrids();
+}
+
+function populateCardLibrary() {
+  const grid = document.getElementById('library-grid');
+  grid.innerHTML = '';
+  
+  const playableCards = ALL_CARDS.filter(card => card.type !== 'Deity');
+  
+  playableCards.forEach(card => {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'library-card';
+    cardEl.dataset.cardId = card.id;
+    cardEl.innerHTML = `
+      <img src="${card.image}" alt="${card.name}" loading="lazy">
+      <span class="card-cost">${card.cost}</span>
+    `;
+    
+    cardEl.addEventListener('click', () => addCardToDeck(card, 1));
+    cardEl.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      addCardToDeck(card, 2);
+    });
+    cardEl.addEventListener('dblclick', () => showCardZoom(card));
+    
+    grid.appendChild(cardEl);
+  });
+}
+
+function filterLibrary() {
+  const typeFilter = document.getElementById('filter-type').value;
+  const aspectFilter = document.getElementById('filter-aspect').value;
+  const costFilter = document.getElementById('filter-cost').value;
+  
+  document.querySelectorAll('.library-card').forEach(cardEl => {
+    const cardId = cardEl.dataset.cardId;
+    const card = getCardById(cardId);
+    
+    let show = true;
+    
+    if (typeFilter !== 'all' && card.type !== typeFilter) show = false;
+    if (aspectFilter !== 'all' && card.aspect !== aspectFilter) show = false;
+    if (costFilter !== 'all') {
+      const cost = card.cost;
+      if (costFilter === '0-2' && cost > 2) show = false;
+      if (costFilter === '3-5' && (cost < 3 || cost > 5)) show = false;
+      if (costFilter === '6-8' && (cost < 6 || cost > 8)) show = false;
+      if (costFilter === '9+' && cost < 9) show = false;
+    }
+    
+    cardEl.style.display = show ? 'block' : 'none';
+  });
+}
+
+function addCardToDeck(card, player) {
+  const deck = GameState.players[player].deck;
+  const existingCount = deck.filter(c => c.id === card.id).length;
+  
+  if (existingCount >= 4) {
+    logMessage(`Cannot add more than 4 copies of ${card.name}`, 'warning');
+    return;
+  }
+  
+  deck.push({ ...card, instanceId: generateId() });
+  updateDeckDisplay(player);
+  checkDeckRequirements();
+}
+
+function removeCardFromDeck(instanceId, player) {
+  const deck = GameState.players[player].deck;
+  const index = deck.findIndex(c => c.instanceId === instanceId);
+  if (index > -1) {
+    deck.splice(index, 1);
+    updateDeckDisplay(player);
+    checkDeckRequirements();
+  }
+}
+
+function updateDeckDisplay(player) {
+  const listEl = document.getElementById(`p${player}-deck-list`);
+  const deck = GameState.players[player].deck;
+  
+  listEl.innerHTML = '';
+  deck.forEach(card => {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'deck-card-mini';
+    cardEl.innerHTML = `<img src="${card.image}" alt="${card.name}">`;
+    cardEl.addEventListener('click', () => removeCardFromDeck(card.instanceId, player));
+    listEl.appendChild(cardEl);
+  });
+  
+  const countEl = document.querySelector(`#p${player}-deck-panel .deck-count`);
+  countEl.textContent = `(${deck.length}/20)`;
+}
+
+function autoFillDeck(player) {
+  const deck = GameState.players[player].deck;
+  const playableCards = ALL_CARDS.filter(card => card.type !== 'Deity');
+  
+  while (deck.length < 20) {
+    const randomCard = playableCards[Math.floor(Math.random() * playableCards.length)];
+    const existingCount = deck.filter(c => c.id === randomCard.id).length;
+    
+    if (existingCount < 4) {
+      deck.push({ ...randomCard, instanceId: generateId() });
+    }
+  }
+  
+  updateDeckDisplay(player);
+  checkDeckRequirements();
+}
+
+function clearDeck(player) {
+  GameState.players[player].deck = [];
+  updateDeckDisplay(player);
+  checkDeckRequirements();
+}
+
+function checkDeckRequirements() {
+  const p1Ready = GameState.players[1].deck.length >= 20;
+  const p2Ready = GameState.players[2].deck.length >= 20;
+  document.getElementById('btn-start-game').disabled = !(p1Ready && p2Ready);
+}
+
+function generateId() {
+  return 'card_' + Math.random().toString(36).substr(2, 9);
+}
+
+function startGame() {
+  [1, 2].forEach(player => {
+    const state = GameState.players[player];
+    state.deck = shuffleArray([...state.deck]);
+    state.hand = [];
+    state.newEarth = [];
+    state.domain = null;
+    state.discard = [];
+    state.exile = [];
+    state.essence = 23;
+    state.klMax = 3;
+    state.kl = 3;
+    state.overflow = 0;
+    state.godCodeCharges = 1;
+    state.godCodeUsed = 0;
+    
+    for (let i = 0; i < 5; i++) {
+      if (state.deck.length > 0) {
+        state.hand.push(state.deck.pop());
+      }
+    }
+  });
+  
+  GameState.currentPlayer = 1;
+  GameState.turnNumber = 1;
+  GameState.currentPhase = 'wake';
+  GameState.gameStarted = true;
+  GameState.gameOver = false;
+  
+  showScreen('game');
+  renderGameBoard();
+  updatePhaseDisplay();
+  
+  logMessage('Game Started! Player 1 goes first.', 'phase');
+  announcePhase('WAKE PHASE');
+  
+  if (GameState.rulesHelper.enabled && GameState.rulesHelper.autoWake) {
+    setTimeout(() => executeWakePhase(1), 1500);
+  }
+}
+
+function renderGameBoard() {
+  [1, 2].forEach(player => {
+    const state = GameState.players[player];
+    
+    const deityDisplay = document.getElementById(`p${player}-deity-display`);
+    if (state.deity) {
+      deityDisplay.innerHTML = `<img src="${state.deity.image}" alt="${state.deity.name}">`;
+    }
+    
+    updatePlayerStats(player);
+    renderHand(player);
+    renderNewEarth(player);
+    renderDomain(player);
+    updateZoneCounts(player);
+  });
+}
+
+function updatePlayerStats(player) {
+  const state = GameState.players[player];
+  
+  document.getElementById(`p${player}-essence`).textContent = state.essence;
+  document.getElementById(`p${player}-essence-bar`).style.width = `${(state.essence / 23) * 100}%`;
+  document.getElementById(`p${player}-kl`).textContent = state.kl;
+  document.getElementById(`p${player}-kl-max`).textContent = state.klMax;
+  document.getElementById(`p${player}-overflow`).textContent = state.overflow;
+  document.getElementById(`p${player}-godcode`).textContent = state.godCodeCharges;
+  
+  const orbsContainer = document.getElementById(`p${player}-kl-orbs`);
+  orbsContainer.innerHTML = '';
+  for (let i = 0; i < state.klMax; i++) {
+    const orb = document.createElement('div');
+    orb.className = 'kl-orb' + (i < state.kl ? ' filled' : '');
+    orbsContainer.appendChild(orb);
+  }
+  
+  const godCodeBtn = document.getElementById(`p${player}-godcode-btn`);
+  godCodeBtn.disabled = state.godCodeCharges <= 0 || state.godCodeUsed >= 2;
+  
+  checkGameOver();
+}
+
+function renderHand(player) {
+  const handContainer = document.querySelector(`#p${player}-hand .hand-cards`);
+  const state = GameState.players[player];
+  
+  handContainer.innerHTML = '';
+  state.hand.forEach(card => {
+    const cardEl = createCardElement(card, player, 'hand');
+    handContainer.appendChild(cardEl);
+  });
+}
+
+function renderNewEarth(player) {
+  const container = document.querySelector(`#p${player}-new-earth .card-slots`);
+  const state = GameState.players[player];
+  
+  container.innerHTML = '';
+  state.newEarth.forEach(card => {
+    const cardEl = createCardElement(card, player, 'newEarth');
+    container.appendChild(cardEl);
+  });
+}
+
+function renderDomain(player) {
+  const container = document.getElementById(`p${player}-domain`);
+  const state = GameState.players[player];
+  
+  const existingCards = container.querySelectorAll('.card');
+  existingCards.forEach(c => c.remove());
+  
+  if (state.domain) {
+    const cardEl = createCardElement(state.domain, player, 'domain');
+    container.appendChild(cardEl);
+  }
+}
+
+function updateZoneCounts(player) {
+  const state = GameState.players[player];
+  
+  document.querySelector(`#p${player}-deck .zone-count`).textContent = state.deck.length;
+  document.querySelector(`#p${player}-discard .zone-count`).textContent = state.discard.length;
+  document.querySelector(`#p${player}-exile .zone-count`).textContent = state.exile.length;
+}
+
+function createCardElement(card, player, zone) {
+  const cardEl = document.createElement('div');
+  cardEl.className = 'card';
+  cardEl.dataset.cardId = card.id;
+  cardEl.dataset.instanceId = card.instanceId;
+  cardEl.dataset.player = player;
+  cardEl.dataset.zone = zone;
+  cardEl.draggable = true;
+  
+  const cardState = GameState.cardStates.get(card.instanceId) || { tapped: false, faceDown: false };
+  if (cardState.tapped) cardEl.classList.add('tapped');
+  if (cardState.faceDown) cardEl.classList.add('face-down');
+  
+  cardEl.innerHTML = `
+    <img src="${cardState.faceDown ? CARD_BACK_URL : card.image}" alt="${card.name}">
+    ${card.aspect ? `<div class="aspect-indicator ${card.aspect.toLowerCase()}"></div>` : ''}
+    <span class="card-cost-badge">${card.cost}</span>
+    ${card.type === 'Avatar' ? `
+      <div class="card-stats">
+        <span class="card-attack">${card.attack}</span>
+        <span class="card-health">${card.health}</span>
+      </div>
+    ` : ''}
+  `;
+  
+  cardEl.addEventListener('click', (e) => handleCardClick(e, card, player, zone));
+  cardEl.addEventListener('contextmenu', (e) => handleCardRightClick(e, card, player, zone));
+  cardEl.addEventListener('dblclick', () => showCardZoom(card));
+  cardEl.addEventListener('dragstart', handleDragStart);
+  cardEl.addEventListener('dragend', handleDragEnd);
+  
+  return cardEl;
+}
+
+function handleCardClick(e, card, player, zone) {
+  e.stopPropagation();
+  
+  if (GameState.combatState.isSelecting) {
+    if (!GameState.combatState.attacker) {
+      if (player === GameState.currentPlayer && zone === 'newEarth' && card.type === 'Avatar') {
+        selectAttacker(card);
+      }
+    } else if (!GameState.combatState.target) {
+      const opponent = GameState.currentPlayer === 1 ? 2 : 1;
+      if (player === opponent && (zone === 'newEarth' || zone === 'deity')) {
+        selectTarget(card, zone === 'deity');
+      }
+    }
+    return;
+  }
+  
+  if (zone === 'hand' && player === GameState.currentPlayer) {
+    if (['main1', 'main2'].includes(GameState.currentPhase)) {
+      tryPlayCard(card, player);
+    }
+  }
+}
+
+function handleCardRightClick(e, card, player, zone) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  GameState.selectedCard = { card, player, zone };
+  showContextMenu(e.clientX, e.clientY, card, zone);
+}
+
+function showContextMenu(x, y, card, zone) {
+  const menu = document.getElementById('context-menu');
+  menu.classList.remove('hidden');
+  
+  menu.style.left = `${Math.min(x, window.innerWidth - 200)}px`;
+  menu.style.top = `${Math.min(y, window.innerHeight - 300)}px`;
+  
+  menu.querySelectorAll('.menu-item').forEach(item => {
+    const action = item.dataset.action;
+    item.style.display = 'block';
+    
+    if (action === 'attack' && (zone !== 'newEarth' || card.type !== 'Avatar')) {
+      item.style.display = 'none';
+    }
+  });
+}
+
+function hideContextMenu() {
+  document.getElementById('context-menu').classList.add('hidden');
+  GameState.selectedCard = null;
+}
+
+function handleContextMenuAction(e) {
+  const action = e.target.dataset.action;
+  if (!action || !GameState.selectedCard) return;
+  
+  const { card, player, zone } = GameState.selectedCard;
+  
+  switch (action) {
+    case 'tap':
+      toggleTap(card);
+      break;
+    case 'flip':
+      toggleFaceDown(card);
+      break;
+    case 'to-hand':
+      moveCard(card, player, zone, 'hand');
+      break;
+    case 'to-new-earth':
+      moveCard(card, player, zone, 'newEarth');
+      break;
+    case 'to-discard':
+      moveCard(card, player, zone, 'discard');
+      break;
+    case 'to-exile':
+      moveCard(card, player, zone, 'exile');
+      break;
+    case 'to-deck-top':
+      moveCard(card, player, zone, 'deckTop');
+      break;
+    case 'to-deck-bottom':
+      moveCard(card, player, zone, 'deckBottom');
+      break;
+    case 'attack':
+      initiateAttack(card, player);
+      break;
+  }
+  
+  hideContextMenu();
+}
+
+function toggleTap(card) {
+  const state = GameState.cardStates.get(card.instanceId) || { tapped: false, faceDown: false };
+  state.tapped = !state.tapped;
+  GameState.cardStates.set(card.instanceId, state);
+  
+  const cardEl = document.querySelector(`[data-instance-id="${card.instanceId}"]`);
+  if (cardEl) {
+    cardEl.classList.toggle('tapped', state.tapped);
+  }
+  
+  logMessage(`${card.name} ${state.tapped ? 'tapped' : 'untapped'}`, 'action');
+}
+
+function toggleFaceDown(card) {
+  const state = GameState.cardStates.get(card.instanceId) || { tapped: false, faceDown: false };
+  state.faceDown = !state.faceDown;
+  GameState.cardStates.set(card.instanceId, state);
+  
+  const cardEl = document.querySelector(`[data-instance-id="${card.instanceId}"]`);
+  if (cardEl) {
+    const img = cardEl.querySelector('img');
+    img.src = state.faceDown ? CARD_BACK_URL : card.image;
+    cardEl.classList.toggle('face-down', state.faceDown);
+  }
+  
+  logMessage(`${card.name} flipped ${state.faceDown ? 'face-down' : 'face-up'}`, 'action');
+}
+
+function moveCard(card, fromPlayer, fromZone, toZone) {
+  const state = GameState.players[fromPlayer];
+  
+  let sourceArray;
+  if (fromZone === 'hand') sourceArray = state.hand;
+  else if (fromZone === 'newEarth') sourceArray = state.newEarth;
+  else if (fromZone === 'discard') sourceArray = state.discard;
+  else if (fromZone === 'exile') sourceArray = state.exile;
+  else if (fromZone === 'domain') {
+    if (state.domain && state.domain.instanceId === card.instanceId) {
+      state.domain = null;
+    }
+    sourceArray = null;
+  }
+  
+  if (sourceArray) {
+    const index = sourceArray.findIndex(c => c.instanceId === card.instanceId);
+    if (index > -1) sourceArray.splice(index, 1);
+  }
+  
+  if (toZone === 'hand') state.hand.push(card);
+  else if (toZone === 'newEarth') state.newEarth.push(card);
+  else if (toZone === 'discard') state.discard.push(card);
+  else if (toZone === 'exile') state.exile.push(card);
+  else if (toZone === 'domain') {
+    if (state.domain) state.discard.push(state.domain);
+    state.domain = card;
+  }
+  else if (toZone === 'deckTop') state.deck.push(card);
+  else if (toZone === 'deckBottom') state.deck.unshift(card);
+  
+  renderGameBoard();
+  logMessage(`${card.name} moved to ${toZone}`, 'action');
+}
+
+function setupDragAndDrop() {
+  document.querySelectorAll('.zone').forEach(zone => {
+    zone.addEventListener('dragover', handleDragOver);
+    zone.addEventListener('dragleave', handleDragLeave);
+    zone.addEventListener('drop', handleDrop);
+  });
+  
+  document.querySelectorAll('.hand-zone').forEach(zone => {
+    zone.addEventListener('dragover', handleDragOver);
+    zone.addEventListener('dragleave', handleDragLeave);
+    zone.addEventListener('drop', handleDrop);
+  });
+}
+
+function handleDragStart(e) {
+  const cardEl = e.target.closest('.card');
+  if (!cardEl) return;
+  
+  cardEl.classList.add('dragging');
+  e.dataTransfer.setData('text/plain', JSON.stringify({
+    instanceId: cardEl.dataset.instanceId,
+    cardId: cardEl.dataset.cardId,
+    player: cardEl.dataset.player,
+    zone: cardEl.dataset.zone
+  }));
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragEnd(e) {
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.zone, .hand-zone').forEach(z => z.classList.remove('drag-over'));
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  
+  try {
+    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+    const targetZone = e.currentTarget.dataset.zone || 'hand';
+    const targetPlayer = e.currentTarget.dataset.player || data.player;
+    
+    const state = GameState.players[data.player];
+    let card;
+    
+    if (data.zone === 'hand') card = state.hand.find(c => c.instanceId === data.instanceId);
+    else if (data.zone === 'newEarth') card = state.newEarth.find(c => c.instanceId === data.instanceId);
+    else if (data.zone === 'domain') card = state.domain;
+    else if (data.zone === 'discard') card = state.discard.find(c => c.instanceId === data.instanceId);
+    else if (data.zone === 'exile') card = state.exile.find(c => c.instanceId === data.instanceId);
+    
+    if (card && data.zone !== targetZone) {
+      if (targetZone === 'newEarth' && data.zone === 'hand' && data.player == GameState.currentPlayer) {
+        tryPlayCard(card, parseInt(data.player));
+      } else {
+        moveCard(card, parseInt(data.player), data.zone, targetZone);
+      }
+    }
+  } catch (err) {
+    console.error('Drop error:', err);
+  }
+}
+
+function tryPlayCard(card, player) {
+  if (!['main1', 'main2'].includes(GameState.currentPhase)) {
+    logMessage('Can only play cards during Main phases', 'warning');
+    return;
+  }
+  
+  if (player !== GameState.currentPlayer) {
+    logMessage('Not your turn!', 'warning');
+    return;
+  }
+  
+  const state = GameState.players[player];
+  
+  if (GameState.rulesHelper.enabled && GameState.rulesHelper.autoKL) {
+    if (state.kl < card.cost) {
+      logMessage(`Not enough KL! Need ${card.cost}, have ${state.kl}`, 'warning');
+      return;
+    }
+    state.kl -= card.cost;
+    logMessage(`Paid ${card.cost} KL for ${card.name}`, 'helper');
+  }
+  
+  const cardIndex = state.hand.findIndex(c => c.instanceId === card.instanceId);
+  if (cardIndex > -1) state.hand.splice(cardIndex, 1);
+  
+  animateCardPlay(card, player, () => {
+    if (card.type === 'Avatar') {
+      state.newEarth.push(card);
+    } else if (card.type === 'Domain') {
+      if (state.domain) {
+        state.discard.push(state.domain);
+        logMessage(`${state.domain.name} replaced`, 'action');
+      }
+      state.domain = card;
+    } else if (card.type === 'Spell') {
+      state.discard.push(card);
+    }
+    
+    if (GameState.rulesHelper.enabled && GameState.rulesHelper.autoAspect) {
+      triggerAspectEffect(card, player);
+    }
+    
+    renderGameBoard();
+    logMessage(`Player ${player} played ${card.name}`, 'action');
+  });
+}
+
+function animateCardPlay(card, player, callback) {
+  const handEl = document.querySelector(`#p${player}-hand`);
+  const targetZone = card.type === 'Domain' 
+    ? document.getElementById(`p${player}-domain`)
+    : document.querySelector(`#p${player}-new-earth`);
+  
+  const handRect = handEl.getBoundingClientRect();
+  const targetRect = targetZone.getBoundingClientRect();
+  
+  const flyingCard = document.createElement('div');
+  flyingCard.className = 'flying-card';
+  flyingCard.innerHTML = `<img src="${card.image}" alt="${card.name}">`;
+  flyingCard.style.left = `${handRect.left + handRect.width / 2 - 60}px`;
+  flyingCard.style.top = `${handRect.top}px`;
+  document.getElementById('animation-layer').appendChild(flyingCard);
+  
+  const centerX = window.innerWidth / 2 - 60;
+  const centerY = window.innerHeight / 2 - 84;
+  
+  setTimeout(() => {
+    flyingCard.style.left = `${centerX}px`;
+    flyingCard.style.top = `${centerY}px`;
+    flyingCard.style.transform = 'scale(1.5)';
+  }, 50);
+  
+  setTimeout(() => {
+    createAspectParticles(centerX + 60, centerY + 84, card.aspect);
+  }, 400);
+  
+  setTimeout(() => {
+    flyingCard.style.left = `${targetRect.left + targetRect.width / 2 - 60}px`;
+    flyingCard.style.top = `${targetRect.top + targetRect.height / 2 - 84}px`;
+    flyingCard.style.transform = 'scale(1)';
+  }, 700);
+  
+  setTimeout(() => {
+    flyingCard.remove();
+    callback();
+  }, 1200);
+}
+
+function triggerAspectEffect(card, player) {
+  const opponent = player === 1 ? 2 : 1;
+  const deity = GameState.players[player].deity;
+  
+  const cardEl = document.querySelector(`#p${player}-deity-display`);
+  const rect = cardEl ? cardEl.getBoundingClientRect() : { left: 100, top: 100 };
+  
+  if (card.aspect === 'Glow') {
+    let essenceGain = 1;
+    if (deity && deity.passive && deity.passive.includes('2 Essence')) {
+      essenceGain = 2;
+    }
+    modifyStat(player, 'essence', essenceGain);
+    showDamageNumber(rect.left + 50, rect.top + 50, `+${essenceGain}`, 'heal');
+    logMessage(`Glow aspect: Player ${player} gains ${essenceGain} Essence`, 'helper');
+  } else if (card.aspect === 'Void') {
+    let essenceLoss = 1;
+    if (deity && deity.passive && deity.passive.includes('2 Essence')) {
+      essenceLoss = 2;
+    }
+    modifyStat(opponent, 'essence', -essenceLoss);
+    const oppRect = document.querySelector(`#p${opponent}-deity-display`).getBoundingClientRect();
+    showDamageNumber(oppRect.left + 50, oppRect.top + 50, `-${essenceLoss}`, 'damage');
+    logMessage(`Void aspect: Player ${opponent} loses ${essenceLoss} Essence`, 'helper');
+  } else if (card.aspect === 'Gray') {
+    let drawCount = 1;
+    if (deity && deity.passive && deity.passive.includes('2 cards')) {
+      drawCount = 2;
+    }
+    for (let i = 0; i < drawCount; i++) {
+      drawCard(player);
+    }
+    showDamageNumber(rect.left + 50, rect.top + 50, `+${drawCount} Card`, 'draw');
+    logMessage(`Gray aspect: Player ${player} draws ${drawCount} card(s)`, 'helper');
+  }
+}
+
+function showDamageNumber(x, y, text, type) {
+  const indicator = document.createElement('div');
+  indicator.className = `damage-number ${type}`;
+  indicator.textContent = text;
+  indicator.style.left = `${x}px`;
+  indicator.style.top = `${y}px`;
+  document.getElementById('damage-indicators').appendChild(indicator);
+  
+  setTimeout(() => indicator.remove(), 1500);
+}
+
+function modifyStat(player, stat, amount) {
+  const state = GameState.players[player];
+  
+  if (stat === 'essence') {
+    state.essence = Math.max(0, state.essence + amount);
+  } else if (stat === 'kl') {
+    state.kl = Math.max(0, Math.min(state.klMax, state.kl + amount));
+  } else if (stat === 'klMax') {
+    const oldMax = state.klMax;
+    state.klMax = Math.min(13, state.klMax + amount);
+    if (state.klMax === 13 && amount > 0) {
+      const overflow = (oldMax + amount) - 13;
+      if (overflow > 0) {
+        state.overflow += overflow;
+        checkOverflowConversion(player);
+      }
+    }
+  } else if (stat === 'overflow') {
+    state.overflow = Math.max(0, state.overflow + amount);
+    checkOverflowConversion(player);
+  } else if (stat === 'godcode') {
+    state.godCodeCharges = Math.max(0, Math.min(2, state.godCodeCharges + amount));
+  }
+  
+  updatePlayerStats(player);
+}
+
+function checkOverflowConversion(player) {
+  if (!GameState.rulesHelper.enabled || !GameState.rulesHelper.autoOverflow) return;
+  
+  const state = GameState.players[player];
+  
+  while (state.overflow >= 13 && state.godCodeCharges < 2) {
+    state.overflow -= 13;
+    state.godCodeCharges++;
+    
+    animateCrownCharge(player);
+    logMessage(`Essence Crown awakened! Player ${player} gains God Code charge!`, 'helper');
+  }
+  
+  updatePlayerStats(player);
+}
+
+function animateCrownCharge(player) {
+  const deityEl = document.getElementById(`p${player}-deity-display`);
+  const rect = deityEl.getBoundingClientRect();
+  
+  createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 'rgb(255, 215, 0)', 50);
+  
+  deityEl.style.boxShadow = '0 0 60px rgba(255, 215, 0, 0.8)';
+  setTimeout(() => {
+    deityEl.style.boxShadow = '';
+  }, 1000);
+}
+
+function drawCard(player) {
+  const state = GameState.players[player];
+  
+  if (state.deck.length === 0) {
+    logMessage(`Player ${player}'s deck is empty!`, 'warning');
+    return null;
+  }
+  
+  const card = state.deck.pop();
+  state.hand.push(card);
+  
+  animateCardDraw(player, card);
+  updateZoneCounts(player);
+  renderHand(player);
+  
+  return card;
+}
+
+function animateCardDraw(player, card) {
+  const deckEl = document.getElementById(`p${player}-deck`);
+  const handEl = document.querySelector(`#p${player}-hand`);
+  
+  const deckRect = deckEl.getBoundingClientRect();
+  const handRect = handEl.getBoundingClientRect();
+  
+  const flyingCard = document.createElement('div');
+  flyingCard.className = 'flying-card';
+  flyingCard.innerHTML = `<img src="${CARD_BACK_URL}" alt="Card">`;
+  flyingCard.style.left = `${deckRect.left}px`;
+  flyingCard.style.top = `${deckRect.top}px`;
+  document.getElementById('animation-layer').appendChild(flyingCard);
+  
+  setTimeout(() => {
+    flyingCard.style.left = `${handRect.left + handRect.width / 2 - 60}px`;
+    flyingCard.style.top = `${handRect.top}px`;
+    flyingCard.querySelector('img').src = card.image;
+  }, 50);
+  
+  setTimeout(() => {
+    flyingCard.remove();
+  }, 600);
+}
+
+function updatePhaseDisplay() {
+  document.querySelectorAll('.phase').forEach(phaseEl => {
+    const phase = phaseEl.dataset.phase;
+    const currentIndex = GameState.phases.indexOf(GameState.currentPhase);
+    const phaseIndex = GameState.phases.indexOf(phase);
+    
+    phaseEl.classList.remove('active', 'completed');
+    if (phase === GameState.currentPhase) {
+      phaseEl.classList.add('active');
+    } else if (phaseIndex < currentIndex) {
+      phaseEl.classList.add('completed');
+    }
+  });
+  
+  document.getElementById('current-turn').textContent = `Turn ${GameState.turnNumber}`;
+  document.getElementById('current-player').textContent = `Player ${GameState.currentPlayer}'s Turn`;
+}
+
+function announcePhase(text) {
+  const announcement = document.getElementById('phase-announcement');
+  announcement.querySelector('.phase-text').textContent = text;
+  announcement.classList.remove('hidden');
+  
+  setTimeout(() => {
+    announcement.classList.add('hidden');
+  }, 1500);
+}
+
+function nextPhase() {
+  const currentIndex = GameState.phases.indexOf(GameState.currentPhase);
+  
+  if (currentIndex < GameState.phases.length - 1) {
+    GameState.currentPhase = GameState.phases[currentIndex + 1];
+    updatePhaseDisplay();
+    
+    const phaseNames = {
+      'wake': 'WAKE PHASE',
+      'main1': 'MAIN PHASE I',
+      'breach': 'BREACH PHASE',
+      'main2': 'MAIN PHASE II',
+      'fade': 'FADE PHASE'
+    };
+    
+    announcePhase(phaseNames[GameState.currentPhase]);
+    logMessage(`Phase: ${phaseNames[GameState.currentPhase]}`, 'phase');
+    
+    if (GameState.currentPhase === 'breach') {
+      enterBreachPhase();
+    }
+  } else {
+    endTurn();
+  }
+}
+
+function endTurn() {
+  GameState.currentPhase = 'fade';
+  updatePhaseDisplay();
+  
+  untapAllCards(GameState.currentPlayer);
+  
+  GameState.currentPlayer = GameState.currentPlayer === 1 ? 2 : 1;
+  GameState.turnNumber++;
+  GameState.currentPhase = 'wake';
+  
+  updatePhaseDisplay();
+  announcePhase('WAKE PHASE');
+  logMessage(`Turn ${GameState.turnNumber}: Player ${GameState.currentPlayer}'s turn`, 'phase');
+  
+  if (GameState.rulesHelper.enabled && GameState.rulesHelper.autoWake) {
+    setTimeout(() => executeWakePhase(GameState.currentPlayer), 1500);
+  }
+}
+
+function executeWakePhase(player) {
+  const state = GameState.players[player];
+  
+  if (state.klMax < 13) {
+    modifyStat(player, 'klMax', 1);
+    logMessage(`KL Max increased to ${state.klMax}`, 'helper');
+  }
+  
+  state.kl = state.klMax;
+  logMessage(`KL refilled to ${state.kl}`, 'helper');
+  
+  const drawnCard = drawCard(player);
+  if (drawnCard) {
+    logMessage(`Drew ${drawnCard.name}`, 'helper');
+  }
+  
+  if (state.domain && state.domain.effect) {
+    if (state.domain.effect.includes('At Wake') || state.domain.effect.includes('At the start of your Wake')) {
+      logMessage(`Domain trigger: ${state.domain.name}`, 'helper');
+    }
+  }
+  
+  updatePlayerStats(player);
+}
+
+function untapAllCards(player) {
+  const state = GameState.players[player];
+  
+  state.newEarth.forEach(card => {
+    const cardState = GameState.cardStates.get(card.instanceId);
+    if (cardState && cardState.tapped) {
+      cardState.tapped = false;
+      GameState.cardStates.set(card.instanceId, cardState);
+    }
+  });
+  
+  renderNewEarth(player);
+}
+
+function enterBreachPhase() {
+  if (GameState.rulesHelper.enabled && GameState.rulesHelper.autoCombat) {
+    const state = GameState.players[GameState.currentPlayer];
+    const hasAttackers = state.newEarth.some(card => card.type === 'Avatar');
+    
+    if (hasAttackers) {
+      document.getElementById('combat-overlay').classList.remove('hidden');
+      GameState.combatState.isSelecting = true;
+      
+      state.newEarth.forEach(card => {
+        if (card.type === 'Avatar') {
+          const cardEl = document.querySelector(`[data-instance-id="${card.instanceId}"]`);
+          if (cardEl) cardEl.classList.add('can-attack');
+        }
+      });
+    }
+  }
+}
+
+function initiateAttack(card, player) {
+  if (GameState.currentPhase !== 'breach') {
+    logMessage('Can only attack during Breach phase', 'warning');
+    return;
+  }
+  
+  document.getElementById('combat-overlay').classList.remove('hidden');
+  GameState.combatState.isSelecting = true;
+  selectAttacker(card);
+}
+
+function selectAttacker(card) {
+  GameState.combatState.attacker = card;
+  
+  const attackerDisplay = document.getElementById('combat-attacker');
+  attackerDisplay.innerHTML = `<img src="${card.image}" alt="${card.name}">`;
+  attackerDisplay.classList.add('has-card');
+  
+  const cardEl = document.querySelector(`[data-instance-id="${card.instanceId}"]`);
+  if (cardEl) cardEl.classList.add('attacking');
+  
+  const opponent = GameState.currentPlayer === 1 ? 2 : 1;
+  const oppState = GameState.players[opponent];
+  
+  oppState.newEarth.forEach(c => {
+    const el = document.querySelector(`[data-instance-id="${c.instanceId}"]`);
+    if (el) el.classList.add('targetable');
+  });
+  
+  document.getElementById(`p${opponent}-deity-display`).classList.add('targetable');
+  
+  document.querySelector('.combat-instruction').textContent = 'Select a target (Avatar or Deity)';
+  document.getElementById('btn-confirm-attack').disabled = true;
+}
+
+function selectTarget(target, isDeity = false) {
+  GameState.combatState.target = isDeity ? { isDeity: true } : target;
+  
+  const targetDisplay = document.getElementById('combat-target');
+  if (isDeity) {
+    const opponent = GameState.currentPlayer === 1 ? 2 : 1;
+    const deity = GameState.players[opponent].deity;
+    targetDisplay.innerHTML = `<img src="${deity.image}" alt="${deity.name}">`;
+  } else {
+    targetDisplay.innerHTML = `<img src="${target.image}" alt="${target.name}">`;
+  }
+  targetDisplay.classList.add('has-card');
+  
+  document.querySelector('.combat-instruction').textContent = 'Confirm attack to proceed';
+  document.getElementById('btn-confirm-attack').disabled = false;
+}
+
+function confirmAttack() {
+  const { attacker, target } = GameState.combatState;
+  const opponent = GameState.currentPlayer === 1 ? 2 : 1;
+  
+  if (target.isDeity) {
+    animateCombat(attacker, null, () => {
+      modifyStat(opponent, 'essence', -attacker.attack);
+      const deityEl = document.getElementById(`p${opponent}-deity-display`);
+      const rect = deityEl.getBoundingClientRect();
+      showDamageNumber(rect.left + 50, rect.top + 50, `-${attacker.attack}`, 'damage');
+      createParticles(rect.left + 50, rect.top + 70, 'rgb(255, 71, 87)', 30);
+      
+      document.getElementById('game-screen').classList.add('screen-shake');
+      setTimeout(() => document.getElementById('game-screen').classList.remove('screen-shake'), 300);
+      
+      logMessage(`${attacker.name} attacks Deity for ${attacker.attack} damage!`, 'damage');
+      
+      triggerBreachEffects(attacker, opponent);
+      toggleTap(attacker);
+      resetCombatState();
+    });
+  } else {
+    animateCombat(attacker, target, () => {
+      const attackerDamage = attacker.attack;
+      const defenderDamage = target.attack;
+      
+      target.health -= attackerDamage;
+      attacker.health -= defenderDamage;
+      
+      const targetEl = document.querySelector(`[data-instance-id="${target.instanceId}"]`);
+      const attackerEl = document.querySelector(`[data-instance-id="${attacker.instanceId}"]`);
+      
+      if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        showDamageNumber(rect.left + 50, rect.top + 50, `-${attackerDamage}`, 'damage');
+        createParticles(rect.left + 60, rect.top + 84, 'rgb(255, 71, 87)', 20);
+      }
+      
+      if (attackerEl && defenderDamage > 0) {
+        const rect = attackerEl.getBoundingClientRect();
+        showDamageNumber(rect.left + 50, rect.top + 50, `-${defenderDamage}`, 'damage');
+      }
+      
+      logMessage(`${attacker.name} attacks ${target.name}! (${attackerDamage} vs ${defenderDamage})`, 'damage');
+      
+      if (target.health <= 0) {
+        destroyAvatar(target, opponent);
+        logMessage(`${target.name} destroyed!`, 'damage');
+      }
+      
+      if (attacker.health <= 0) {
+        destroyAvatar(attacker, GameState.currentPlayer);
+        logMessage(`${attacker.name} destroyed!`, 'damage');
+      }
+      
+      toggleTap(attacker);
+      resetCombatState();
+      renderGameBoard();
+    });
+  }
+}
+
+function animateCombat(attacker, target, callback) {
+  const attackerEl = document.querySelector(`[data-instance-id="${attacker.instanceId}"]`);
+  if (!attackerEl) {
+    callback();
+    return;
+  }
+  
+  const opponent = GameState.currentPlayer === 1 ? 2 : 1;
+  let targetEl;
+  
+  if (target) {
+    targetEl = document.querySelector(`[data-instance-id="${target.instanceId}"]`);
+  } else {
+    targetEl = document.getElementById(`p${opponent}-deity-display`);
+  }
+  
+  const attackerRect = attackerEl.getBoundingClientRect();
+  const targetRect = targetEl.getBoundingClientRect();
+  
+  const flyingCard = document.createElement('div');
+  flyingCard.className = 'flying-card';
+  flyingCard.innerHTML = `<img src="${attacker.image}" alt="${attacker.name}">`;
+  flyingCard.style.left = `${attackerRect.left}px`;
+  flyingCard.style.top = `${attackerRect.top}px`;
+  document.getElementById('animation-layer').appendChild(flyingCard);
+  
+  const midX = (attackerRect.left + targetRect.left) / 2;
+  const midY = (attackerRect.top + targetRect.top) / 2;
+  
+  setTimeout(() => {
+    flyingCard.style.left = `${targetRect.left}px`;
+    flyingCard.style.top = `${targetRect.top}px`;
+  }, 100);
+  
+  setTimeout(() => {
+    createParticles(targetRect.left + 60, targetRect.top + 84, 'rgb(255, 71, 87)', 40);
+    
+    document.getElementById('game-screen').classList.add('screen-shake');
+    setTimeout(() => document.getElementById('game-screen').classList.remove('screen-shake'), 300);
+    
+    flyingCard.style.left = `${attackerRect.left}px`;
+    flyingCard.style.top = `${attackerRect.top}px`;
+  }, 400);
+  
+  setTimeout(() => {
+    flyingCard.remove();
+    callback();
+  }, 800);
+}
+
+function triggerBreachEffects(attacker, targetPlayer) {
+  if (attacker.effect && attacker.effect.includes('Breach:')) {
+    logMessage(`Breach trigger: ${attacker.name}`, 'helper');
+  }
+}
+
+function destroyAvatar(card, player) {
+  const state = GameState.players[player];
+  const index = state.newEarth.findIndex(c => c.instanceId === card.instanceId);
+  
+  if (index > -1) {
+    const destroyed = state.newEarth.splice(index, 1)[0];
+    
+    const originalCard = getCardById(destroyed.id);
+    destroyed.health = originalCard.health;
+    destroyed.attack = originalCard.attack;
+    
+    state.discard.push(destroyed);
+    
+    const cardEl = document.querySelector(`[data-instance-id="${card.instanceId}"]`);
+    if (cardEl) {
+      const rect = cardEl.getBoundingClientRect();
+      createParticles(rect.left + 60, rect.top + 84, 'rgb(100, 100, 100)', 50);
+    }
+  }
+}
+
+function cancelCombat() {
+  resetCombatState();
+}
+
+function skipCombat() {
+  resetCombatState();
+  logMessage('Combat skipped', 'action');
+}
+
+function resetCombatState() {
+  GameState.combatState = {
+    attacker: null,
+    target: null,
+    isSelecting: false
+  };
+  
+  document.getElementById('combat-overlay').classList.add('hidden');
+  document.getElementById('combat-attacker').innerHTML = '';
+  document.getElementById('combat-attacker').classList.remove('has-card');
+  document.getElementById('combat-target').innerHTML = '';
+  document.getElementById('combat-target').classList.remove('has-card');
+  document.querySelector('.combat-instruction').textContent = 'Select an attacker or skip combat';
+  document.getElementById('btn-confirm-attack').disabled = true;
+  
+  document.querySelectorAll('.card').forEach(card => {
+    card.classList.remove('can-attack', 'attacking', 'targetable');
+  });
+  document.querySelectorAll('.deity-card').forEach(card => {
+    card.classList.remove('targetable');
+  });
+}
+
+function activateGodCode(player) {
+  const state = GameState.players[player];
+  
+  if (state.godCodeCharges <= 0 || state.godCodeUsed >= 2) {
+    logMessage('No God Code charges available!', 'warning');
+    return;
+  }
+  
+  if (player !== GameState.currentPlayer) {
+    logMessage('Can only activate on your turn!', 'warning');
+    return;
+  }
+  
+  state.godCodeCharges--;
+  state.godCodeUsed++;
+  
+  const deity = state.deity;
+  
+  const deityEl = document.getElementById(`p${player}-deity-display`);
+  const rect = deityEl.getBoundingClientRect();
+  createParticles(rect.left + 50, rect.top + 70, 'rgb(255, 215, 0)', 60);
+  
+  announcePhase('GOD CODE ACTIVATED!');
+  logMessage(`Player ${player} activates God Code: ${deity.godCode}`, 'phase');
+  
+  updatePlayerStats(player);
+}
+
+function showCardZoom(card) {
+  const modal = document.getElementById('card-zoom-modal');
+  const image = document.getElementById('zoom-card-image');
+  const info = document.getElementById('zoom-card-info');
+  
+  image.src = card.image;
+  info.innerHTML = `
+    <h3>${card.name}</h3>
+    <p><strong>Type:</strong> ${card.type} | <strong>Aspect:</strong> ${card.aspect || 'None'}</p>
+    <p><strong>Cost:</strong> ${card.cost} KL</p>
+    ${card.type === 'Avatar' ? `<p><strong>Stats:</strong> ${card.attack} ATK / ${card.health} HP</p>` : ''}
+    ${card.effect ? `<p><strong>Effect:</strong> ${card.effect}</p>` : ''}
+    ${card.passive ? `<p><strong>Passive:</strong> ${card.passive}</p>` : ''}
+    ${card.godCode ? `<p><strong>God Code:</strong> ${card.godCode}</p>` : ''}
+  `;
+  
+  modal.classList.remove('hidden');
+}
+
+function closeCardZoom() {
+  document.getElementById('card-zoom-modal').classList.add('hidden');
+}
+
+function logMessage(message, type = 'action') {
+  if (!GameState.rulesHelper.showLog && type === 'helper') return;
+  
+  const logContent = document.getElementById('log-content');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+  logContent.appendChild(entry);
+  logContent.scrollTop = logContent.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('log-content').innerHTML = '';
+}
+
+function checkGameOver() {
+  [1, 2].forEach(player => {
+    if (GameState.players[player].essence <= 0 && !GameState.gameOver) {
+      GameState.gameOver = true;
+      const winner = player === 1 ? 2 : 1;
+      showVictoryScreen(winner);
+    }
+  });
+}
+
+function showVictoryScreen(winner) {
+  const screen = document.getElementById('victory-screen');
+  screen.querySelector('.victory-title').textContent = `Player ${winner} Wins!`;
+  screen.querySelector('.victory-subtitle').textContent = 'The Essence Crown has been claimed!';
+  screen.classList.remove('hidden');
+  
+  for (let i = 0; i < 100; i++) {
+    setTimeout(() => {
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * window.innerHeight;
+      createParticles(x, y, 'rgb(255, 215, 0)', 5);
+    }, i * 50);
+  }
+}
+
+function restartGame() {
+  GameState.gameOver = false;
+  GameState.gameStarted = false;
+  GameState.cardStates.clear();
+  
+  document.getElementById('victory-screen').classList.add('hidden');
+  showScreen('welcome');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+  </script>
+</body>
+</html>

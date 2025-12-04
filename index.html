@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Essence Crown: Shard Wars</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sun-altar.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- SUN ALTAR ARENA LAYOUT -->
+        <div class="ec-frame sun-altar" id="ec-arena-frame" data-domain="second-sun">
+            <!-- TOP HUD - Opponent with Floating Deity -->
+            <div class="ec-hud ec-hud--top">
+                <div class="ec-hud-player">
+                    <div class="deity-ring" id="p2-deity-zone">
+                        <div class="deity-card-inner" id="p2-deity"></div>
+                    </div>
+                    <div class="ec-hud-text">
+                        <span class="ec-hud-name" id="p2-deity-name">Opponent</span>
+                        <span class="ec-hud-title" id="p2-title">Challenger</span>
+                    </div>
+                </div>
+                <div class="essence-hud">
+                    <div class="essence-counter">
+                        <div class="essence-glyph"></div>
+                        <span class="essence-value" id="p2-essence">23</span>
+                    </div>
+                    <div class="kl-display">
+                        <span class="kl-label">Kundalini</span>
+                        <div class="kl-pips" id="p2-kl-pips">
+                            <div class="kl-pip active"></div>
+                            <div class="kl-pip active"></div>
+                            <div class="kl-pip active"></div>
+                        </div>
+                        <span class="kl-text" id="p2-kl">3/3</span>
+                    </div>
+                    <div class="ec-hud-stats">
+                        <div class="ec-pill ec-pill--deck" id="p2-deck">
+                            <span class="ec-pill-icon">📜</span>
+                            <span class="ec-pill-value" id="p2-deck-count">0</span>
+                            <span class="ec-pill-label">Veiled</span>
+                        </div>
+                        <div class="ec-pill ec-pill--void" id="p2-graveyard">
+                            <span class="ec-pill-icon">💀</span>
+                            <span class="ec-pill-value" id="p2-graveyard-count">0</span>
+                            <span class="ec-pill-label">Fracture</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ec-phase-display">
+                    <div id="phase-badge">
+                        <div class="turn-number" id="turn-number">Turn 1</div>
+                        <div class="phase-name" id="phase-name">Dawn Phase</div>
+                    </div>
+                    <div id="phase-tracker">
+                        <div class="phase-step active" data-phase="dawn">
+                            <div class="phase-icon">☀</div>
+                            <div class="phase-label">Dawn</div>
+                        </div>
+                        <div class="phase-step" data-phase="draw">
+                            <div class="phase-icon">🃏</div>
+                            <div class="phase-label">Draw</div>
+                        </div>
+                        <div class="phase-step" data-phase="main">
+                            <div class="phase-icon">⚔</div>
+                            <div class="phase-label">Main</div>
+                        </div>
+                        <div class="phase-step" data-phase="clash">
+                            <div class="phase-icon">💥</div>
+                            <div class="phase-label">Clash</div>
+                        </div>
+                        <div class="phase-step" data-phase="twilight">
+                            <div class="phase-icon">🌙</div>
+                            <div class="phase-label">Twilight</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT GRID - OFFICIAL PLAYMAT LAYOUT -->
+            <div class="ec-main">
+                <div class="ec-playmat">
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <!-- OPPONENT SIDE (Player 2) - Mirrored/Upside Down Layout -->
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <div class="playmat-half playmat-half--opponent">
+                        <!-- STATUS ZONE ROW (Top of opponent) -->
+                        <div class="playmat-row playmat-row--status">
+                            <div class="playmat-zone zone-status" id="p2-status-zone">
+                                <span class="zone-label-plate">Status • Shards</span>
+                                <div class="zone-content">
+                                    <div class="status-tokens" id="p2-status-tokens"></div>
+                                </div>
+                            </div>
+                            <div class="playmat-zone zone-essence" id="p2-essence-zone">
+                                <span class="zone-label-plate">Essence</span>
+                                <div class="zone-content essence-display">
+                                    <span class="essence-glyph-large">◈</span>
+                                    <span class="essence-number" id="p2-essence-display">23</span>
+                                </div>
+                                <div class="zone-subtext">Your hand is held off-mat below this edge</div>
+                            </div>
+                            <div class="playmat-zone zone-deity" id="p2-deity-playmat">
+                                <span class="zone-label-plate">Deity / Aspect</span>
+                                <div class="zone-content">
+                                    <div class="deity-card-slot" id="p2-deity-slot"></div>
+                                </div>
+                                <div class="zone-subtext">Your Identity on New Earth</div>
+                            </div>
+                        </div>
+
+                        <!-- RESOURCE BAND ROW -->
+                        <div class="playmat-row playmat-row--resource">
+                            <div class="playmat-zone zone-void" id="p2-void-zone">
+                                <span class="zone-label-plate">Void / Exile</span>
+                                <div class="zone-content">
+                                    <div class="pile-slot" id="p2-void-pile" onclick="Game.showPile('exile', 1)"></div>
+                                </div>
+                                <div class="zone-subtext">Removed from Cycle</div>
+                            </div>
+                            <div class="playmat-zone zone-abyss" id="p2-abyss-zone">
+                                <span class="zone-label-plate">Abyss</span>
+                                <div class="zone-content">
+                                    <div class="pile-slot" id="p2-abyss-pile" onclick="Game.showPile('graveyard', 1)"></div>
+                                </div>
+                            </div>
+                            <div class="playmat-zone zone-domains" id="p2-domains-zone">
+                                <span class="zone-label-plate">Resource Band – Domains • Deck • Abyss • Void</span>
+                                <div class="zone-content domain-slots" id="p2-domain-row">
+                                    <div class="domain-slot ec-card-slot" data-slot="1" data-zone="domain">
+                                        <span class="slot-label">Domain 1</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="2" data-zone="domain">
+                                        <span class="slot-label">Domain 2</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="3" data-zone="domain">
+                                        <span class="slot-label">Domain 3</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="4" data-zone="domain">
+                                        <span class="slot-label">Domain 4</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="5" data-zone="domain">
+                                        <span class="slot-label">Domain 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="playmat-zone zone-deck" id="p2-deck-zone">
+                                <span class="zone-label-plate">Deck</span>
+                                <div class="zone-content">
+                                    <div class="deck-pile" id="p2-deck-pile">
+                                        <div class="deck-cards-stack"></div>
+                                        <span class="deck-count" id="p2-deck-count-display">60</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AVATAR LINE ROW -->
+                        <div class="playmat-row playmat-row--avatars">
+                            <div class="playmat-zone zone-avatars">
+                                <span class="zone-label-plate">Avatar Line – Frontline on New Earth</span>
+                                <div class="zone-content avatar-slots" id="p2-avatar-row">
+                                    <div class="avatar-slot ec-card-slot" data-slot="1" data-zone="avatar">
+                                        <span class="slot-label">Avatar 1</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="2" data-zone="avatar">
+                                        <span class="slot-label">Avatar 2</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="3" data-zone="avatar">
+                                        <span class="slot-label">Avatar 3</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="4" data-zone="avatar">
+                                        <span class="slot-label">Avatar 4</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="5" data-zone="avatar">
+                                        <span class="slot-label">Avatar 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RELIC ROW (Support Line) -->
+                        <div class="playmat-row playmat-row--relics">
+                            <div class="playmat-zone zone-relics">
+                                <span class="zone-label-plate">Relic Row – Relics / Constructs</span>
+                                <div class="zone-content relic-slots" id="p2-relic-row">
+                                    <div class="relic-slot ec-card-slot" data-slot="1" data-zone="relic">
+                                        <span class="slot-label">Relic 1</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="2" data-zone="relic">
+                                        <span class="slot-label">Relic 2</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="3" data-zone="relic">
+                                        <span class="slot-label">Relic 3</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="4" data-zone="relic">
+                                        <span class="slot-label">Relic 4</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="5" data-zone="relic">
+                                        <span class="slot-label">Relic 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GAME RULES TEXT (Opponent Side) -->
+                        <div class="playmat-rules playmat-rules--opponent">
+                            <div class="rules-text">
+                                <strong>Turn Flow:</strong> Start → Main → Combat → End<br>
+                                1 Domain play per turn (unless a card says otherwise).<br>
+                                Ready → Draw 1 → Play → Attack → <strong>Draw Deck</strong><br>
+                                Unblocked Avatars damage Essence. Essence⓪ = Crown Shattered.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <!-- CENTER BANNER - TITLE STRIP -->
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <div class="playmat-center-banner">
+                        <div class="banner-title">ESSENCE CROWN: SHARD WARS – DUEL FIELD</div>
+                        <div class="banner-subtitle">Children of the Shattered Sun • <span id="active-domain-name">New Earth</span> Duel Field</div>
+                    </div>
+
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <!-- PLAYER SIDE (Player 1) - Normal Layout -->
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <div class="playmat-half playmat-half--player">
+                        <!-- RELIC ROW (Support Line) -->
+                        <div class="playmat-row playmat-row--relics">
+                            <div class="playmat-zone zone-relics">
+                                <span class="zone-label-plate">Relic Row – Relics / Constructs</span>
+                                <div class="zone-content relic-slots" id="p1-relic-row">
+                                    <div class="relic-slot ec-card-slot" data-slot="1" data-zone="relic">
+                                        <span class="slot-label">Relic 1</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="2" data-zone="relic">
+                                        <span class="slot-label">Relic 2</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="3" data-zone="relic">
+                                        <span class="slot-label">Relic 3</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="4" data-zone="relic">
+                                        <span class="slot-label">Relic 4</span>
+                                    </div>
+                                    <div class="relic-slot ec-card-slot" data-slot="5" data-zone="relic">
+                                        <span class="slot-label">Relic 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AVATAR LINE ROW -->
+                        <div class="playmat-row playmat-row--avatars">
+                            <div class="playmat-zone zone-avatars">
+                                <span class="zone-label-plate">Avatar Line – Frontline on New Earth</span>
+                                <div class="zone-content avatar-slots" id="p1-avatar-row">
+                                    <div class="avatar-slot ec-card-slot" data-slot="1" data-zone="avatar">
+                                        <span class="slot-label">Avatar 1</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="2" data-zone="avatar">
+                                        <span class="slot-label">Avatar 2</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="3" data-zone="avatar">
+                                        <span class="slot-label">Avatar 3</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="4" data-zone="avatar">
+                                        <span class="slot-label">Avatar 4</span>
+                                    </div>
+                                    <div class="avatar-slot ec-card-slot" data-slot="5" data-zone="avatar">
+                                        <span class="slot-label">Avatar 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RESOURCE BAND ROW -->
+                        <div class="playmat-row playmat-row--resource">
+                            <div class="playmat-zone zone-void" id="p1-void-zone">
+                                <span class="zone-label-plate">Void / Exile</span>
+                                <div class="zone-content">
+                                    <div class="pile-slot" id="p1-void-pile" onclick="Game.showPile('exile', 0)"></div>
+                                </div>
+                                <div class="zone-subtext">Removed from Cycle</div>
+                            </div>
+                            <div class="playmat-zone zone-abyss" id="p1-abyss-zone">
+                                <span class="zone-label-plate">Abyss</span>
+                                <div class="zone-content">
+                                    <div class="pile-slot" id="p1-abyss-pile" onclick="Game.showPile('graveyard', 0)"></div>
+                                </div>
+                            </div>
+                            <div class="playmat-zone zone-domains" id="p1-domains-zone">
+                                <span class="zone-label-plate">Resource Band – Domains • Deck • Abyss • Void</span>
+                                <div class="zone-content domain-slots" id="p1-domain-row">
+                                    <div class="domain-slot ec-card-slot" data-slot="1" data-zone="domain">
+                                        <span class="slot-label">Domain 1</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="2" data-zone="domain">
+                                        <span class="slot-label">Domain 2</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="3" data-zone="domain">
+                                        <span class="slot-label">Domain 3</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="4" data-zone="domain">
+                                        <span class="slot-label">Domain 4</span>
+                                    </div>
+                                    <div class="domain-slot ec-card-slot" data-slot="5" data-zone="domain">
+                                        <span class="slot-label">Domain 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="playmat-zone zone-deck" id="p1-deck-zone">
+                                <span class="zone-label-plate">Deck</span>
+                                <div class="zone-content">
+                                    <div class="deck-pile" id="p1-deck-pile">
+                                        <div class="deck-cards-stack"></div>
+                                        <span class="deck-count" id="p1-deck-count-display">60</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GAME RULES TEXT (Player Side) -->
+                        <div class="playmat-rules playmat-rules--player">
+                            <div class="rules-text">
+                                <strong>Turn Flow:</strong> Start → Main → Combat → End<br>
+                                1 Domain play per turn (unless a card says otherwise).<br>
+                                Ready → Draw 1 → Play → Attack → <strong>Draw Deck</strong><br>
+                                Unblocked Avatars damage Essence. Essence⓪ = Crown Shattered.
+                            </div>
+                        </div>
+
+                        <!-- STATUS ZONE ROW (Bottom of player) -->
+                        <div class="playmat-row playmat-row--status">
+                            <div class="playmat-zone zone-deity" id="p1-deity-playmat">
+                                <span class="zone-label-plate">Deity / Aspect</span>
+                                <div class="zone-content">
+                                    <div class="deity-card-slot" id="p1-deity-slot"></div>
+                                </div>
+                                <div class="zone-subtext">Your Identity on New Earth</div>
+                            </div>
+                            <div class="playmat-zone zone-essence" id="p1-essence-zone">
+                                <span class="zone-label-plate">Essence</span>
+                                <div class="zone-content essence-display">
+                                    <span class="essence-glyph-large">◈</span>
+                                    <span class="essence-number" id="p1-essence-display">23</span>
+                                </div>
+                                <div class="zone-subtext">Your hand is held off-mat below this edge</div>
+                            </div>
+                            <div class="playmat-zone zone-status" id="p1-status-zone">
+                                <span class="zone-label-plate">Status • Shards</span>
+                                <div class="zone-content">
+                                    <div class="status-tokens" id="p1-status-tokens"></div>
+                                </div>
+                                <div class="zone-subtext">Tokens • Conditions • Campaign</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: SIDE PANELS -->
+                <div class="ec-side-panels">
+                    <!-- Codex View Panel -->
+                    <div class="ec-panel ec-panel--codex">
+                        <div class="ec-panel-header">
+                            <span class="ec-panel-title">Codex View</span>
+                            <span class="ec-panel-tag">Card Detail</span>
+                        </div>
+                        <div class="ec-codex-card" id="codex-card">
+                            <div class="ec-codex-name" id="codex-name">Hover a card...</div>
+                            <div class="ec-codex-meta" id="codex-meta"></div>
+                            <div class="ec-codex-body" id="codex-body">Select or hover over any card to view its details here.</div>
+                            <div class="ec-codex-flavor" id="codex-flavor"></div>
+                        </div>
+                    </div>
+
+                    <!-- Battle Chronicle Panel -->
+                    <div class="ec-panel ec-panel--chronicle">
+                        <div class="ec-panel-header">
+                            <span class="ec-panel-title">Battle Chronicle</span>
+                            <span class="ec-panel-tag">Turn Log</span>
+                        </div>
+                        <div class="ec-chronicle-body" id="log-content">
+                            <div class="ec-chronicle-entry">Match begins...</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="ec-panel ec-panel--actions">
+                        <div id="turn-controls">
+                            <button class="turn-btn" id="btn-next-phase">Next Phase</button>
+                            <button class="turn-btn" id="btn-end-turn">End Turn</button>
+                        </div>
+                        <div id="side-panel">
+                            <button class="panel-btn" id="btn-codex" title="Codex">?</button>
+                            <button class="panel-btn auto-btn" id="btn-rules-helper" title="Rules Helper">Auto</button>
+                            <button class="panel-btn" id="btn-settings" title="Settings">⚙</button>
+                            <button class="panel-btn" id="btn-log" title="Game Log">📜</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM HUD - Player with Floating Deity -->
+            <div class="ec-hud ec-hud--bottom">
+                <div class="ec-hud-player">
+                    <div class="deity-ring" id="p1-deity-zone">
+                        <div class="deity-card-inner" id="p1-deity"></div>
+                    </div>
+                    <div class="ec-hud-text">
+                        <span class="ec-hud-name" id="p1-deity-name">You</span>
+                        <span class="ec-hud-title" id="p1-title">Shardkeeper</span>
+                    </div>
+                </div>
+                <div class="essence-hud">
+                    <div class="essence-counter">
+                        <div class="essence-glyph"></div>
+                        <span class="essence-value" id="p1-essence">23</span>
+                    </div>
+                    <div class="kl-display">
+                        <span class="kl-label">Kundalini</span>
+                        <div class="kl-pips" id="p1-kl-pips">
+                            <div class="kl-pip active"></div>
+                            <div class="kl-pip active"></div>
+                            <div class="kl-pip active"></div>
+                        </div>
+                        <span class="kl-text" id="p1-kl">3/3</span>
+                    </div>
+                    <div class="ec-hud-stats">
+                        <div class="ec-pill ec-pill--deck" id="p1-deck">
+                            <span class="ec-pill-icon">📜</span>
+                            <span class="ec-pill-value" id="p1-deck-count">0</span>
+                            <span class="ec-pill-label">Veiled</span>
+                        </div>
+                        <div class="ec-pill ec-pill--void" id="p1-graveyard">
+                            <span class="ec-pill-icon">💀</span>
+                            <span class="ec-pill-value" id="p1-graveyard-count">0</span>
+                            <span class="ec-pill-label">Fracture</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Shattered Sun Chronicle Panel (Campaign Mode) -->
+            <div class="chronicle-panel hidden" id="chronicle-panel">
+                <div class="chronicle-header">
+                    <span class="chronicle-title">Shattered Sun Chronicle</span>
+                    <button class="chronicle-toggle" onclick="ChroniclePanel.toggle()">−</button>
+                </div>
+                <div class="chronicle-content" id="chronicle-content">
+                    <div class="chronicle-act" id="chronicle-act">Act I</div>
+                    <div class="chronicle-chapter" id="chronicle-chapter">Chapter 1: The Awakening</div>
+                    <div class="chronicle-story" id="chronicle-story">
+                        Your journey begins at the Second Sun temple...
+                    </div>
+                    <div class="chronicle-objectives">
+                        <div class="objective-title">Objectives</div>
+                        <div class="objective-item" id="obj-win">
+                            <span class="objective-icon">⚔</span>
+                            <span>Defeat the opponent</span>
+                        </div>
+                    </div>
+                    <div class="chronicle-progress" id="chronicle-progress">
+                        <div class="progress-node complete">1</div>
+                        <div class="progress-node current">2</div>
+                        <div class="progress-node">3</div>
+                        <div class="progress-node">4</div>
+                        <div class="progress-node">5</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMAND HAND BAR -->
+            <div class="ec-hand-bar" id="hand-zone">
+                <div class="ec-hand-header">
+                    <span class="ec-hand-title">Command Hand</span>
+                    <span class="ec-hand-info" id="hand-info">0 cards</span>
+                </div>
+                <div class="ec-hand-content">
+                    <div class="ec-deck-pile" id="deck-pile" onclick="Game.drawCardManual()">
+                        <div class="ec-deck-stack">
+                            <div class="ec-deck-card"></div>
+                            <div class="ec-deck-card"></div>
+                            <div class="ec-deck-card"></div>
+                        </div>
+                        <div class="ec-deck-count" id="deck-pile-count">0</div>
+                        <div class="ec-deck-label">DECK</div>
+                    </div>
+                    <div class="ec-hand-cards" id="player-hand"></div>
+                    <div class="ec-graveyard-pile" id="graveyard-pile" onclick="Game.showPile('graveyard', 0)">
+                        <div class="ec-graveyard-icon">💀</div>
+                        <div class="ec-graveyard-count" id="graveyard-pile-count">0</div>
+                        <div class="ec-graveyard-label">VOID</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legacy IDs for JS compatibility -->
+        <div id="p1-life-badge" class="hidden-badge" data-player="0"></div>
+        <div id="p2-life-badge" class="hidden-badge" data-player="1"></div>
+        <div id="p1-banished" class="hidden-badge"><span id="p1-banished-count">0</span></div>
+        <div id="p2-banished" class="hidden-badge"><span id="p2-banished-count">0</span></div>
+
+        <!-- Reaction Bar -->
+        <div class="ec-reaction-bar" id="ec-reaction-bar">
+            <span class="ec-reaction-prompt">You may respond</span>
+            <div class="ec-reaction-cards"></div>
+            <div class="ec-reaction-actions">
+                <button class="ec-reaction-btn ec-reaction-btn--respond" onclick="ReactionBar.respond()">Respond</button>
+                <button class="ec-reaction-btn ec-reaction-btn--pass" onclick="ReactionBar.pass()">Pass</button>
+            </div>
+            <div class="ec-reaction-autopass">
+                <input type="checkbox" id="ec-autopass-toggle" onchange="ReactionBar.toggleAutoPass()">
+                <label for="ec-autopass-toggle">Auto-pass</label>
+            </div>
+        </div>
+
+        <!-- Crown Victory/Defeat Overlay -->
+        <div class="ec-crown-overlay" id="ec-crown-overlay">
+            <div class="ec-crown-title" id="ec-crown-title">CROWN CLAIMED</div>
+        </div>
+
+        <!-- Turn Indicator -->
+        <div id="turn-indicator" class="turn-indicator p1">Player 1's Turn</div>
+
+        <!-- Action Prompt -->
+        <div id="action-prompt"></div>
+
+        <!-- Battle Overlay -->
+        <div id="battle-overlay"></div>
+        
+        <!-- Draw Animation Overlay -->
+        <div id="draw-animation"></div>
+        
+        <!-- Pile/Graveyard Overlay -->
+        <div id="pile-overlay"></div>
+        
+        <!-- AI Play Overlay -->
+        <div id="ai-play-overlay"></div>
+        
+        <!-- Card Preview -->
+        <div id="card-preview"></div>
+
+        <!-- Shard Chain Panel -->
+        <div id="shard-chain-panel">
+            <div class="shard-chain-header">
+                <span class="chain-title">SHARD CHAIN</span>
+                <span class="chain-count">0 Links</span>
+            </div>
+            <div class="shard-chain-links"></div>
+            <div class="shard-chain-controls">
+                <button class="chain-btn pass-btn" onclick="Game.passShardChainPriority()">PASS</button>
+            </div>
+        </div>
+        <!-- Tutorial Hint Overlay -->
+        <div id="tutorial-hint" class="tutorial-hint hidden">
+            <div class="hint-content">
+                <div class="hint-text" id="hint-text"></div>
+                <button class="hint-btn" onclick="TutorialBattle.nextHint()">Got it →</button>
+            </div>
+        </div>
+
+        <!-- Damage Numbers Container -->
+        <div id="damage-numbers"></div>
+
+        <!-- Particle Canvas -->
+        <canvas id="particle-canvas"></canvas>
+        
+        <!-- Persistent Game Controls -->
+        <div class="ec-game-controls" id="game-controls">
+            <button class="ec-ctrl-btn" onclick="GameControls.toggleFullscreen()" title="Toggle Fullscreen">
+                <span class="ctrl-icon">⛶</span>
+            </button>
+            <button class="ec-ctrl-btn" onclick="GameControls.showPause()" title="Pause Menu">
+                <span class="ctrl-icon">⏸</span>
+            </button>
+            <button class="ec-ctrl-btn" onclick="GameControls.goHome()" title="Return to Menu">
+                <span class="ctrl-icon">🏠</span>
+            </button>
+        </div>
+        
+        <!-- Pause Menu Overlay -->
+        <div class="ec-pause-overlay hidden" id="pause-overlay">
+            <div class="ec-pause-menu">
+                <h2 class="pause-title">GAME PAUSED</h2>
+                <div class="pause-options">
+                    <button class="pause-btn" onclick="GameControls.resume()">Resume Game</button>
+                    <button class="pause-btn" onclick="GameControls.toggleFullscreen()">Toggle Fullscreen</button>
+                    <button class="pause-btn" onclick="MainMenu.selectMode('settings')">Settings</button>
+                    <button class="pause-btn pause-btn--danger" onclick="GameControls.surrender()">Surrender Match</button>
+                    <button class="pause-btn pause-btn--danger" onclick="GameControls.goHome()">Quit to Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="PlayerProfile.closeModal()"></div>
+        <div class="modal-content profile-modal-enhanced">
+            <div class="modal-header">
+                <h2>⚔️ Shardkeeper Profile</h2>
+                <button class="modal-close" onclick="PlayerProfile.closeModal()">✕</button>
+            </div>
+            
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="identity" onclick="PlayerProfile.switchTab('identity')">Identity</button>
+                <button class="profile-tab" data-tab="cosmetics" onclick="PlayerProfile.switchTab('cosmetics')">Cosmetics</button>
+                <button class="profile-tab" data-tab="stats" onclick="PlayerProfile.switchTab('stats')">Stats</button>
+            </div>
+            
+            <!-- Identity Tab -->
+            <div class="profile-tab-content active" id="tab-identity">
+                <div class="form-group">
+                    <label>Shardkeeper Name</label>
+                    <input type="text" id="profile-name-input" placeholder="Enter your legendary name" maxlength="20">
+                </div>
+                
+                <div class="form-group">
+                    <label>Avatar Emblem</label>
+                    <div class="avatar-options enhanced">
+                        <div class="avatar-option" data-avatar="cosmic" onclick="PlayerProfile.selectAvatar('cosmic')">
+                            <span class="avatar-icon">🌌</span>
+                            <span class="avatar-label">Cosmic</span>
+                        </div>
+                        <div class="avatar-option" data-avatar="void" onclick="PlayerProfile.selectAvatar('void')">
+                            <span class="avatar-icon">🌑</span>
+                            <span class="avatar-label">Void</span>
+                        </div>
+                        <div class="avatar-option" data-avatar="essence" onclick="PlayerProfile.selectAvatar('essence')">
+                            <span class="avatar-icon">✨</span>
+                            <span class="avatar-label">Essence</span>
+                        </div>
+                        <div class="avatar-option" data-avatar="divine" onclick="PlayerProfile.selectAvatar('divine')">
+                            <span class="avatar-icon">👑</span>
+                            <span class="avatar-label">Divine</span>
+                        </div>
+                        <div class="avatar-option" data-avatar="inferno" onclick="PlayerProfile.selectAvatar('inferno')">
+                            <span class="avatar-icon">🔥</span>
+                            <span class="avatar-label">Inferno</span>
+                        </div>
+                        <div class="avatar-option" data-avatar="storm" onclick="PlayerProfile.selectAvatar('storm')">
+                            <span class="avatar-icon">⚡</span>
+                            <span class="avatar-label">Storm</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Title</label>
+                    <div class="title-options">
+                        <div class="title-option" data-title="Initiate" onclick="PlayerProfile.selectTitle('Initiate')">Initiate</div>
+                        <div class="title-option" data-title="Shardkeeper" onclick="PlayerProfile.selectTitle('Shardkeeper')">Shardkeeper</div>
+                        <div class="title-option" data-title="Essence Weaver" onclick="PlayerProfile.selectTitle('Essence Weaver')">Essence Weaver</div>
+                        <div class="title-option" data-title="Void Walker" onclick="PlayerProfile.selectTitle('Void Walker')">Void Walker</div>
+                        <div class="title-option locked" data-title="Champion" onclick="PlayerProfile.selectTitle('Champion')">Champion 🔒</div>
+                        <div class="title-option locked" data-title="Deity Slayer" onclick="PlayerProfile.selectTitle('Deity Slayer')">Deity Slayer 🔒</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Battle Motto</label>
+                    <input type="text" id="profile-motto-input" placeholder="Your legendary battle cry..." maxlength="50">
+                </div>
+            </div>
+            
+            <!-- Cosmetics Tab -->
+            <div class="profile-tab-content" id="tab-cosmetics">
+                <div class="form-group">
+                    <label>Card Back</label>
+                    <div class="cardback-options">
+                        <div class="cardback-option selected" data-cardback="default" onclick="PlayerProfile.selectCardBack('default')">
+                            <div class="cardback-preview default"></div>
+                            <span>Classic</span>
+                        </div>
+                        <div class="cardback-option" data-cardback="cosmic" onclick="PlayerProfile.selectCardBack('cosmic')">
+                            <div class="cardback-preview cosmic"></div>
+                            <span>Cosmic</span>
+                        </div>
+                        <div class="cardback-option" data-cardback="void" onclick="PlayerProfile.selectCardBack('void')">
+                            <div class="cardback-preview void"></div>
+                            <span>Void</span>
+                        </div>
+                        <div class="cardback-option" data-cardback="golden" onclick="PlayerProfile.selectCardBack('golden')">
+                            <div class="cardback-preview golden"></div>
+                            <span>Golden</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Profile Border</label>
+                    <div class="border-options">
+                        <div class="border-option selected" data-border="bronze" onclick="PlayerProfile.selectBorder('bronze')">
+                            <div class="border-preview bronze"></div>
+                            <span>Bronze</span>
+                        </div>
+                        <div class="border-option" data-border="silver" onclick="PlayerProfile.selectBorder('silver')">
+                            <div class="border-preview silver"></div>
+                            <span>Silver</span>
+                        </div>
+                        <div class="border-option" data-border="gold" onclick="PlayerProfile.selectBorder('gold')">
+                            <div class="border-preview gold"></div>
+                            <span>Gold</span>
+                        </div>
+                        <div class="border-option locked" data-border="divine" onclick="PlayerProfile.selectBorder('divine')">
+                            <div class="border-preview divine"></div>
+                            <span>Divine 🔒</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Favorite Deity</label>
+                    <select id="profile-deity-select" onchange="PlayerProfile.selectFavoriteDeity(this.value)">
+                        <option value="">Select your patron deity...</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Stats Tab -->
+            <div class="profile-tab-content" id="tab-stats">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-matches">0</div>
+                        <div class="stat-label">Total Matches</div>
+                    </div>
+                    <div class="stat-card wins">
+                        <div class="stat-value" id="stat-wins">0</div>
+                        <div class="stat-label">Victories</div>
+                    </div>
+                    <div class="stat-card losses">
+                        <div class="stat-value" id="stat-losses">0</div>
+                        <div class="stat-label">Defeats</div>
+                    </div>
+                    <div class="stat-card winrate">
+                        <div class="stat-value" id="stat-winrate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-streak">0</div>
+                        <div class="stat-label">Best Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-campaign">0/10</div>
+                        <div class="stat-label">Campaign</div>
+                    </div>
+                </div>
+                
+                <div class="recent-matches">
+                    <h3>Recent Battles</h3>
+                    <div class="match-history" id="match-history-list">
+                        <div class="no-matches">No battles yet. Begin your legend!</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <button class="btn-secondary" onclick="PlayerProfile.closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="PlayerProfile.saveProfile()">Save Profile</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Match Intro Cinematic -->
+    <div id="match-intro" class="match-intro hidden">
+        <div class="intro-bg"></div>
+        <div class="intro-content">
+            <div class="duelist duelist-left">
+                <div class="duelist-avatar" id="intro-p1-avatar"></div>
+                <div class="duelist-name" id="intro-p1-name"></div>
+                <div class="duelist-title" id="intro-p1-title"></div>
+                <div class="duelist-deity" id="intro-p1-deity"></div>
+            </div>
+            <div class="vs-emblem">
+                <span class="vs-text">VS</span>
+                <div class="vs-glow"></div>
+            </div>
+            <div class="duelist duelist-right">
+                <div class="duelist-avatar" id="intro-p2-avatar"></div>
+                <div class="duelist-name" id="intro-p2-name"></div>
+                <div class="duelist-title" id="intro-p2-title"></div>
+                <div class="duelist-deity" id="intro-p2-deity"></div>
+            </div>
+        </div>
+        <div class="intro-bottom">
+            <div class="battle-quote" id="intro-quote"></div>
+            <div class="intro-progress"></div>
+        </div>
+    </div>
+
+    <!-- Main Menu Screen -->
+    <div id="main-menu" class="main-menu-screen">
+        <div class="menu-background">
+            <div class="menu-particles"></div>
+        </div>
+        
+        <div class="menu-header">
+            <div class="menu-logo">
+                <h1>ESSENCE CROWN</h1>
+                <h2>SHARD WARS</h2>
+            </div>
+            <div class="menu-controls">
+                <button class="audio-btn" id="btn-music" onclick="AudioManager.toggleMusic()" title="Toggle Music">🎵</button>
+                <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="40" 
+                       onchange="AudioManager.setVolume(this.value / 100)" title="Music Volume">
+                <button class="fullscreen-btn" id="btn-fullscreen" onclick="FullscreenToggle.toggle()" title="Toggle Fullscreen">⛶</button>
+            </div>
+            <div class="menu-profile" onclick="PlayerProfile.showModal()">
+                <div class="profile-avatar" id="menu-avatar">👑</div>
+                <div class="profile-info">
+                    <span class="profile-name" id="menu-player-name">Create Profile</span>
+                    <span class="profile-rank" id="menu-player-rank">Click to setup</span>
+                </div>
+                <div class="profile-currency">
+                    <span class="currency-shards" id="menu-shards">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="menu-content">
+            <div class="menu-modes">
+                <div class="mode-card profile-setup" onclick="PlayerProfile.showModal()">
+                    <div class="mode-icon">👤</div>
+                    <div class="mode-info">
+                        <h3>CREATE PROFILE</h3>
+                        <p>Customize your name & avatar</p>
+                    </div>
+                    <div class="mode-badge">Start Here</div>
+                </div>
+                
+                <div class="mode-card solo" onclick="MainMenu.selectMode('solo')">
+                    <div class="mode-icon">⚔</div>
+                    <div class="mode-info">
+                        <h3>SOLO BATTLE</h3>
+                        <p>Fight against AI opponents</p>
+                    </div>
+                    <div class="mode-badge">Practice</div>
+                </div>
+                
+                <div class="mode-card tutorial-battle" onclick="MainMenu.selectMode('learntoplay')">
+                    <div class="mode-icon">📖</div>
+                    <div class="mode-info">
+                        <h3>LEARN TO PLAY</h3>
+                        <p>Rules & Tutorial</p>
+                    </div>
+                    <div class="mode-badge hot">Guided</div>
+                </div>
+                
+                <div class="mode-card campaign" onclick="MainMenu.selectMode('campaign')">
+                    <div class="mode-icon">👑</div>
+                    <div class="mode-info">
+                        <h3>CAMPAIGN</h3>
+                        <p>Challenge the Deity Bosses</p>
+                    </div>
+                    <div class="mode-badge new">Story</div>
+                </div>
+                
+                <div class="mode-card multiplayer" onclick="MainMenu.selectMode('multiplayer')">
+                    <div class="mode-icon">🌐</div>
+                    <div class="mode-info">
+                        <h3>MULTIPLAYER</h3>
+                        <p>Ranked & Casual matches</p>
+                    </div>
+                    <div class="mode-badge hot">Online</div>
+                </div>
+                
+                <div class="mode-card deckbuilder" onclick="MainMenu.selectMode('deckbuilder')">
+                    <div class="mode-icon">📚</div>
+                    <div class="mode-info">
+                        <h3>DECK BUILDER</h3>
+                        <p>Build your perfect deck</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card collection" onclick="MainMenu.selectMode('collection')">
+                    <div class="mode-icon">✨</div>
+                    <div class="mode-info">
+                        <h3>COLLECTION</h3>
+                        <p>View cards & cosmetics</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card shop" onclick="MainMenu.selectMode('shop')">
+                    <div class="mode-icon">💎</div>
+                    <div class="mode-info">
+                        <h3>SHARD SHOP</h3>
+                        <p>Buy cosmetics with Shards</p>
+                    </div>
+                    <div class="mode-badge hot">Shop</div>
+                </div>
+                
+                <div class="mode-card settings" onclick="MainMenu.selectMode('settings')">
+                    <div class="mode-icon">⚙</div>
+                    <div class="mode-info">
+                        <h3>SETTINGS</h3>
+                        <p>Options & accessibility</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-news">
+                <div class="news-banner">
+                    <span class="news-label">NEWS</span>
+                    <span class="news-text">Season 1 is live! Climb the ranks and earn exclusive rewards.</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="menu-footer">
+            <button class="menu-footer-btn" onclick="MainMenu.selectMode('learntoplay')">Tutorial</button>
+            <button class="menu-footer-btn" onclick="MainMenu.showCredits()">Credits</button>
+            <span class="menu-version">v1.0.0</span>
+        </div>
+    </div>
+    
+    <!-- Menu Settings Overlay -->
+    <div id="menu-settings-overlay" class="overlay hidden">
+        <div class="menu-settings-container">
+            <button class="back-btn" onclick="MainMenu.hideSettings()">← Back to Menu</button>
+            <h1>SETTINGS</h1>
+            
+            <div class="settings-sections">
+                <div class="settings-section">
+                    <h3>Audio</h3>
+                    <div class="settings-option">
+                        <label>Music</label>
+                        <div class="toggle-switch" id="menu-opt-music" onclick="MainMenu.toggleSetting('music')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Sound Effects</label>
+                        <div class="toggle-switch" id="menu-opt-sfx" onclick="MainMenu.toggleSetting('sfx')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Volume</label>
+                        <input type="range" id="menu-opt-volume" min="0" max="100" value="60" class="settings-slider" onchange="MainMenu.setVolume(this.value)">
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Display</h3>
+                    <div class="settings-option">
+                        <label>Animations</label>
+                        <div class="toggle-switch active" id="menu-opt-animations" onclick="MainMenu.toggleSetting('animations')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Reduce Motion</label>
+                        <div class="toggle-switch" id="menu-opt-reduce-motion" onclick="MainMenu.toggleSetting('reduceMotion')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Low-FX Mode</label>
+                        <div class="toggle-switch" id="menu-opt-low-fx" onclick="MainMenu.toggleSetting('lowFx')"></div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Accessibility</h3>
+                    <div class="settings-option">
+                        <label>Text Size</label>
+                        <select id="menu-opt-text-size" class="settings-select" onchange="MainMenu.setTextSize(this.value)">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                    <div class="settings-option">
+                        <label>Colorblind Mode</label>
+                        <select id="menu-opt-colorblind" class="settings-select" onchange="MainMenu.setColorblind(this.value)">
+                            <option value="off">Off</option>
+                            <option value="deuteranopia">Deuteranopia</option>
+                            <option value="protanopia">Protanopia</option>
+                            <option value="tritanopia">Tritanopia</option>
+                        </select>
+                    </div>
+                    <div class="settings-option">
+                        <label>High Contrast</label>
+                        <div class="toggle-switch" id="menu-opt-contrast" onclick="MainMenu.toggleSetting('contrast')"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="primary-btn" onclick="MainMenu.hideSettings()">Save & Close</button>
+        </div>
+    </div>
+    
+    <!-- Learn to Play Overlay -->
+    <div id="learn-overlay" class="overlay hidden">
+        <div class="learn-container">
+            <button class="back-btn" onclick="MainMenu.hideLearnToPlay()">← Back to Menu</button>
+            
+            <div id="learn-overview" class="learn-content">
+                <h1>LEARN TO PLAY</h1>
+                <p class="learn-subtitle">Master the Shard Wars</p>
+                
+                <div class="learn-sections">
+                    <div class="learn-card">
+                        <div class="learn-card-icon">🎯</div>
+                        <h3>Objective</h3>
+                        <p>Reduce your opponent's <strong>Essence</strong> to 0 to shatter their Crown and win the match.</p>
+                    </div>
+                    
+                    <div class="learn-card">
+                        <div class="learn-card-icon">⚔️</div>
+                        <h3>Battlefield</h3>
+                        <p>Summon <strong>Avatars</strong> to your Avatar Row to attack. Play <strong>Domains</strong> to power abilities. Your <strong>Deity</strong> grants special powers.</p>
+                    </div>
+                    
+                    <div class="learn-card">
+                        <div class="learn-card-icon">💠</div>
+                        <h3>Kundalini (KL)</h3>
+                        <p>KL is your mana resource. Each card costs KL to play. You gain +1 max KL each turn (up to 13).</p>
+                    </div>
+                    
+                    <div class="learn-card">
+                        <div class="learn-card-icon">🔄</div>
+                        <h3>Turn Flow</h3>
+                        <p><strong>Dawn</strong> → Gain KL & draw<br><strong>Main</strong> → Play cards<br><strong>Clash</strong> → Attack<br><strong>Twilight</strong> → End effects</p>
+                    </div>
+                    
+                    <div class="learn-card">
+                        <div class="learn-card-icon">⭐</div>
+                        <h3>Combat</h3>
+                        <p>Avatars attack with <strong>Power</strong> and defend with <strong>Guard</strong>. Unblocked attacks deal Essence damage to the enemy Deity.</p>
+                    </div>
+                    
+                    <div class="learn-card">
+                        <div class="learn-card-icon">👑</div>
+                        <h3>God Code</h3>
+                        <p>Each Deity has a powerful <strong>God Code</strong> ability. Use it wisely - it can only be activated once per game!</p>
+                    </div>
+                </div>
+                
+                <div class="learn-actions">
+                    <button class="learn-btn secondary" onclick="MainMenu.showFullRules()">📜 Read Full Rules</button>
+                    <button class="learn-btn primary" onclick="MainMenu.startTutorialMatch()">🎮 Start Tutorial Match</button>
+                </div>
+            </div>
+            
+            <div id="learn-full-rules" class="learn-content hidden">
+                <div class="rules-header">
+                    <button class="back-btn" onclick="MainMenu.hideFullRules()">← Back to Overview</button>
+                    <h2>Complete Rulebook</h2>
+                </div>
+                
+                <div class="rules-scroll">
+                    <section class="rule-section">
+                        <h3>🎯 Win Conditions</h3>
+                        <ul>
+                            <li><strong>Essence Victory:</strong> Reduce opponent's Essence to 0</li>
+                            <li><strong>Deck Out:</strong> If opponent must draw but has no cards, they lose</li>
+                            <li><strong>Concede:</strong> A player may forfeit at any time</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="rule-section">
+                        <h3>⚔️ Game Zones</h3>
+                        <ul>
+                            <li><strong>Deity Zone:</strong> Your Deity card providing passive bonuses and God Code</li>
+                            <li><strong>Avatar Row (New Earth):</strong> Where Avatars battle (max 5)</li>
+                            <li><strong>Domain Row:</strong> Domains that grant aspects and abilities (max 5)</li>
+                            <li><strong>Relic Row:</strong> Artifacts with ongoing effects (max 5)</li>
+                            <li><strong>Deck:</strong> Your draw pile</li>
+                            <li><strong>Void (Graveyard):</strong> Destroyed cards</li>
+                            <li><strong>Abyss (Exile):</strong> Banished cards (cannot be retrieved)</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="rule-section">
+                        <h3>💠 Kundalini (KL) System</h3>
+                        <ul>
+                            <li>Start with 3 KL maximum</li>
+                            <li>Gain +1 max KL at the start of each turn (cap: 13)</li>
+                            <li>KL fully refreshes each turn</li>
+                            <li>Spend KL to play cards matching their cost</li>
+                            <li>Overflow: If you would exceed 13 KL, trigger God Code instead</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="rule-section">
+                        <h3>🔄 Turn Phases</h3>
+                        <ul>
+                            <li><strong>Dawn Phase:</strong> Untap cards, increase max KL, refill KL</li>
+                            <li><strong>Draw Phase:</strong> Draw 1 card (mandatory)</li>
+                            <li><strong>Main Phase:</strong> Play Avatars, Domains, Relics, and Spells</li>
+                            <li><strong>Clash Phase:</strong> Declare attacks, resolve combat</li>
+                            <li><strong>Twilight Phase:</strong> End-of-turn effects, discard to 7 cards</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="rule-section">
+                        <h3>⭐ Combat Rules</h3>
+                        <ul>
+                            <li>Avatars with summoning sickness cannot attack (unless Haste)</li>
+                            <li>Attacker deals Power damage, defender deals Power back</li>
+                            <li>Avatar dies when Guard reaches 0</li>
+                            <li>Unblocked attacks deal Power as Essence damage to Deity</li>
+                            <li><strong>Guardian:</strong> Must be targeted first before other Avatars/Deity</li>
+                            <li><strong>Haste:</strong> Can attack immediately when played</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="rule-section">
+                        <h3>🌈 Aspects</h3>
+                        <ul>
+                            <li><strong>Glow:</strong> Light and healing</li>
+                            <li><strong>Void:</strong> Darkness and destruction</li>
+                            <li><strong>Gray:</strong> Balance and control</li>
+                            <li><strong>Beast:</strong> Creature synergies</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="rule-section">
+                        <h3>👑 God Codes</h3>
+                        <p>Each Deity has a unique God Code - a powerful ability that can only be activated once per game. God Codes trigger automatically when your KL would exceed 13, or can be activated manually when available.</p>
+                    </section>
+                </div>
+                
+                <div class="learn-actions">
+                    <button class="learn-btn primary" onclick="MainMenu.startTutorialMatch()">🎮 Start Tutorial Match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tutorial Overlay (kept for backward compatibility) -->
+    <div id="tutorial-overlay" class="hidden"></div>
+    
+    <!-- Solo Mode Selection -->
+    <div id="solo-overlay" class="overlay hidden">
+        <div class="solo-container">
+            <h1>SOLO BATTLE</h1>
+            <p>Choose your challenge level</p>
+            
+            <div class="difficulty-grid">
+                <div class="difficulty-card" onclick="AIManager.startMatch('easy')">
+                    <div class="diff-icon">🌱</div>
+                    <h3>EASY</h3>
+                    <p>Learn the basics against a forgiving opponent</p>
+                    <div class="diff-rewards">Rewards: 232 Shards</div>
+                </div>
+                
+                <div class="difficulty-card" onclick="AIManager.startMatch('medium')">
+                    <div class="diff-icon">⚔</div>
+                    <h3>MEDIUM</h3>
+                    <p>A balanced challenge for growing skills</p>
+                    <div class="diff-rewards">Rewards: 247 Shards</div>
+                </div>
+                
+                <div class="difficulty-card" onclick="AIManager.startMatch('hard')">
+                    <div class="diff-icon">💀</div>
+                    <h3>HARD</h3>
+                    <p>Face a cunning opponent with advanced tactics</p>
+                    <div class="diff-rewards">Rewards: 272 Shards</div>
+                </div>
+                
+                <div class="difficulty-card boss" onclick="AIManager.startMatch('boss')">
+                    <div class="diff-icon">👹</div>
+                    <h3>BOSS RUSH</h3>
+                    <p>Challenge random boss deities</p>
+                    <div class="diff-rewards">Rewards: 322 Shards</div>
+                </div>
+            </div>
+            
+            <button class="back-btn" onclick="MainMenu.back()">Back to Menu</button>
+        </div>
+    </div>
+    
+    <!-- Campaign Mode -->
+    <div id="campaign-overlay" class="overlay hidden">
+        <div class="campaign-container">
+            <h1>CAMPAIGN: CROWN WARS</h1>
+            <p>Defeat the Deity Bosses and claim your crown</p>
+            
+            <div class="campaign-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="campaign-progress-bar"></div>
+                </div>
+                <span id="campaign-progress-text">0 / 10 Bosses Defeated</span>
+            </div>
+            
+            <div class="chapter-grid" id="campaign-chapters">
+                <!-- Generated by CampaignManager -->
+            </div>
+            
+            <button class="back-btn" onclick="MainMenu.back()">Back to Menu</button>
+        </div>
+    </div>
+    
+    <!-- Deck Builder -->
+    <div id="deckbuilder-overlay" class="overlay hidden">
+        <div class="ec-deckbuilder">
+            <div class="ec-deckbuilder-header">
+                <div class="ec-db-title">
+                    <span class="ec-db-icon">📜</span>
+                    <h1>DECK FORGE</h1>
+                </div>
+                <div class="ec-db-deck-meta">
+                    <input type="text" id="deck-name" class="ec-db-name-input" placeholder="Deck Name" value="New Deck">
+                    <div class="ec-db-card-counter">
+                        <span class="ec-db-count" id="deck-card-count">0</span>
+                        <span class="ec-db-count-max">/60</span>
+                    </div>
+                </div>
+                <div class="ec-db-actions">
+                    <button class="ec-db-btn save" onclick="DeckBuilder.saveDeck()">
+                        <span class="btn-icon">💾</span> Save
+                    </button>
+                    <button class="ec-db-btn clear" onclick="DeckBuilder.clearDeck()">
+                        <span class="btn-icon">🗑</span> Clear
+                    </button>
+                    <button class="ec-db-btn play" onclick="DeckBuilder.playWithDeck()">
+                        <span class="btn-icon">⚔</span> Battle
+                    </button>
+                </div>
+            </div>
+            
+            <div class="ec-deckbuilder-grid">
+                <div class="ec-db-pool card-pool">
+                    <div class="ec-db-filter-bar pool-filters">
+                        <div class="ec-filter-search">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="deck-search" placeholder="Search cards...">
+                        </div>
+                        <div class="ec-filter-chips">
+                            <select id="deck-filter-type" class="ec-filter-select">
+                                <option value="">All Types</option>
+                                <option value="Avatar">Avatars</option>
+                                <option value="Spell">Spells</option>
+                                <option value="Domain">Domains</option>
+                                <option value="Relic">Relics</option>
+                            </select>
+                            <select id="deck-filter-aspect" class="ec-filter-select">
+                                <option value="">All Aspects</option>
+                                <option value="Glow">Glow</option>
+                                <option value="Void">Void</option>
+                                <option value="Gray">Gray</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ec-db-pool-cards pool-cards" id="deck-card-pool"></div>
+                </div>
+                
+                <div class="ec-db-stats">
+                    <div class="ec-stats-panel">
+                        <h3 class="ec-stats-title">Deck Analytics</h3>
+                        
+                        <div class="ec-stat-section">
+                            <h4>KL Curve</h4>
+                            <div class="ec-kl-curve" id="deck-kl-curve">
+                                <div class="ec-kl-bar" data-cost="0"><div class="bar-fill"></div><span>0</span></div>
+                                <div class="ec-kl-bar" data-cost="1"><div class="bar-fill"></div><span>1</span></div>
+                                <div class="ec-kl-bar" data-cost="2"><div class="bar-fill"></div><span>2</span></div>
+                                <div class="ec-kl-bar" data-cost="3"><div class="bar-fill"></div><span>3</span></div>
+                                <div class="ec-kl-bar" data-cost="4"><div class="bar-fill"></div><span>4</span></div>
+                                <div class="ec-kl-bar" data-cost="5"><div class="bar-fill"></div><span>5</span></div>
+                                <div class="ec-kl-bar" data-cost="6"><div class="bar-fill"></div><span>6+</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="ec-stat-section">
+                            <h4>Card Types</h4>
+                            <div class="ec-type-bars" id="deck-type-breakdown">
+                                <div class="ec-type-row">
+                                    <span class="type-label">Avatar</span>
+                                    <div class="type-bar"><div class="type-fill avatar" id="type-avatar-bar"></div></div>
+                                    <span class="type-count" id="type-avatar-count">0</span>
+                                </div>
+                                <div class="ec-type-row">
+                                    <span class="type-label">Spell</span>
+                                    <div class="type-bar"><div class="type-fill spell" id="type-spell-bar"></div></div>
+                                    <span class="type-count" id="type-spell-count">0</span>
+                                </div>
+                                <div class="ec-type-row">
+                                    <span class="type-label">Domain</span>
+                                    <div class="type-bar"><div class="type-fill domain" id="type-domain-bar"></div></div>
+                                    <span class="type-count" id="type-domain-count">0</span>
+                                </div>
+                                <div class="ec-type-row">
+                                    <span class="type-label">Relic</span>
+                                    <div class="type-bar"><div class="type-fill relic" id="type-relic-bar"></div></div>
+                                    <span class="type-count" id="type-relic-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ec-stat-section">
+                            <h4>Aspects</h4>
+                            <div class="ec-aspect-rings" id="deck-aspect-dist">
+                                <div class="ec-aspect-badge glow">
+                                    <span class="aspect-icon">☀</span>
+                                    <span class="aspect-count" id="aspect-glow-count">0</span>
+                                </div>
+                                <div class="ec-aspect-badge void">
+                                    <span class="aspect-icon">🌑</span>
+                                    <span class="aspect-count" id="aspect-void-count">0</span>
+                                </div>
+                                <div class="ec-aspect-badge gray">
+                                    <span class="aspect-icon">⚖</span>
+                                    <span class="aspect-count" id="aspect-gray-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ec-saved-panel">
+                        <h3 class="ec-stats-title">Saved Decks</h3>
+                        <div class="ec-saved-decks" id="saved-decks-list"></div>
+                    </div>
+                </div>
+                
+                <div class="ec-db-decklist current-deck">
+                    <div class="ec-decklist-header">
+                        <span class="ec-decklist-title">Current Deck</span>
+                        <div class="ec-deck-validity" id="deck-validity">
+                            <span class="validity-icon">⚠</span>
+                            <span class="validity-text">Need 60 cards</span>
+                        </div>
+                    </div>
+                    <div class="ec-deck-cards deck-cards" id="deck-current-cards"></div>
+                </div>
+            </div>
+            
+            <button class="ec-db-back back-btn" onclick="MainMenu.back()">← Back to Menu</button>
+        </div>
+    </div>
+    
+    <!-- Card Detail Modal -->
+    <div id="card-detail-modal" class="card-detail-modal hidden">
+        <div class="card-detail-content">
+            <button class="card-detail-close" onclick="DeckBuilder.closeCardDetail()">×</button>
+            <div class="card-detail-image">
+                <img id="card-detail-img" src="" alt="Card">
+            </div>
+            <div class="card-detail-info">
+                <h2 id="card-detail-name">Card Name</h2>
+                <div class="card-detail-meta">
+                    <span id="card-detail-type" class="meta-badge">Type</span>
+                    <span id="card-detail-cost" class="meta-badge cost">Cost</span>
+                </div>
+                <p id="card-detail-aspects" class="aspects"></p>
+                <div id="card-detail-stats" class="stats"></div>
+                <p id="card-detail-effect" class="effect-text"></p>
+                <button class="card-detail-btn" onclick="DeckBuilder.quickAddCard()">Add to Deck</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Collection/Codex -->
+    <div id="collection-overlay" class="overlay hidden">
+        <div class="collection-container">
+            <h1>COLLECTION</h1>
+            <div class="collection-tabs">
+                <button class="coll-tab active" onclick="Collection.showTab('cards')">Cards</button>
+                <button class="coll-tab" onclick="Collection.showTab('deities')">Deities</button>
+                <button class="coll-tab" onclick="Collection.showTab('cosmetics')">Cosmetics</button>
+            </div>
+            
+            <div class="collection-grid" id="collection-grid"></div>
+            
+            <button class="back-btn" onclick="MainMenu.back()">Back to Menu</button>
+        </div>
+    </div>
+    
+    <!-- Queue Selection Overlay -->
+    <div id="queue-overlay" class="overlay hidden">
+        <div class="queue-container">
+            <button class="back-btn" onclick="MainMenu.back()">← Back to Menu</button>
+            <h1>CHOOSE YOUR BATTLE MODE</h1>
+            <div class="player-profile clickable" onclick="Game.openProfileViewer()">
+                <div class="rank-badge clickable-indicator">
+                    <div id="player-rank-display">Bronze III (1000 MMR)</div>
+                    <div id="player-stats-display">W: 0 / L: 0</div>
+                    <div class="click-hint">Click to view profile</div>
+                </div>
+            </div>
+            <div class="queue-buttons">
+                <button class="queue-btn casual" onclick="Game.joinQueue('casual')">
+                    <span class="queue-title">CASUAL</span>
+                    <span class="queue-desc">Play for fun, no MMR</span>
+                </button>
+                <button class="queue-btn ranked" onclick="Game.joinQueue('ranked')">
+                    <span class="queue-title">RANKED</span>
+                    <span class="queue-desc">Climb the ranks, gain MMR</span>
+                </button>
+            </div>
+            <div class="queue-extras">
+                <button class="queue-extra-btn" onclick="Game.showTournaments()">
+                    <span class="extra-icon">🏆</span>
+                    <span class="extra-title">Tournaments</span>
+                </button>
+                <button class="queue-extra-btn" onclick="Game.showEvents()">
+                    <span class="extra-icon">🎭</span>
+                    <span class="extra-title">Special Events</span>
+                </button>
+                <button class="queue-extra-btn" onclick="Game.showLimited()">
+                    <span class="extra-icon">📦</span>
+                    <span class="extra-title">Limited</span>
+                </button>
+            </div>
+            <div class="queue-extras secondary">
+                <button class="queue-extra-btn cosmetic" onclick="Game.showCosmetics()">
+                    <span class="extra-icon">✨</span>
+                    <span class="extra-title">Cosmetics</span>
+                </button>
+                <button class="queue-extra-btn shardpath" onclick="Game.showShardPath()">
+                    <span class="extra-icon">🛤️</span>
+                    <span class="extra-title">Shard Path</span>
+                </button>
+            </div>
+            <div class="queue-extras tertiary">
+                <button class="queue-extra-btn sandbox" onclick="Game.showSandbox()">
+                    <span class="extra-icon">🧪</span>
+                    <span class="extra-title">Sandbox</span>
+                </button>
+                <button class="queue-extra-btn custom" onclick="Game.showCustomLobby()">
+                    <span class="extra-icon">🔧</span>
+                    <span class="extra-title">Custom Lobby</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Friends & Direct Challenge Overlay -->
+    <div id="friends-overlay" class="overlay hidden">
+        <div class="friends-container">
+            <div class="friends-header">
+                <h1>Friends & Challenges</h1>
+                <button class="friends-close" onclick="Game.proceedToQueue()">→ Queue</button>
+            </div>
+            <div class="friends-sections">
+                <div class="section">
+                    <h2>Friends</h2>
+                    <button class="add-friend-btn" onclick="Game.addNewFriend()">+ Add Friend</button>
+                    <div id="friends-list" class="friends-list"></div>
+                </div>
+                <div class="section">
+                    <h2>Friend Requests</h2>
+                    <div id="friend-requests-list" class="requests-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Replay Browser Overlay -->
+    <div id="replay-browser-overlay" class="overlay hidden">
+        <div class="replay-browser-container">
+            <div class="replay-browser-header">
+                <h1>Match Replays</h1>
+                <button class="close-btn" onclick="Game.hideReplayBrowser()">×</button>
+            </div>
+            <div id="replay-list" class="replay-list"></div>
+            <div class="replay-browser-footer">
+                <button class="secondary-btn" onclick="Game.showAnalytics()">View Analytics</button>
+                <button class="secondary-btn" onclick="Game.hideReplayBrowser()">Back</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Replay Viewer Controls -->
+    <div id="replay-overlay" class="replay-controls hidden">
+        <div class="replay-bar">
+            <div id="replay-info" class="replay-info"></div>
+            <div class="replay-controls-row">
+                <button id="btn-replay-backward" class="replay-btn" onclick="ReplayViewer.stepBackward()">⏮</button>
+                <button id="btn-replay-play" class="replay-btn" onclick="ReplayViewer.play()">▶</button>
+                <button id="btn-replay-forward" class="replay-btn" onclick="ReplayViewer.stepForward()">⏭</button>
+                <input type="range" id="replay-progress" class="replay-slider" min="0" max="100" value="0" onchange="ReplayViewer.seekTo(this.value)">
+                <span id="replay-turn" class="replay-turn">Turn 1</span>
+                <span id="replay-action" class="replay-action">0/0</span>
+                <button class="replay-btn close" onclick="ReplayViewer.close()">✕</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Spectator Overlay -->
+    <div id="spectator-overlay" class="spectator-controls hidden">
+        <div class="spectator-bar">
+            <div id="spectator-info" class="spectator-info"></div>
+            <span id="spectator-turn" class="spectator-turn">Turn 1</span>
+            <button class="spectator-btn" onclick="SpectatorMode.stopSpectating()">Stop Spectating</button>
+        </div>
+    </div>
+    
+    <!-- Live Matches Browser -->
+    <div id="spectate-browser-overlay" class="overlay hidden">
+        <div class="spectate-browser-container">
+            <div class="spectate-browser-header">
+                <h1>Live Matches</h1>
+                <button class="close-btn" onclick="Game.hideSpectateBrowser()">×</button>
+            </div>
+            <div id="live-matches-list" class="live-matches-list">
+                <p class="no-matches">No live matches available</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analytics Panel -->
+    <div id="analytics-overlay" class="overlay hidden">
+        <div class="analytics-container">
+            <div class="analytics-header">
+                <h1>Card Analytics</h1>
+                <button class="close-btn" onclick="Game.hideAnalytics()">×</button>
+            </div>
+            <div class="analytics-tabs">
+                <button class="analytics-tab active" data-tab="cards" onclick="Game.switchAnalyticsTab('cards')">Top Cards</button>
+                <button class="analytics-tab" data-tab="archetypes" onclick="Game.switchAnalyticsTab('archetypes')">Archetypes</button>
+                <button class="analytics-tab" data-tab="history" onclick="Game.switchAnalyticsTab('history')">History</button>
+            </div>
+            <div id="analytics-content" class="analytics-content"></div>
+            <div class="analytics-footer">
+                <button class="secondary-btn" onclick="Game.exportAnalytics()">Export Data</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tournament Browser Overlay -->
+    <div id="tournament-overlay" class="overlay hidden">
+        <div class="tournament-container">
+            <div class="tournament-header">
+                <h1>TOURNAMENTS</h1>
+                <button class="close-btn" onclick="Game.hideTournaments()">×</button>
+            </div>
+            <div class="tournament-tabs">
+                <button class="tournament-tab active" data-tab="open" onclick="Game.switchTournamentTab('open')">Open</button>
+                <button class="tournament-tab" data-tab="active" onclick="Game.switchTournamentTab('active')">Active</button>
+                <button class="tournament-tab" data-tab="completed" onclick="Game.switchTournamentTab('completed')">Completed</button>
+                <button class="tournament-tab" data-tab="create" onclick="Game.switchTournamentTab('create')">+ Create</button>
+            </div>
+            <div id="tournament-content" class="tournament-content"></div>
+        </div>
+    </div>
+    
+    <!-- Tournament Detail View -->
+    <div id="tournament-detail-overlay" class="overlay hidden">
+        <div class="tournament-detail-container">
+            <div class="tournament-detail-header">
+                <button class="back-btn" onclick="Game.backToTournaments()">← Back</button>
+                <h1 id="tournament-detail-name">Tournament Name</h1>
+                <span id="tournament-detail-status" class="tournament-status">Registration</span>
+            </div>
+            <div class="tournament-detail-info">
+                <div class="info-row">
+                    <span class="info-label">Format:</span>
+                    <span id="tournament-detail-format">Swiss</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Players:</span>
+                    <span id="tournament-detail-players">0/8</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Round:</span>
+                    <span id="tournament-detail-round">0/3</span>
+                </div>
+                <div class="info-row" id="tournament-event-row">
+                    <span class="info-label">Event:</span>
+                    <span id="tournament-detail-event">Standard</span>
+                </div>
+            </div>
+            <div class="tournament-detail-actions" id="tournament-actions"></div>
+            <div class="tournament-detail-tabs">
+                <button class="detail-tab active" data-tab="matches" onclick="Game.switchTournamentDetailTab('matches')">Matches</button>
+                <button class="detail-tab" data-tab="standings" onclick="Game.switchTournamentDetailTab('standings')">Standings</button>
+                <button class="detail-tab" data-tab="bracket" onclick="Game.switchTournamentDetailTab('bracket')">Bracket</button>
+            </div>
+            <div id="tournament-detail-content" class="tournament-detail-content"></div>
+        </div>
+    </div>
+    
+    <!-- Events Browser Overlay -->
+    <div id="events-overlay" class="overlay hidden">
+        <div class="events-container">
+            <div class="events-header">
+                <h1>SPECIAL EVENTS</h1>
+                <button class="close-btn" onclick="Game.hideEvents()">×</button>
+            </div>
+            <div class="events-description">
+                <p>Queue into special formats with unique rules and restrictions</p>
+            </div>
+            <div id="events-list" class="events-list"></div>
+        </div>
+    </div>
+    
+    <!-- Event Queue Confirmation -->
+    <div id="event-queue-overlay" class="overlay hidden">
+        <div class="event-queue-container">
+            <div id="event-queue-header" class="event-queue-header">
+                <span class="event-icon">🎮</span>
+                <h2 id="event-queue-name">Event Name</h2>
+            </div>
+            <div id="event-queue-rules" class="event-queue-rules"></div>
+            <div class="event-queue-actions">
+                <button class="queue-btn event-queue" onclick="Game.joinEventQueue()">
+                    <span class="queue-title">JOIN EVENT QUEUE</span>
+                </button>
+                <button class="secondary-btn" onclick="Game.hideEventQueue()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Limited Mode Overlay -->
+    <div id="limited-overlay" class="overlay hidden">
+        <div class="limited-container">
+            <div class="limited-header">
+                <h1>LIMITED MODE</h1>
+                <button class="close-btn" onclick="Game.hideLimited()">×</button>
+            </div>
+            <div class="limited-modes">
+                <div class="limited-mode-card" onclick="Game.startSealed()">
+                    <div class="mode-icon">📦</div>
+                    <h2>SEALED</h2>
+                    <p>Open a pool of 45 cards and build a 30-40 card deck</p>
+                    <ul>
+                        <li>1 Guaranteed Mythic</li>
+                        <li>2 Guaranteed Arcane</li>
+                        <li>5 Guaranteed Master</li>
+                    </ul>
+                </div>
+                <div class="limited-mode-card coming-soon">
+                    <div class="mode-icon">🔄</div>
+                    <h2>DRAFT</h2>
+                    <p>Pick cards from rotating packs to build your deck</p>
+                    <span class="coming-soon-badge">Coming Soon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sealed Deckbuilder Overlay -->
+    <div id="sealed-deckbuilder-overlay" class="overlay hidden">
+        <div class="sealed-container">
+            <div class="sealed-header">
+                <h1>SEALED DECKBUILDER</h1>
+                <div class="sealed-stats">
+                    <span id="sealed-deck-count">Deck: 0/30-40</span>
+                    <span id="sealed-pool-count">Pool: 45</span>
+                </div>
+                <button class="close-btn" onclick="Game.exitSealed()">×</button>
+            </div>
+            <div class="sealed-content">
+                <div class="sealed-pool-section">
+                    <h2>CARD POOL</h2>
+                    <div id="sealed-pool" class="sealed-card-grid"></div>
+                </div>
+                <div class="sealed-deck-section">
+                    <h2>YOUR DECK</h2>
+                    <div id="sealed-deck" class="sealed-card-grid"></div>
+                </div>
+            </div>
+            <div class="sealed-actions">
+                <button class="secondary-btn" onclick="Game.exitSealed()">Abandon</button>
+                <button class="queue-btn sealed-play" id="sealed-play-btn" onclick="Game.playSealedDeck()" disabled>
+                    Play with Deck
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cosmetics Shop Overlay -->
+    <div id="cosmetics-overlay" class="overlay hidden">
+        <div class="cosmetics-container">
+            <button class="back-btn" onclick="MainMenu.hideShop()">← Back to Menu</button>
+            <div class="cosmetics-header">
+                <h1>COSMETICS</h1>
+                <div class="currency-display">
+                    <span class="shard-icon">💎</span>
+                    <span id="cosmetics-currency">0</span> Shards
+                </div>
+                <button class="close-btn" onclick="Game.hideCosmetics()">×</button>
+            </div>
+            <div class="cosmetics-tabs">
+                <button class="cosmetic-tab active" data-type="cardBack" onclick="Game.showCosmeticType('cardBack')">Card Backs</button>
+                <button class="cosmetic-tab" data-type="boardSkin" onclick="Game.showCosmeticType('boardSkin')">Boards</button>
+                <button class="cosmetic-tab" data-type="cardFrame" onclick="Game.showCosmeticType('cardFrame')">Frames</button>
+                <button class="cosmetic-tab" data-type="effectVariant" onclick="Game.showCosmeticType('effectVariant')">Effects</button>
+                <button class="cosmetic-tab" data-type="deitySkin" onclick="Game.showCosmeticType('deitySkin')">Deities</button>
+            </div>
+            <div id="cosmetics-grid" class="cosmetics-grid"></div>
+        </div>
+    </div>
+    
+    <!-- Shard Path (Battle Pass) Overlay -->
+    <div id="shard-path-overlay" class="overlay hidden">
+        <div class="shard-path-container">
+            <button class="back-btn" onclick="Game.hideShardPath()">← Back to Menu</button>
+            <div class="shard-path-header">
+                <div class="season-info">
+                    <h1 id="shard-path-season">SEASON OF THE CROWN</h1>
+                    <span id="shard-path-timer">90 days remaining</span>
+                </div>
+                <div class="path-stats">
+                    <div class="xp-display">
+                        <span id="shard-path-level">Level 1</span>
+                        <div class="xp-bar">
+                            <div id="shard-path-xp-fill" class="xp-fill" style="width: 0%"></div>
+                        </div>
+                        <span id="shard-path-xp">0 / 1000 XP</span>
+                    </div>
+                    <div class="currency-display">
+                        <span class="shard-icon">💎</span>
+                        <span id="shard-path-currency">0</span> Shards
+                    </div>
+                </div>
+                <button class="close-btn" onclick="Game.hideShardPath()">×</button>
+            </div>
+            <div class="shard-path-tabs">
+                <button class="path-tab active" data-tab="rewards" onclick="Game.showShardPathTab('rewards')">Rewards</button>
+                <button class="path-tab" data-tab="quests" onclick="Game.showShardPathTab('quests')">Quests</button>
+            </div>
+            <div id="shard-path-content" class="shard-path-content">
+                <div class="reward-tracks">
+                    <div class="track free-track">
+                        <h3>FREE TRACK</h3>
+                        <div id="free-track-rewards" class="track-rewards"></div>
+                    </div>
+                    <div class="track premium-track">
+                        <h3>PREMIUM TRACK <span id="premium-status" class="locked">🔒</span></h3>
+                        <div id="premium-track-rewards" class="track-rewards"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="shard-path-quests" class="shard-path-quests hidden">
+                <div class="quest-section">
+                    <h3>DAILY QUESTS</h3>
+                    <div id="daily-quests" class="quest-list"></div>
+                </div>
+                <div class="quest-section">
+                    <h3>WEEKLY QUESTS</h3>
+                    <div id="weekly-quests" class="quest-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Deity Selection Overlay -->
+    <div id="deity-select-overlay" class="overlay hidden">
+        <div class="deity-select-content">
+            <button class="back-btn deity-back-btn" onclick="Game.cancelDeitySelection()">← Cancel</button>
+            <h1 id="deity-select-title">SELECT PLAYER 1 DEITY</h1>
+            <p>Choose the Sovereign who will lead your forces</p>
+            <div id="deity-grid" class="deity-grid"></div>
+        </div>
+    </div>
+    
+    <!-- Game Log Panel -->
+    <div id="log-panel">
+        <h3>Game Log</h3>
+        <div id="log-content"></div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal">
+        <button class="close-modal" id="close-settings-btn" onclick="Game.toggleSettings()">✕</button>
+        <h2>Settings</h2>
+        
+        <h3 class="settings-section-title">Gameplay</h3>
+        <div class="settings-option">
+            <label>Auto Wake Phase</label>
+            <div class="toggle-switch active" id="opt-auto-wake"></div>
+        </div>
+        <div class="settings-option">
+            <label>Auto Aspect Triggers</label>
+            <div class="toggle-switch active" id="opt-auto-aspect"></div>
+        </div>
+        <div class="settings-option">
+            <label>Combat Helpers</label>
+            <div class="toggle-switch active" id="opt-auto-combat"></div>
+        </div>
+        <div class="settings-option">
+            <label>Auto Overflow → God Code</label>
+            <div class="toggle-switch active" id="opt-auto-overflow"></div>
+        </div>
+        
+        <h3 class="settings-section-title">Accessibility</h3>
+        <div class="settings-option">
+            <label>Text Size</label>
+            <select id="opt-text-size" class="settings-select">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+            </select>
+        </div>
+        <div class="settings-option">
+            <label>Colorblind Mode</label>
+            <select id="opt-colorblind" class="settings-select">
+                <option value="off">Off</option>
+                <option value="deuteranopia">Deuteranopia (Red-Green)</option>
+                <option value="protanopia">Protanopia (Red-Green)</option>
+                <option value="tritanopia">Tritanopia (Blue-Yellow)</option>
+            </select>
+        </div>
+        <div class="settings-option">
+            <label>Low-FX Mode</label>
+            <div class="toggle-switch" id="opt-low-fx"></div>
+        </div>
+        <div class="settings-option">
+            <label>High Contrast</label>
+            <div class="toggle-switch" id="opt-high-contrast"></div>
+        </div>
+        <div class="settings-option">
+            <label>Reduce Motion</label>
+            <div class="toggle-switch" id="opt-reduce-motion"></div>
+        </div>
+        
+        <button class="close-modal" id="close-settings">Close</button>
+    </div>
+    
+    <!-- Sandbox Mode Overlay -->
+    <div id="sandbox-overlay" class="overlay hidden">
+        <div class="sandbox-container">
+            <h1>SANDBOX MODE</h1>
+            <p>Set up custom board states for testing and content creation</p>
+            
+            <div class="sandbox-controls">
+                <div class="sandbox-section">
+                    <h3>Player Settings</h3>
+                    <div class="sandbox-player-row">
+                        <div class="sandbox-player">
+                            <h4>Player 1</h4>
+                            <div class="sandbox-stat">
+                                <label>Essence:</label>
+                                <input type="number" id="sandbox-p1-essence" value="23" min="0" max="99">
+                            </div>
+                            <div class="sandbox-stat">
+                                <label>KL:</label>
+                                <input type="number" id="sandbox-p1-kl" value="3" min="0" max="20">
+                                <span>/</span>
+                                <input type="number" id="sandbox-p1-kl-max" value="3" min="1" max="20">
+                            </div>
+                            <button class="sandbox-btn" onclick="Game.sandboxApplyPlayer(0)">Apply</button>
+                            <button class="sandbox-btn danger" onclick="SandboxMode.clearBoard(0)">Clear Board</button>
+                        </div>
+                        <div class="sandbox-player">
+                            <h4>Player 2</h4>
+                            <div class="sandbox-stat">
+                                <label>Essence:</label>
+                                <input type="number" id="sandbox-p2-essence" value="23" min="0" max="99">
+                            </div>
+                            <div class="sandbox-stat">
+                                <label>KL:</label>
+                                <input type="number" id="sandbox-p2-kl" value="3" min="0" max="20">
+                                <span>/</span>
+                                <input type="number" id="sandbox-p2-kl-max" value="3" min="1" max="20">
+                            </div>
+                            <button class="sandbox-btn" onclick="Game.sandboxApplyPlayer(1)">Apply</button>
+                            <button class="sandbox-btn danger" onclick="SandboxMode.clearBoard(1)">Clear Board</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sandbox-section">
+                    <h3>Add Cards</h3>
+                    <div class="sandbox-add-card">
+                        <select id="sandbox-player-select">
+                            <option value="0">Player 1</option>
+                            <option value="1">Player 2</option>
+                        </select>
+                        <select id="sandbox-zone-select">
+                            <option value="hand">Hand</option>
+                            <option value="avatar">Avatar Row</option>
+                            <option value="domain">Domain Row</option>
+                            <option value="relic">Relic Row</option>
+                            <option value="graveyard">Graveyard</option>
+                        </select>
+                        <input type="text" id="sandbox-card-search" placeholder="Search cards...">
+                    </div>
+                    <div id="sandbox-card-results" class="sandbox-card-grid"></div>
+                </div>
+                
+                <div class="sandbox-section">
+                    <h3>Saved States</h3>
+                    <div class="sandbox-save-row">
+                        <input type="text" id="sandbox-state-name" placeholder="State name...">
+                        <button class="sandbox-btn" onclick="Game.sandboxSaveState()">Save State</button>
+                    </div>
+                    <div id="sandbox-saved-states" class="sandbox-states-list"></div>
+                </div>
+            </div>
+            
+            <div class="sandbox-actions">
+                <button class="queue-btn" onclick="Game.sandboxStartGame()">START GAME</button>
+                <button class="queue-btn secondary" onclick="Game.hideSandbox()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Lobby Overlay -->
+    <div id="custom-lobby-overlay" class="overlay hidden">
+        <div class="lobby-container">
+            <h1>CUSTOM RULES LOBBY</h1>
+            
+            <div class="lobby-tabs">
+                <button class="lobby-tab active" onclick="Game.showLobbyTab('create')">Create Lobby</button>
+                <button class="lobby-tab" onclick="Game.showLobbyTab('browse')">Browse Lobbies</button>
+            </div>
+            
+            <div id="lobby-create-tab" class="lobby-tab-content">
+                <div class="lobby-settings">
+                    <div class="lobby-preset-row">
+                        <label>Preset:</label>
+                        <select id="lobby-preset" onchange="Game.applyLobbyPreset()">
+                            <option value="">Custom</option>
+                            <option value="standard">Standard</option>
+                            <option value="highLife">High Life (40 Essence)</option>
+                            <option value="turbo">Turbo (15 Essence, 6 KL)</option>
+                            <option value="sudden">Sudden Death (10 Essence)</option>
+                            <option value="avatarsOnly">Avatars Only</option>
+                            <option value="spellsUnleashed">Spells Unleashed</option>
+                            <option value="voidWar">Void War (Void Only)</option>
+                            <option value="glowCrusade">Glow Crusade (Glow Only)</option>
+                            <option value="domination">Domination (Avatar Kills)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="lobby-setting-row">
+                        <label>Lobby Name:</label>
+                        <input type="text" id="lobby-name" placeholder="My Custom Match" maxlength="30">
+                    </div>
+                    
+                    <div class="lobby-setting-row">
+                        <label>Starting Essence:</label>
+                        <input type="number" id="lobby-essence" value="23" min="5" max="99">
+                    </div>
+                    
+                    <div class="lobby-setting-row">
+                        <label>Starting KL:</label>
+                        <input type="number" id="lobby-kl" value="3" min="1" max="13">
+                    </div>
+                    
+                    <div class="lobby-setting-row">
+                        <label>Victory Condition:</label>
+                        <select id="lobby-victory">
+                            <option value="essence">Reduce Essence to 0</option>
+                            <option value="avatars">Destroy X Avatars</option>
+                        </select>
+                    </div>
+                    
+                    <div class="lobby-setting-row" id="lobby-avatar-count-row" style="display:none;">
+                        <label>Avatars to Destroy:</label>
+                        <input type="number" id="lobby-avatar-count" value="5" min="3" max="15">
+                    </div>
+                    
+                    <div class="lobby-setting-row">
+                        <label>Allowed Aspects:</label>
+                        <div class="lobby-checkboxes">
+                            <label><input type="checkbox" id="lobby-aspect-glow" checked> Glow</label>
+                            <label><input type="checkbox" id="lobby-aspect-void" checked> Void</label>
+                            <label><input type="checkbox" id="lobby-aspect-gray" checked> Gray</label>
+                        </div>
+                    </div>
+                    
+                    <div class="lobby-setting-row">
+                        <label>Allowed Types:</label>
+                        <div class="lobby-checkboxes">
+                            <label><input type="checkbox" id="lobby-type-avatar" checked> Avatar</label>
+                            <label><input type="checkbox" id="lobby-type-spell" checked> Spell</label>
+                            <label><input type="checkbox" id="lobby-type-domain" checked> Domain</label>
+                            <label><input type="checkbox" id="lobby-type-relic" checked> Relic</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="queue-btn" onclick="Game.createCustomLobby()">CREATE LOBBY</button>
+            </div>
+            
+            <div id="lobby-browse-tab" class="lobby-tab-content hidden">
+                <div id="lobby-list" class="lobby-list">
+                    <p class="lobby-empty">No open lobbies available. Create one!</p>
+                </div>
+                <button class="queue-btn secondary" onclick="Game.refreshLobbies()">Refresh</button>
+            </div>
+            
+            <button class="close-overlay-btn" onclick="Game.hideCustomLobby()">Back</button>
+        </div>
+    </div>
+    
+    <!-- Active Lobby Waiting Room -->
+    <div id="lobby-waiting-overlay" class="overlay hidden">
+        <div class="lobby-waiting-container">
+            <h1 id="lobby-waiting-name">Custom Match</h1>
+            <div class="lobby-waiting-info">
+                <div class="lobby-rules-summary" id="lobby-rules-summary"></div>
+                <div class="lobby-players">
+                    <h3>Players</h3>
+                    <div id="lobby-player-list"></div>
+                </div>
+            </div>
+            <div class="lobby-waiting-actions">
+                <button class="queue-btn" id="lobby-start-btn" onclick="Game.startCustomLobby()" disabled>Waiting for opponent...</button>
+                <button class="queue-btn secondary" onclick="Game.leaveCustomLobby()">Leave Lobby</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Context Menu -->
+    <div id="context-menu">
+        <div class="context-option" data-action="play">Play Card</div>
+        <div class="context-option" data-action="tap">Tap / Untap</div>
+        <div class="context-option" data-action="flip">Flip</div>
+        <div class="context-option" data-action="to-hand">To Hand</div>
+        <div class="context-option" data-action="to-discard">To Graveyard</div>
+        <div class="context-option" data-action="to-exile">To Exile</div>
+    </div>
+
+    <!-- Card Zoom Panel -->
+    <div id="card-zoom-panel" class="hidden">
+        <div class="zoom-close" onclick="Game.hideCardZoom()">&times;</div>
+        <div class="zoom-content">
+            <div class="zoom-image-container">
+                <img id="zoom-card-image" src="" alt="Card">
+            </div>
+            <div class="zoom-details">
+                <h2 id="zoom-card-name"></h2>
+                <div class="zoom-stats">
+                    <span id="zoom-card-type" class="zoom-type"></span>
+                    <span id="zoom-card-aspect" class="zoom-aspect"></span>
+                    <span id="zoom-card-cost" class="zoom-cost"></span>
+                </div>
+                <div id="zoom-card-stats-row" class="zoom-stats-row"></div>
+                <div id="zoom-card-effect" class="zoom-effect"></div>
+                <div id="zoom-card-rarity" class="zoom-rarity"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Codex / Glossary Overlay -->
+    <div id="codex-overlay" class="overlay hidden">
+        <div class="codex-container">
+            <div class="codex-header">
+                <h1>ESSENCE CROWN CODEX</h1>
+                <button class="codex-close" onclick="Game.toggleCodex()">&times;</button>
+            </div>
+            <div class="codex-tabs">
+                <button class="codex-tab active" data-tab="basics">Basics</button>
+                <button class="codex-tab" data-tab="cards">Card Types</button>
+                <button class="codex-tab" data-tab="phases">Phases</button>
+                <button class="codex-tab" data-tab="combat">Combat</button>
+                <button class="codex-tab" data-tab="advanced">Advanced</button>
+            </div>
+            <div class="codex-content">
+                <div class="codex-section active" id="codex-basics">
+                    <h2>ESSENCE</h2>
+                    <p>Your life total. Start with 20-25 based on your Deity. Reach 0 and you lose!</p>
+                    
+                    <h2>KUNDALINI (KL)</h2>
+                    <p>Energy used to play cards. Starts at 3, grows each turn (max 13). Refills at Dawn phase.</p>
+                    
+                    <h2>ASPECTS</h2>
+                    <p>The three cosmic forces that power all cards:</p>
+                    <ul>
+                        <li><span class="aspect-glow">GLOW</span> - Light and healing. When a Glow card enters, gain +1 Essence.</li>
+                        <li><span class="aspect-void">VOID</span> - Darkness and destruction. When a Void card enters, opponent loses 1 Essence.</li>
+                        <li><span class="aspect-gray">GRAY</span> - Balance and wisdom. When a Gray card enters, draw 1 card.</li>
+                    </ul>
+                    
+                    <h2>DEITIES</h2>
+                    <p>Your Sovereign - a powerful being with a Passive ability (always active) and a God Code (ultimate ability requiring 2 Overflow charges).</p>
+                </div>
+                
+                <div class="codex-section" id="codex-cards">
+                    <h2>AVATARS</h2>
+                    <p>Creatures that fight for you. Have Attack/Health stats. Summoned to the Avatar Row (New Earth).</p>
+                    <ul>
+                        <li><strong>Guardian</strong> - Must be attacked first before other Avatars or your Deity.</li>
+                        <li><strong>Beast</strong> - Synergizes with other Beast-type cards.</li>
+                    </ul>
+                    
+                    <h2>DOMAINS</h2>
+                    <p>Permanent locations that provide ongoing effects. Placed in the Domain slot.</p>
+                    
+                    <h2>SPELLS</h2>
+                    <p>One-time effects that go to the Graveyard after use.</p>
+                    <ul>
+                        <li><strong>Normal Spell</strong> - Play during your Main phase.</li>
+                        <li><strong>Quick Spell</strong> - Can respond to actions (adds to Shard Chain).</li>
+                    </ul>
+                    
+                    <h2>RITUALS</h2>
+                    <p>Powerful spells with additional costs (sacrifice, discard, etc.).</p>
+                    
+                    <h2>RELICS & CROWNS</h2>
+                    <p>Equipment cards. Relics provide effects; Crowns are legendary artifacts with powerful abilities.</p>
+                </div>
+                
+                <div class="codex-section" id="codex-phases">
+                    <h2>DAWN PHASE</h2>
+                    <p>Start of your turn. Your KL refills to max, KL max increases by 1 (up to 13). Start-of-turn triggers activate.</p>
+                    
+                    <h2>DRAW PHASE</h2>
+                    <p>Draw 1 card from your deck. (First player skips draw on turn 1.)</p>
+                    
+                    <h2>MAIN PHASE</h2>
+                    <p>Play cards, activate abilities, set up your board. Use KL to summon Avatars, cast Spells, play Domains.</p>
+                    
+                    <h2>CLASH PHASE</h2>
+                    <p>Combat! Declare attacks with your Avatars. Target enemy Avatars or the enemy Deity (if no Guardians block).</p>
+                    
+                    <h2>TWILIGHT PHASE</h2>
+                    <p>End of turn. End-of-turn effects trigger, then pass to opponent.</p>
+                </div>
+                
+                <div class="codex-section" id="codex-combat">
+                    <h2>DECLARING ATTACKS</h2>
+                    <p>During Clash phase, tap your Avatars to attack. Newly summoned Avatars have "summoning sickness" and cannot attack.</p>
+                    
+                    <h2>GUARDIANS</h2>
+                    <p>If your opponent has a Guardian, you MUST attack it first before targeting other Avatars or their Deity.</p>
+                    
+                    <h2>DAMAGE RESOLUTION</h2>
+                    <p>Both the attacker and defender deal damage simultaneously. An Avatar with 0 or less Health is destroyed.</p>
+                    
+                    <h2>ATTACKING THE DEITY</h2>
+                    <p>If no enemy Avatars remain (or Guardians are cleared), you can attack the enemy Deity directly, reducing their Essence!</p>
+                </div>
+                
+                <div class="codex-section" id="codex-advanced">
+                    <h2>SHARD CHAIN</h2>
+                    <p>The stack/priority system. When you play a Quick Spell or ability, it goes on the Chain. Players alternate priority to respond. Resolves last-in, first-out (LIFO).</p>
+                    
+                    <h2>OVERFLOW</h2>
+                    <p>When your KL exceeds 13, the excess becomes Overflow points. At 2 Overflow, you can use your Deity's God Code.</p>
+                    
+                    <h2>GOD CODE</h2>
+                    <p>Your Deity's ultimate ability. Costs 2 Overflow charges. Extremely powerful, game-changing effects!</p>
+                    
+                    <h2>GRAVEYARD & BANISHED</h2>
+                    <p>Destroyed cards go to Graveyard. Some effects "banish" cards (remove from game entirely).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="hidden">
+        <div class="tutorial-box">
+            <div class="tutorial-arrow"></div>
+            <div class="tutorial-content">
+                <h3 id="tutorial-title">Welcome to Essence Crown!</h3>
+                <p id="tutorial-text">This tutorial will teach you the basics of the game.</p>
+                <div class="tutorial-buttons">
+                    <button class="tutorial-btn" id="btn-tutorial-prev">Back</button>
+                    <button class="tutorial-btn primary" id="btn-tutorial-next">Next</button>
+                    <button class="tutorial-btn" id="btn-tutorial-skip">Skip Tutorial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Viewer Modal -->
+    <div id="profile-viewer-overlay" class="overlay hidden">
+        <div class="profile-modal">
+            <button class="close-btn" onclick="Game.closeProfileViewer()">×</button>
+            <div class="profile-header">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar" id="profile-avatar">👑</div>
+                    <div class="profile-info">
+                        <h1 id="profile-name">Player Name</h1>
+                        <div class="profile-tier">
+                            <span id="profile-tier">Bronze III</span>
+                            <span id="profile-mmr">1000 MMR</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-tabs">
+                <button class="profile-tab active" onclick="Game.showProfileTab('stats')">Stats</button>
+                <button class="profile-tab" onclick="Game.showProfileTab('cosmetics')">Cosmetics</button>
+            </div>
+            <div id="profile-stats-tab" class="profile-tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Wins</div>
+                        <div class="stat-value" id="profile-wins">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Losses</div>
+                        <div class="stat-value" id="profile-losses">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Win Rate</div>
+                        <div class="stat-value" id="profile-winrate">0%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Highest Tier</div>
+                        <div class="stat-value" id="profile-highest">Bronze III</div>
+                    </div>
+                </div>
+                <div class="matches-history">
+                    <h3>Recent Matches</h3>
+                    <div id="profile-match-history"></div>
+                </div>
+            </div>
+            <div id="profile-cosmetics-tab" class="profile-tab-content">
+                <div class="owned-cosmetics-grid" id="profile-cosmetics-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Prompt -->
+    <div id="fullscreen-prompt" class="overlay hidden">
+        <div class="fullscreen-content">
+            <h1>Enter Fullscreen</h1>
+            <p>For the best experience, play in fullscreen mode</p>
+            <div class="fullscreen-buttons">
+                <button class="fullscreen-btn" onclick="Game.requestFullscreen()">Enter Fullscreen</button>
+                <button class="fullscreen-btn secondary" onclick="document.getElementById('fullscreen-prompt').classList.add('hidden'); Game.state.matchMode = 'casual'; Game.showDeitySelection(0);">Skip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Tabs -->
+    <div id="mobile-tabs" class="mobile-tabs">
+        <button class="mobile-tab active" data-panel="hand">Hand</button>
+        <button class="mobile-tab" data-panel="chain">Chain</button>
+        <button class="mobile-tab" data-panel="log">Log</button>
+    </div>
+    
+    <script src="cards.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
