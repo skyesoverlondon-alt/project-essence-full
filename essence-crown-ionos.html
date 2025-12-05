@@ -1880,6 +1880,86 @@ html, body {
 }
 
 /* === BOARD CSS START === */
+.command-bridge-shell {
+    position: relative;
+    margin: 12px auto;
+    padding: 12px 12px 16px;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at top left, rgba(129, 140, 248, 0.15), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(251, 191, 36, 0.12), transparent 50%),
+        linear-gradient(180deg, #050012 0%, #0a0320 50%, #050012 100%);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow:
+        0 0 0 1px rgba(17, 24, 39, 0.65),
+        0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+.command-bridge-header {
+    text-align: center;
+    padding: 8px 6px 4px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.2), rgba(124, 58, 237, 0.18));
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    margin-bottom: 10px;
+}
+
+.command-bridge-title {
+    font-size: 18px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #fef9c3;
+    text-shadow: 0 0 12px rgba(250, 250, 210, 0.7);
+}
+
+.command-bridge-subtitle {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: rgba(226, 232, 240, 0.72);
+}
+
+.command-bridge-body {
+    position: relative;
+}
+
+#board-layout-marker {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    padding: 4px 8px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: rgba(14, 165, 233, 0.25);
+    border: 1px solid rgba(124, 58, 237, 0.55);
+    border-radius: 999px;
+    color: #e0f2fe;
+    box-shadow: 0 0 12px rgba(124, 58, 237, 0.55);
+    z-index: 5;
+}
+
+/* === NEW BOARD CSS START (from provided board code) === */
+/* Utility styling for the transplanted Command Bridge layout */
+.command-bridge-shell .top-bar,
+.command-bridge-shell .controls {
+    justify-content: center;
+}
+
+.command-bridge-shell .board {
+    border-radius: 20px;
+    padding: 10px;
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.94), #020617);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.72);
+}
+
+.command-bridge-shell .player-section.is-active {
+    box-shadow:
+        0 0 0 1px rgba(129, 140, 248, 0.9),
+        0 0 28px rgba(129, 140, 248, 0.65),
+        0 20px 40px rgba(0, 0, 0, 0.85);
+}
+/* === NEW BOARD CSS END === */
 /* ===== GAME BOARD - NEW EARTH ARENA ===== */
 /* Legacy #game-board styles removed - now using .ec-frame */
 
@@ -16704,6 +16784,13 @@ body.defeat-effect {
 <body>
     <!-- === BOARD LAYOUT START === -->
     <div id="game-container">
+        <div class="command-bridge-shell">
+            <div id="board-layout-marker">NEW-BOARD-LAYOUT-V1</div>
+            <div class="command-bridge-header">
+                <div class="command-bridge-title">Essence Crown – New Earth Command Bridge</div>
+                <div class="command-bridge-subtitle">KL gauge • Essence Crown • Shards • Domains</div>
+            </div>
+            <div class="command-bridge-body">
         <!-- SUN ALTAR ARENA LAYOUT -->
         <div class="ec-frame sun-altar" id="ec-arena-frame" data-domain="second-sun">
             <!-- TOP HUD - Opponent with Floating Deity -->
@@ -17190,8 +17277,10 @@ body.defeat-effect {
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- end ec-frame -->
 
+            </div><!-- end command-bridge-body -->
+        </div><!-- end command-bridge-shell -->
         <!-- Legacy IDs for JS compatibility -->
         <div id="p1-life-badge" class="hidden-badge" data-player="0"></div>
         <div id="p2-life-badge" class="hidden-badge" data-player="1"></div>
