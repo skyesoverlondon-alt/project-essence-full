@@ -561,14 +561,6 @@
                 <button class="chain-btn pass-btn" onclick="Game.passShardChainPriority()">PASS</button>
             </div>
         </div>
-        <!-- Tutorial Hint Overlay -->
-        <div id="tutorial-hint" class="tutorial-hint hidden">
-            <div class="hint-content">
-                <div class="hint-text" id="hint-text"></div>
-                <button class="hint-btn" onclick="TutorialBattle.nextHint()">Got it →</button>
-            </div>
-        </div>
-
         <!-- Damage Numbers Container -->
         <div id="damage-numbers"></div>
 
@@ -847,15 +839,6 @@
                     <div class="mode-badge">Practice</div>
                 </div>
                 
-                <div class="mode-card tutorial-battle" onclick="MainMenu.selectMode('learntoplay')">
-                    <div class="mode-icon">📖</div>
-                    <div class="mode-info">
-                        <h3>LEARN TO PLAY</h3>
-                        <p>Rules & Tutorial</p>
-                    </div>
-                    <div class="mode-badge hot">Guided</div>
-                </div>
-                
                 <div class="mode-card campaign" onclick="MainMenu.selectMode('campaign')">
                     <div class="mode-icon">👑</div>
                     <div class="mode-info">
@@ -917,7 +900,6 @@
         </div>
         
         <div class="menu-footer">
-            <button class="menu-footer-btn" onclick="MainMenu.selectMode('learntoplay')">Tutorial</button>
             <button class="menu-footer-btn" onclick="MainMenu.showCredits()">Credits</button>
             <span class="menu-version">v1.0.0</span>
         </div>
@@ -991,148 +973,6 @@
             <button class="primary-btn" onclick="MainMenu.hideSettings()">Save & Close</button>
         </div>
     </div>
-    
-    <!-- Learn to Play Overlay -->
-    <div id="learn-overlay" class="overlay hidden">
-        <div class="learn-container">
-            <button class="back-btn" onclick="MainMenu.hideLearnToPlay()">← Back to Menu</button>
-            
-            <div id="learn-overview" class="learn-content">
-                <h1>LEARN TO PLAY</h1>
-                <p class="learn-subtitle">Master the Shard Wars</p>
-                
-                <div class="learn-sections">
-                    <div class="learn-card">
-                        <div class="learn-card-icon">🎯</div>
-                        <h3>Objective</h3>
-                        <p>Reduce your opponent's <strong>Essence</strong> to 0 to shatter their Crown and win the match.</p>
-                    </div>
-                    
-                    <div class="learn-card">
-                        <div class="learn-card-icon">⚔️</div>
-                        <h3>Battlefield</h3>
-                        <p>Summon <strong>Avatars</strong> to your Avatar Row to attack. Play <strong>Domains</strong> to power abilities. Your <strong>Deity</strong> grants special powers.</p>
-                    </div>
-                    
-                    <div class="learn-card">
-                        <div class="learn-card-icon">💠</div>
-                        <h3>Kundalini (KL)</h3>
-                        <p>KL is your mana resource. Each card costs KL to play. You gain +1 max KL each turn (up to 13).</p>
-                    </div>
-                    
-                    <div class="learn-card">
-                        <div class="learn-card-icon">🔄</div>
-                        <h3>Turn Flow</h3>
-                        <p><strong>Dawn</strong> → Gain KL & draw<br><strong>Main</strong> → Play cards<br><strong>Clash</strong> → Attack<br><strong>Twilight</strong> → End effects</p>
-                    </div>
-                    
-                    <div class="learn-card">
-                        <div class="learn-card-icon">⭐</div>
-                        <h3>Combat</h3>
-                        <p>Avatars attack with <strong>Power</strong> and defend with <strong>Guard</strong>. Unblocked attacks deal Essence damage to the enemy Deity.</p>
-                    </div>
-                    
-                    <div class="learn-card">
-                        <div class="learn-card-icon">👑</div>
-                        <h3>God Code</h3>
-                        <p>Each Deity has a powerful <strong>God Code</strong> ability. Use it wisely - it can only be activated once per game!</p>
-                    </div>
-                </div>
-                
-                <div class="learn-actions">
-                    <button class="learn-btn secondary" onclick="MainMenu.showFullRules()">📜 Read Full Rules</button>
-                    <button class="learn-btn primary" onclick="MainMenu.startTutorialMatch()">🎮 Start Tutorial Match</button>
-                </div>
-            </div>
-            
-            <div id="learn-full-rules" class="learn-content hidden">
-                <div class="rules-header">
-                    <button class="back-btn" onclick="MainMenu.hideFullRules()">← Back to Overview</button>
-                    <h2>Complete Rulebook</h2>
-                </div>
-                
-                <div class="rules-scroll">
-                    <section class="rule-section">
-                        <h3>🎯 Win Conditions</h3>
-                        <ul>
-                            <li><strong>Essence Victory:</strong> Reduce opponent's Essence to 0</li>
-                            <li><strong>Deck Out:</strong> If opponent must draw but has no cards, they lose</li>
-                            <li><strong>Concede:</strong> A player may forfeit at any time</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="rule-section">
-                        <h3>⚔️ Game Zones</h3>
-                        <ul>
-                            <li><strong>Deity Zone:</strong> Your Deity card providing passive bonuses and God Code</li>
-                            <li><strong>Avatar Row (New Earth):</strong> Where Avatars battle (max 5)</li>
-                            <li><strong>Domain Row:</strong> Domains that grant aspects and abilities (max 5)</li>
-                            <li><strong>Relic Row:</strong> Artifacts with ongoing effects (max 5)</li>
-                            <li><strong>Deck:</strong> Your draw pile</li>
-                            <li><strong>Void (Graveyard):</strong> Destroyed cards</li>
-                            <li><strong>Abyss (Exile):</strong> Banished cards (cannot be retrieved)</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="rule-section">
-                        <h3>💠 Kundalini (KL) System</h3>
-                        <ul>
-                            <li>Start with 3 KL maximum</li>
-                            <li>Gain +1 max KL at the start of each turn (cap: 13)</li>
-                            <li>KL fully refreshes each turn</li>
-                            <li>Spend KL to play cards matching their cost</li>
-                            <li>Overflow: If you would exceed 13 KL, trigger God Code instead</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="rule-section">
-                        <h3>🔄 Turn Phases</h3>
-                        <ul>
-                            <li><strong>Dawn Phase:</strong> Untap cards, increase max KL, refill KL</li>
-                            <li><strong>Draw Phase:</strong> Draw 1 card (mandatory)</li>
-                            <li><strong>Main Phase:</strong> Play Avatars, Domains, Relics, and Spells</li>
-                            <li><strong>Clash Phase:</strong> Declare attacks, resolve combat</li>
-                            <li><strong>Twilight Phase:</strong> End-of-turn effects, discard to 7 cards</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="rule-section">
-                        <h3>⭐ Combat Rules</h3>
-                        <ul>
-                            <li>Avatars with summoning sickness cannot attack (unless Haste)</li>
-                            <li>Attacker deals Power damage, defender deals Power back</li>
-                            <li>Avatar dies when Guard reaches 0</li>
-                            <li>Unblocked attacks deal Power as Essence damage to Deity</li>
-                            <li><strong>Guardian:</strong> Must be targeted first before other Avatars/Deity</li>
-                            <li><strong>Haste:</strong> Can attack immediately when played</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="rule-section">
-                        <h3>🌈 Aspects</h3>
-                        <ul>
-                            <li><strong>Glow:</strong> Light and healing</li>
-                            <li><strong>Void:</strong> Darkness and destruction</li>
-                            <li><strong>Gray:</strong> Balance and control</li>
-                            <li><strong>Beast:</strong> Creature synergies</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="rule-section">
-                        <h3>👑 God Codes</h3>
-                        <p>Each Deity has a unique God Code - a powerful ability that can only be activated once per game. God Codes trigger automatically when your KL would exceed 13, or can be activated manually when available.</p>
-                    </section>
-                </div>
-                
-                <div class="learn-actions">
-                    <button class="learn-btn primary" onclick="MainMenu.startTutorialMatch()">🎮 Start Tutorial Match</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Tutorial Overlay (kept for backward compatibility) -->
-    <div id="tutorial-overlay" class="hidden"></div>
     
     <!-- Solo Mode Selection -->
     <div id="solo-overlay" class="overlay hidden">
@@ -2133,22 +1973,6 @@
                     
                     <h2>GRAVEYARD & BANISHED</h2>
                     <p>Destroyed cards go to Graveyard. Some effects "banish" cards (remove from game entirely).</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tutorial Overlay -->
-    <div id="tutorial-overlay" class="hidden">
-        <div class="tutorial-box">
-            <div class="tutorial-arrow"></div>
-            <div class="tutorial-content">
-                <h3 id="tutorial-title">Welcome to Essence Crown!</h3>
-                <p id="tutorial-text">This tutorial will teach you the basics of the game.</p>
-                <div class="tutorial-buttons">
-                    <button class="tutorial-btn" id="btn-tutorial-prev">Back</button>
-                    <button class="tutorial-btn primary" id="btn-tutorial-next">Next</button>
-                    <button class="tutorial-btn" id="btn-tutorial-skip">Skip Tutorial</button>
                 </div>
             </div>
         </div>
