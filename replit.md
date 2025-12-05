@@ -56,7 +56,6 @@ The application is built using pure HTML/CSS/JavaScript, designed for easy embed
     - **Custom Lobbies:** For host-defined rules.
     - **Tournaments & Events:** Supports Swiss and Single-Elimination formats.
 - **User Experience Enhancements:**
-    - **Tutorial System:** Integrates with Campaign Chapter 1 as an interactive walkthrough.
     - **Deck Builder:** A premium three-panel layout with a card pool, real-time deck analytics (KL curve, card types, aspects), and saved deck management, enforcing 60-card deck validity.
     - **Collection Viewer:** For browsing all game assets.
     - **Replay System:** Records and views match actions.
