@@ -20125,6 +20125,8 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = { CARD_DATABASE, DEITY_DATABASE, CARD_BACK_IMAGE, ALL_CARDS, getDeities, getPlayableCards, getCardById };
 }
 
+// === CARD DATA END ===
+
 
 // Settings screen removal kept for IONOS build.
 document.addEventListener('DOMContentLoaded', () => {
@@ -26414,7 +26416,6 @@ const Game = {
         const codexBtn = document.getElementById('btn-codex');
         const replaysBtn = document.getElementById('btn-replays');
         const spectateBtn = document.getElementById('btn-spectate');
-        const drawWarningClose = document.getElementById('draw-phase-warning-close');
 
         const turnControls = document.getElementById('turn-controls');
         if (turnControls && !document.getElementById('btn-shard-surge')) {
@@ -26435,7 +26436,6 @@ const Game = {
         if (replaysBtn) replaysBtn.onclick = () => this.showReplayBrowser();
         if (spectateBtn) spectateBtn.onclick = () => this.showSpectateBrowser();
         if (shardSurgeBtn) shardSurgeBtn.onclick = () => this.activateShardSurge();
-        if (drawWarningClose) drawWarningClose.onclick = () => this.hideDrawPhaseWarning();
         
         document.querySelectorAll('.codex-tab').forEach(tab => {
             tab.onclick = () => this.switchCodexTab(tab.dataset.tab);
