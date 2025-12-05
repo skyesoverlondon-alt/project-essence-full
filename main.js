@@ -2106,10 +2106,6 @@ const MainMenu = {
             case 'shop':
                 this.showShop();
                 break;
-            case 'settings':
-                console.warn('Settings screen has been disabled (settings-screen is hidden).');
-                this.show();
-                break;
             default:
                 console.warn(`Unknown mode selected: ${mode}`);
                 this.show();
