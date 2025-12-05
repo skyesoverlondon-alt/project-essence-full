@@ -2066,362 +2066,6 @@ const BattleEffects = {
     }
 };
 
-const TutorialController = {
-    active: false,
-    currentStep: 0,
-    awaitingAction: null,
-    
-    steps: [
-        {
-            id: 'welcome',
-            title: "Welcome to Essence Crown!",
-            text: "Let's play a real match together! I'll guide you through each step. Click CONTINUE to begin.",
-            action: 'continue',
-            highlight: null
-        },
-        {
-            id: 'show_essence',
-            title: "Your Life Total",
-            text: "This is your ESSENCE (life). You have 23. If it reaches 0, you lose! Your opponent's Essence is at the top.",
-            action: 'continue',
-            highlight: '#p1-life-badge',
-            arrow: 'left'
-        },
-        {
-            id: 'show_kl',
-            title: "Your Energy Resource",
-            text: "This is your KUNDALINI (KL). You spend KL to play cards. It starts at 3 and grows each turn (max 13).",
-            action: 'continue',
-            highlight: '#p1-kl-badge',
-            arrow: 'left'
-        },
-        {
-            id: 'show_hand',
-            title: "Your Hand",
-            text: "These are your cards! Each card has a KL cost in the corner. During Main phase, you can play cards that cost up to your available KL.",
-            action: 'continue',
-            highlight: '#hand-zone',
-            arrow: 'up'
-        },
-        {
-            id: 'advance_to_main',
-            title: "Advance to Main Phase",
-            text: "Now let's play! Click the 'Next Phase' button to advance from Draw phase to Main phase, where you can play cards.",
-            action: 'next_phase',
-            highlight: '#btn-next-phase',
-            arrow: 'down',
-            requiredPhase: 'Main'
-        },
-        {
-            id: 'play_card',
-            title: "Play a Card!",
-            text: "Great! Now click on any card in your hand that you can afford (cost <= your KL) to play it to the board!",
-            action: 'play_card',
-            highlight: '#hand-zone',
-            arrow: 'up'
-        },
-        {
-            id: 'advance_to_clash',
-            title: "Enter Combat!",
-            text: "Excellent! Your Avatar is on the board. Now click 'Next Phase' to advance to the CLASH phase where combat happens.",
-            action: 'next_phase',
-            highlight: '#btn-next-phase',
-            arrow: 'down',
-            requiredPhase: 'Clash'
-        },
-        {
-            id: 'attack_explain',
-            title: "Attack the Opponent!",
-            text: "In Clash phase, your Avatars can attack! Click on one of your Avatars in the Avatar Zone to select it as an attacker.",
-            action: 'select_attacker',
-            highlight: '#p1-avatar-row',
-            arrow: 'up'
-        },
-        {
-            id: 'select_target',
-            title: "Choose Your Target",
-            text: "Now click on the opponent's Deity (their portrait at the top) to deal damage directly to their Essence!",
-            action: 'select_target',
-            highlight: '#p2-deity-zone',
-            arrow: 'down'
-        },
-        {
-            id: 'end_turn',
-            title: "End Your Turn",
-            text: "Great attack! Now click 'Next Phase' to advance through Twilight and end your turn. The opponent will then take their turn.",
-            action: 'next_phase',
-            highlight: '#btn-next-phase',
-            arrow: 'down',
-            requiredPhase: 'Twilight'
-        },
-        {
-            id: 'opponent_turn',
-            title: "Opponent's Turn",
-            text: "Watch as your opponent takes their turn. When it's your turn again, you'll draw a card and gain +1 max KL!",
-            action: 'wait_turn',
-            highlight: null
-        },
-        {
-            id: 'complete',
-            title: "Tutorial Complete!",
-            text: "You've learned the basics! Keep playing to master combat, card abilities, and powerful combos. Good luck, Sovereign!",
-            action: 'complete',
-            highlight: null
-        }
-    ],
-    
-    tutorialDeck: [
-        { id: 'tutorial_avatar_1', name: 'Eager Apprentice', type: 'Avatar', cost: 2, attack: 2, health: 3, aspect: 'Glow', effect: 'Basic Avatar for learning.' },
-        { id: 'tutorial_avatar_2', name: 'Shadow Scout', type: 'Avatar', cost: 2, attack: 3, health: 2, aspect: 'Void', effect: 'Swift attacker.' },
-        { id: 'tutorial_avatar_3', name: 'Temple Guardian', type: 'Avatar', cost: 3, attack: 2, health: 4, aspect: 'Glow', effect: 'Guardian: Must be attacked first.' },
-        { id: 'tutorial_spell_1', name: 'Minor Heal', type: 'Spell', cost: 1, aspect: 'Glow', effect: 'Restore 3 Essence.' },
-        { id: 'tutorial_avatar_4', name: 'Arcane Student', type: 'Avatar', cost: 1, attack: 1, health: 2, aspect: 'Gray', effect: 'Draw a card when played.' }
-    ],
-    
-    start() {
-        this.active = true;
-        this.currentStep = 0;
-        this.awaitingAction = null;
-        
-        this.setupTutorialMatch();
-        this.showStep();
-    },
-    
-    setupTutorialMatch() {
-        const tutorialDeity = {
-            id: 'tutorial_deity',
-            name: 'Solara, Light Sovereign',
-            health: 23,
-            image: 'https://via.placeholder.com/200x280/4a1a7a/ffffff?text=Solara',
-            aspects: ['Glow'],
-            passive: 'Radiance',
-            passiveText: 'Glow cards heal +1 extra.',
-            godCode: 'Divine Light',
-            godCodeText: 'Restore 5 Essence to all allies.',
-            godCodeCost: 7
-        };
-        
-        Game.state.selectedDeities = [tutorialDeity, tutorialDeity];
-        Game.state.matchMode = 'tutorial';
-        Game.state.isAIMatch = true;
-        Game.state.aiDifficulty = 'easy';
-        
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('solo-overlay').classList.add('hidden');
-        
-        Game.startGame();
-        
-        setTimeout(() => {
-            const player = Game.state.players[0];
-            player.hand = [];
-            this.tutorialDeck.forEach(card => {
-                player.hand.push({ ...card, instanceId: 'tut_' + Math.random().toString(36).substr(2, 9) });
-            });
-            Game.renderHand(0);
-        }, 500);
-    },
-    
-    showStep() {
-        const step = this.steps[this.currentStep];
-        if (!step) {
-            this.complete();
-            return;
-        }
-        
-        this.awaitingAction = step.action;
-        
-        document.querySelectorAll('.tutorial-highlight-active').forEach(el => el.classList.remove('tutorial-highlight-active'));
-        
-        let promptHtml = `
-            <div id="tutorial-prompt" class="tutorial-prompt">
-                <div class="tutorial-prompt-content">
-                    <h3>${step.title}</h3>
-                    <p>${step.text}</p>
-                    <div class="tutorial-prompt-footer">
-                        <span class="tutorial-step-indicator">Step ${this.currentStep + 1} of ${this.steps.length}</span>
-                        ${step.action === 'continue' ? '<button class="tutorial-continue-btn" onclick="TutorialController.onAction(\'continue\')">CONTINUE</button>' : ''}
-                        ${step.action === 'complete' ? '<button class="tutorial-continue-btn" onclick="TutorialController.complete()">FINISH TUTORIAL</button>' : ''}
-                        <button class="tutorial-skip-btn" onclick="TutorialController.skip()">Skip Tutorial</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        let existingPrompt = document.getElementById('tutorial-prompt');
-        if (existingPrompt) existingPrompt.remove();
-        
-        document.body.insertAdjacentHTML('beforeend', promptHtml);
-        
-        if (step.highlight) {
-            const target = document.querySelector(step.highlight);
-            if (target) {
-                target.classList.add('tutorial-highlight-active');
-                this.positionPrompt(target, step.arrow);
-            }
-        } else {
-            const prompt = document.getElementById('tutorial-prompt');
-            if (prompt) {
-                prompt.style.position = 'fixed';
-                prompt.style.top = '50%';
-                prompt.style.left = '50%';
-                prompt.style.transform = 'translate(-50%, -50%)';
-            }
-        }
-    },
-    
-    positionPrompt(target, arrow) {
-        const prompt = document.getElementById('tutorial-prompt');
-        if (!prompt || !target) return;
-        
-        const rect = target.getBoundingClientRect();
-        prompt.style.position = 'fixed';
-        
-        switch(arrow) {
-            case 'up':
-                prompt.style.top = (rect.bottom + 20) + 'px';
-                prompt.style.left = (rect.left + rect.width / 2) + 'px';
-                prompt.style.transform = 'translateX(-50%)';
-                break;
-            case 'down':
-                prompt.style.top = (rect.top - 180) + 'px';
-                prompt.style.left = (rect.left + rect.width / 2) + 'px';
-                prompt.style.transform = 'translateX(-50%)';
-                break;
-            case 'left':
-                prompt.style.top = (rect.top + rect.height / 2) + 'px';
-                prompt.style.left = (rect.right + 20) + 'px';
-                prompt.style.transform = 'translateY(-50%)';
-                break;
-            case 'right':
-                prompt.style.top = (rect.top + rect.height / 2) + 'px';
-                prompt.style.left = (rect.left - 320) + 'px';
-                prompt.style.transform = 'translateY(-50%)';
-                break;
-            default:
-                prompt.style.top = '50%';
-                prompt.style.left = '50%';
-                prompt.style.transform = 'translate(-50%, -50%)';
-        }
-    },
-    
-    onAction(action) {
-        if (!this.active) return;
-        
-        const step = this.steps[this.currentStep];
-        if (!step) return;
-        
-        if (action === step.action || action === 'continue') {
-            this.advanceStep();
-        }
-    },
-    
-    onGameEvent(eventType, data) {
-        if (!this.active) return;
-        
-        const step = this.steps[this.currentStep];
-        if (!step) return;
-        
-        switch(step.action) {
-            case 'next_phase':
-                if (eventType === 'phase_change') {
-                    if (!step.requiredPhase || data.phase === step.requiredPhase) {
-                        setTimeout(() => this.advanceStep(), 300);
-                    }
-                }
-                break;
-            case 'play_card':
-                if (eventType === 'card_played') {
-                    setTimeout(() => this.advanceStep(), 500);
-                }
-                break;
-            case 'select_attacker':
-                if (eventType === 'attacker_selected') {
-                    setTimeout(() => this.advanceStep(), 300);
-                }
-                break;
-            case 'select_target':
-                if (eventType === 'attack_declared') {
-                    setTimeout(() => this.advanceStep(), 500);
-                }
-                break;
-            case 'wait_turn':
-                if (eventType === 'turn_start' && data.playerIndex === 0) {
-                    setTimeout(() => this.advanceStep(), 300);
-                }
-                break;
-        }
-    },
-    
-    advanceStep() {
-        this.currentStep++;
-        if (this.currentStep >= this.steps.length) {
-            this.complete();
-        } else {
-            this.showStep();
-        }
-    },
-    
-    complete() {
-        this.active = false;
-        this.awaitingAction = null;
-        
-        const prompt = document.getElementById('tutorial-prompt');
-        if (prompt) prompt.remove();
-        
-        document.querySelectorAll('.tutorial-highlight-active').forEach(el => el.classList.remove('tutorial-highlight-active'));
-        
-        localStorage.setItem('ec-tutorial-seen', 'true');
-        
-        const shardsEarned = 247;
-        CosmeticsManager.addShards(shardsEarned);
-        
-        Game.log('Tutorial completed! Earned ' + shardsEarned + ' Shards!', 'reward');
-        
-        const notification = document.createElement('div');
-        notification.className = 'tutorial-complete-notification';
-        notification.innerHTML = `
-            <h2>Tutorial Complete!</h2>
-            <p>You earned ${shardsEarned} Shards!</p>
-            <p>Continue playing this match or return to menu.</p>
-            <button onclick="this.parentElement.remove()">Continue Playing</button>
-            <button onclick="TutorialController.returnToMenu()">Return to Menu</button>
-        `;
-        document.body.appendChild(notification);
-    },
-    
-    skip() {
-        this.active = false;
-        this.awaitingAction = null;
-        
-        const prompt = document.getElementById('tutorial-prompt');
-        if (prompt) prompt.remove();
-        
-        document.querySelectorAll('.tutorial-highlight-active').forEach(el => el.classList.remove('tutorial-highlight-active'));
-        
-        localStorage.setItem('ec-tutorial-seen', 'true');
-    },
-    
-    returnToMenu() {
-        document.querySelector('.tutorial-complete-notification')?.remove();
-        Game.endMatch();
-        document.getElementById('game-board').classList.add('hidden');
-        document.getElementById('main-menu').classList.remove('hidden');
-    },
-    
-    isActionAllowed(action) {
-        if (!this.active) return true;
-        
-        const step = this.steps[this.currentStep];
-        if (!step) return true;
-        
-        if (step.action === 'continue' || step.action === 'complete') return false;
-        
-        return true;
-    }
-};
-
-const Tutorial = TutorialController;
-
 const MainMenu = {
     currentScreen: 'main',
     playerData: JSON.parse(localStorage.getItem('ec-player-data') || '{"shards": 0, "name": "Sovereign"}'),
@@ -2465,8 +2109,9 @@ const MainMenu = {
             case 'shop':
                 this.showShop();
                 break;
-            case 'learntoplay':
-                this.showLearnToPlay();
+            default:
+                console.warn(`Unknown mode selected: ${mode}`);
+                this.show();
                 break;
         }
     },
@@ -2485,11 +2130,6 @@ const MainMenu = {
         document.getElementById('main-menu').classList.remove('hidden');
         this.updateProfile();
         AudioManager.play('menu');
-    },
-    
-    showTutorial() {
-        this.back();
-        TutorialController.start();
     },
     
     showCredits() {
@@ -2527,33 +2167,6 @@ const MainMenu = {
         document.getElementById('cosmetics-overlay').classList.add('hidden');
         document.getElementById('main-menu').classList.remove('hidden');
         this.currentScreen = 'main';
-    },
-    
-    // ========== LEARN TO PLAY SCREEN ==========
-    showLearnToPlay() {
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('learn-overlay').classList.remove('hidden');
-    },
-    
-    hideLearnToPlay() {
-        document.getElementById('learn-overlay').classList.add('hidden');
-        document.getElementById('main-menu').classList.remove('hidden');
-        this.currentScreen = 'main';
-    },
-    
-    showFullRules() {
-        document.getElementById('learn-overview').classList.add('hidden');
-        document.getElementById('learn-full-rules').classList.remove('hidden');
-    },
-    
-    hideFullRules() {
-        document.getElementById('learn-full-rules').classList.add('hidden');
-        document.getElementById('learn-overview').classList.remove('hidden');
-    },
-    
-    startTutorialMatch() {
-        document.getElementById('learn-overlay').classList.add('hidden');
-        CampaignManager.startTutorialBattle();
     },
     
     // ========== SETTINGS TOGGLES ==========
@@ -3299,86 +2912,7 @@ const CampaignManager = {
         document.getElementById('campaign-overlay').classList.remove('hidden');
         this.renderStoryMode();
     },
-    
-    async startTutorialBattle() {
-        const tutorialChapter = this.getAllChapters().find(ch => ch.id === 1);
-        if (!tutorialChapter) return;
-        
-        this.isTutorialMode = true;
-        this.activeChapter = tutorialChapter;
-        
-        document.getElementById('main-menu').classList.add('hidden');
-        
-        await this.showTutorialIntro();
-        
-        const tutorialBoss = {
-            id: tutorialChapter.id,
-            name: 'Training Mentor',
-            deity: tutorialChapter.bossDeity,
-            difficulty: 'easy',
-            reward: tutorialChapter.rewards.shards,
-            desc: 'Your guide to the Shard Wars',
-            portrait: '🎓',
-            intro: ["Welcome, young Shardkeeper!", "I will guide you through your first battle.", "Let's begin your training!"],
-            taunt: ["Good move!", "You're learning fast!", "Keep it up!"],
-            defeat: ["Excellent work!", "You've learned the basics of the Shard Wars!", "Now you're ready for the real challenges..."],
-            ability: null
-        };
-        this.activeBoss = tutorialBoss;
-        
-        Game.state.matchMode = 'campaign';
-        Game.state.isAIMatch = true;
-        Game.state.isTutorial = true;
-        Game.state.currentBoss = tutorialBoss;
-        AIManager.difficulty = 'easy';
-        Game.state.bossDeck = BossDecks[1] || [];
-        
-        const bossDeity = getDeities().find(d => d.id === tutorialChapter.bossDeity);
-        if (bossDeity) {
-            Game.state.selectedDeities[1] = bossDeity;
-            Game.log(`TUTORIAL: Learning the Basics`, 'phase');
-        }
-        
-        Game.showDeitySelection(0);
-    },
-    
-    async showTutorialIntro() {
-        return new Promise(resolve => {
-            const overlay = document.createElement('div');
-            overlay.className = 'story-cutscene-overlay';
-            overlay.innerHTML = `
-                <div class="cutscene-container tutorial-intro">
-                    <div class="cutscene-header">
-                        <div class="cutscene-portrait">🎓</div>
-                        <div class="cutscene-title">Welcome to Essence Crown: Shard Wars</div>
-                    </div>
-                    <div class="cutscene-text">
-                        <p>Greetings, aspiring Shardkeeper! You are about to learn the ancient art of Shard Warfare.</p>
-                        <p><strong>Key Gameplay Tips:</strong></p>
-                        <ul style="text-align: left; margin: 10px 20px; list-style: disc;">
-                            <li><strong>Phases:</strong> Each turn has Dawn, Draw, Main, Clash, and Twilight phases</li>
-                            <li><strong>Draw Phase:</strong> Click your DECK to draw a card</li>
-                            <li><strong>Main Phase:</strong> Play Avatars and Spells from your hand</li>
-                            <li><strong>Clash Phase:</strong> Attack with your Avatars</li>
-                            <li><strong>KL (Kundalini):</strong> Energy used to play cards - shown on each card's cost</li>
-                            <li><strong>Essence:</strong> Your life total - reach 0 and you lose!</li>
-                        </ul>
-                        <p>Now, choose your Deity and begin your first battle!</p>
-                    </div>
-                    <div class="cutscene-actions">
-                        <button class="cutscene-btn" onclick="this.closest('.story-cutscene-overlay').remove()">BEGIN TRAINING</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-            
-            overlay.querySelector('.cutscene-btn').onclick = () => {
-                overlay.remove();
-                resolve();
-            };
-        });
-    },
-    
+
     renderStoryMode() {
         const container = document.getElementById('campaign-chapters');
         const allChapters = this.getAllChapters();
@@ -6197,8 +5731,7 @@ const RewardsSystem = {
             casual: { win: 237, loss: 227 },
             ranked: { win: 252, loss: 232 },
             tournament: { win: 272, loss: 242 },
-            campaign: { win: 0, loss: 0 },
-            tutorial: { win: 247, loss: 0 }
+            campaign: { win: 0, loss: 0 }
         };
         
         const aiBonus = {
@@ -6559,8 +6092,6 @@ const Game = {
         logVisible: false,
         settingsVisible: false,
         codexVisible: false,
-        tutorialMode: false,
-        tutorialStep: 0,
         zoomCard: null,
         matchMode: 'casual',
         isPrivateMatch: false,
@@ -6736,7 +6267,6 @@ const Game = {
         const settingsBtn = document.getElementById('btn-settings');
         const logBtn = document.getElementById('btn-log');
         const codexBtn = document.getElementById('btn-codex');
-        const tutorialBtn = document.getElementById('btn-tutorial');
         const replaysBtn = document.getElementById('btn-replays');
         const spectateBtn = document.getElementById('btn-spectate');
         const closeSettings = document.getElementById('close-settings');
@@ -6747,7 +6277,6 @@ const Game = {
         if (settingsBtn) settingsBtn.onclick = () => this.toggleSettings();
         if (logBtn) logBtn.onclick = () => this.toggleLog();
         if (codexBtn) codexBtn.onclick = () => this.toggleCodex();
-        if (tutorialBtn) tutorialBtn.onclick = () => this.startTutorial();
         if (replaysBtn) replaysBtn.onclick = () => this.showReplayBrowser();
         if (spectateBtn) spectateBtn.onclick = () => this.showSpectateBrowser();
         if (closeSettings) closeSettings.onclick = () => this.toggleSettings();
@@ -6759,13 +6288,6 @@ const Game = {
         document.querySelectorAll('.mobile-tab').forEach(tab => {
             tab.onclick = () => this.switchMobilePanel(tab.dataset.panel);
         });
-        
-        const tutorialNext = document.getElementById('btn-tutorial-next');
-        const tutorialPrev = document.getElementById('btn-tutorial-prev');
-        const tutorialSkip = document.getElementById('btn-tutorial-skip');
-        if (tutorialNext) tutorialNext.onclick = () => this.nextTutorialStep();
-        if (tutorialPrev) tutorialPrev.onclick = () => this.prevTutorialStep();
-        if (tutorialSkip) tutorialSkip.onclick = () => this.endTutorial();
         
         const p1Life = document.getElementById('p1-life-badge');
         const p2Life = document.getElementById('p2-life-badge');
@@ -7028,7 +6550,6 @@ const Game = {
             this.showPhaseHint(phase);
         }
         
-        TutorialController.onGameEvent('phase_change', { phase: this.state.phaseNames[phase] });
     },
     
     showPhaseHint(phase) {
@@ -7102,9 +6623,6 @@ const Game = {
             this.endTurn();
         } else {
             this.setPhase(phases[nextIndex]);
-            if (TutorialController.active) {
-                TutorialController.onGameEvent('phase_change', { phase: phases[nextIndex] });
-            }
         }
     },
 
@@ -7144,10 +6662,6 @@ const Game = {
         this.setPhase('dawn');
         this.log(`Player ${this.state.currentPlayer + 1}'s turn`, 'phase');
         MatchRecorder.recordAction('TURN_START', { turn: this.state.turnNumber, player: this.state.currentPlayer }, this.state.currentPlayer);
-        
-        if (TutorialController.active && this.state.currentPlayer === 0) {
-            TutorialController.onGameEvent('turn_start', { playerIndex: 0 });
-        }
         
         if (this.state.matchMode === 'campaign' && this.state.currentPlayer === 1) {
             CampaignManager.applyBossAbility('turn', { turn: this.state.turnNumber });
@@ -8078,9 +7592,6 @@ const Game = {
         this.animateCardPlay(card);
         this.render();
         
-        if (TutorialController.active && playerIndex === 0) {
-            TutorialController.onGameEvent('card_played', { card, playerIndex });
-        }
     },
     
     handleOnEnterTrigger(card, playerIndex) {
@@ -8796,156 +8307,6 @@ const Game = {
     
     hideCardZoom() {
         document.getElementById('card-zoom-panel')?.classList.add('hidden');
-    },
-
-    // ==================== TUTORIAL SYSTEM ====================
-    tutorialSteps: [
-        {
-            title: "Welcome to Essence Crown!",
-            text: "This tutorial will teach you the basics of the game. Let's start with the most important concept: Essence!",
-            target: null,
-            position: { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
-        },
-        {
-            title: "Essence (Life Total)",
-            text: "This is your Essence - your life total. If it reaches 0, you lose! Your starting Essence depends on your Deity (usually 20-25).",
-            target: '#p1-life-badge',
-            arrow: 'left'
-        },
-        {
-            title: "Kundalini (KL)",
-            text: "KL is your energy resource used to play cards. It starts at 3, grows each turn (max 13), and refills at the start of each turn.",
-            target: '#p1-kl-badge',
-            arrow: 'left'
-        },
-        {
-            title: "Your Deity",
-            text: "This is your Deity - a powerful Sovereign with a Passive ability (always active) and a God Code (ultimate ability).",
-            target: '#p1-deity-zone',
-            arrow: 'right'
-        },
-        {
-            title: "Phase Tracker",
-            text: "The game flows through 5 phases: Dawn (upkeep), Draw (draw a card), Main (play cards), Clash (combat), and Twilight (end turn).",
-            target: '#phase-tracker',
-            arrow: 'up'
-        },
-        {
-            title: "Your Hand",
-            text: "These are the cards in your hand. During the Main phase, you can play them by spending KL. Hover over cards to see details!",
-            target: '#hand-zone',
-            arrow: 'down'
-        },
-        {
-            title: "Avatar Zone",
-            text: "Avatars (creatures) go here when summoned. They can attack during the Clash phase to damage enemy Avatars or the enemy Deity.",
-            target: '#p1-avatar-row',
-            arrow: 'up'
-        },
-        {
-            title: "Domain/Spell Zone",
-            text: "Domains go in the first slot and provide ongoing effects. Spells and Relics use the other slots.",
-            target: '#p1-domain-row',
-            arrow: 'up'
-        },
-        {
-            title: "Aspects",
-            text: "Cards have Aspects: Glow (heals you), Void (damages opponent), and Gray (draws cards). These trigger when played!",
-            target: null,
-            position: { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
-        },
-        {
-            title: "Rules Helper",
-            text: "The 'Auto' button toggles the Rules Helper. When ON, the game handles phases and triggers automatically. Turn it OFF for full manual control.",
-            target: '#btn-rules-helper',
-            arrow: 'left'
-        },
-        {
-            title: "Ready to Play!",
-            text: "You're ready to start! Click 'Next Phase' to advance, play cards from your hand, and attack during Clash. Good luck, Sovereign!",
-            target: null,
-            position: { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
-        }
-    ],
-    
-    startTutorial() {
-        TutorialController.start();
-    },
-    
-    showTutorialStep() {
-        const step = this.tutorialSteps[this.state.tutorialStep];
-        if (!step) {
-            this.endTutorial();
-            return;
-        }
-        
-        const box = document.querySelector('.tutorial-box');
-        const arrow = document.querySelector('.tutorial-arrow');
-        const title = document.getElementById('tutorial-title');
-        const text = document.getElementById('tutorial-text');
-        const prevBtn = document.getElementById('btn-tutorial-prev');
-        
-        title.textContent = step.title;
-        text.textContent = step.text;
-        
-        prevBtn.style.display = this.state.tutorialStep === 0 ? 'none' : 'inline-block';
-        
-        document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
-        arrow.className = 'tutorial-arrow';
-        
-        if (step.target) {
-            const target = document.querySelector(step.target);
-            if (target) {
-                target.classList.add('tutorial-highlight');
-                const rect = target.getBoundingClientRect();
-                
-                if (step.arrow === 'up') {
-                    box.style.top = (rect.bottom + 50) + 'px';
-                    box.style.left = (rect.left + rect.width / 2) + 'px';
-                    box.style.transform = 'translateX(-50%)';
-                    arrow.classList.add('arrow-up');
-                } else if (step.arrow === 'down') {
-                    box.style.top = (rect.top - 200) + 'px';
-                    box.style.left = (rect.left + rect.width / 2) + 'px';
-                    box.style.transform = 'translateX(-50%)';
-                    arrow.classList.add('arrow-down');
-                } else if (step.arrow === 'left') {
-                    box.style.top = (rect.top + rect.height / 2) + 'px';
-                    box.style.left = (rect.right + 50) + 'px';
-                    box.style.transform = 'translateY(-50%)';
-                    arrow.classList.add('arrow-left');
-                } else if (step.arrow === 'right') {
-                    box.style.top = (rect.top + rect.height / 2) + 'px';
-                    box.style.left = (rect.left - 420) + 'px';
-                    box.style.transform = 'translateY(-50%)';
-                    arrow.classList.add('arrow-right');
-                }
-            }
-        } else if (step.position) {
-            Object.assign(box.style, step.position);
-        }
-    },
-    
-    nextTutorialStep() {
-        this.state.tutorialStep++;
-        if (this.state.tutorialStep >= this.tutorialSteps.length) {
-            this.endTutorial();
-        } else {
-            this.showTutorialStep();
-        }
-    },
-    
-    prevTutorialStep() {
-        if (this.state.tutorialStep > 0) {
-            this.state.tutorialStep--;
-            this.showTutorialStep();
-        }
-    },
-    
-    endTutorial() {
-        this.state.tutorialMode = false;
-        document.getElementById('tutorial-overlay').classList.add('hidden');
-        document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
     },
 
     // ==================== MOBILE PANEL SYSTEM ====================
@@ -11220,9 +10581,6 @@ const Game = {
         this.showPrompt('Select a target to attack (enemy Avatar or Deity)');
         this.render();
         
-        if (TutorialController.active && playerIndex === 0) {
-            TutorialController.onGameEvent('attacker_selected', { card, playerIndex });
-        }
     },
 
     selectTarget(card, playerIndex) {
@@ -11277,10 +10635,6 @@ const Game = {
         
         this.state.combat.selectedTarget = { type: 'deity', playerIndex };
         this.showBattleOverlay();
-        
-        if (TutorialController.active) {
-            TutorialController.onGameEvent('attack_declared', { target: 'deity', playerIndex });
-        }
     },
 
     showBattleOverlay() {
@@ -11732,11 +11086,6 @@ const Game = {
             const winnerId = winnerIndex === 0 ? playerId : 'opponent';
             this.reportTournamentResult(winnerId);
         }
-        if (Game.state.isTutorial && winnerIndex === 0) {
-            TutorialBattle.onMatchEnd(true);
-            return;
-        }
-        
         if (this.state.matchMode === 'sealed') {
             LimitedMode.endSealed();
         }
@@ -12050,76 +11399,8 @@ document.addEventListener('DOMContentLoaded', () => {
     RewardsSystem.init();
     AudioManager.init();
     Game.init();
+    console.log('Essence Crown core game initialized (no tutorial/walkthrough modes).');
 });
-
-const TutorialBattle = {
-    isTutorialActive: false,
-    tutorialStep: 0,
-    tutorialSteps: [
-        { trigger: 'start', title: '🎯 Your First Battle', text: 'Welcome! You\'re about to play your first match. This is a guided tutorial battle - we\'ll help you learn as you play!' },
-        { trigger: 'main_phase', title: '🃏 Main Phase', text: 'It\'s the Main Phase - you can now play cards from your hand! Click a card to play it.' },
-        { trigger: 'card_played', title: '⚔️ Card Played!', text: 'Great! You played a card. Now it\'s in your Domain Zone. You can play more cards or move to the next phase.' },
-        { trigger: 'clash_phase', title: '💥 Clash Phase', text: 'Now it\'s the Clash Phase! Your Avatars can attack the opponent. Click an Avatar, then click the opponent to attack!' },
-        { trigger: 'attack_resolved', title: '✨ Attack Landed!', text: 'Excellent! Your attack hit! Keep attacking or let the phase end to finish your turn.' },
-        { trigger: 'victory', title: '🏆 Victory!', text: 'You won your first battle! Congratulations, Shardkeeper! You\'ve learned the basics. Now try Solo Battle for real challenges.' }
-    ],
-    
-    start() {
-        this.isTutorialActive = true;
-        this.tutorialStep = 0;
-        
-        document.getElementById('main-menu').classList.add('hidden');
-        Game.state.matchMode = 'tutorial';
-        Game.state.isAIMatch = true;
-        Game.state.aiDifficulty = 'easy';
-        Game.state.isTutorial = true;
-        
-        const deities = getDeities();
-        Game.state.selectedDeities = [deities[0], deities[5]];
-        
-        this.showHint(0);
-        setTimeout(() => Game.startGameWithMatchMode(), 500);
-    },
-    
-    showHint(stepIndex) {
-        if (stepIndex >= this.tutorialSteps.length) return;
-        
-        const step = this.tutorialSteps[stepIndex];
-        const hintEl = document.getElementById('tutorial-hint');
-        document.getElementById('hint-text').textContent = step.text;
-        hintEl.classList.remove('hidden');
-        
-        this.tutorialStep = stepIndex;
-    },
-    
-    nextHint() {
-        if (this.tutorialStep < this.tutorialSteps.length - 1) {
-            this.showHint(this.tutorialStep + 1);
-        }
-    },
-    
-    hideHint() {
-        document.getElementById('tutorial-hint').classList.add('hidden');
-    },
-    
-    triggerHint(trigger) {
-        if (!this.isTutorialActive) return;
-        
-        const step = this.tutorialSteps.find(s => s.trigger === trigger);
-        if (step) {
-            this.showHint(this.tutorialSteps.indexOf(step));
-        }
-    },
-    
-    onMatchEnd(playerWon) {
-        if (playerWon) {
-            this.triggerHint('victory');
-            setTimeout(() => {
-                Game.showVictoryScreen(0);
-            }, 2000);
-        }
-    }
-};
 
 Game.openProfileViewer = function() {
     const profile = PlayerProfile.data;
