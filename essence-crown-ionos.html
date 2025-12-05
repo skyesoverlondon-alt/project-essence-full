@@ -18613,11 +18613,6 @@ console.log("Essence Crown – IONOS standalone loaded.");
 // Last updated: 2025-12-02
 
 // === CARD DATA START ===
-// Essence Crown: Shard Wars - Card Database
-// Generated from official card data
-// Total: 109 playable cards + 11 deities
-// Last updated: 2025-12-02
-
 const CARD_BACK_IMAGE = 'https://cdn1.sharemyimage.com/2025/12/02/Back.png';
 
 const CARD_DATABASE = [
@@ -19958,6 +19953,12 @@ const CARD_DATABASE = [
     },
 ];
 
+// Shardstorm expansion placeholder block (keeps engine object shape)
+const SHARDSTORM_EXPANSION = [];
+
+// Append expansion cards to the main database
+CARD_DATABASE.push(...SHARDSTORM_EXPANSION);
+
 const DEITY_DATABASE = [
     {
         id: 'EC-001',
@@ -20123,6 +20124,8 @@ function getCardById(id) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { CARD_DATABASE, DEITY_DATABASE, CARD_BACK_IMAGE, ALL_CARDS, getDeities, getPlayableCards, getCardById };
 }
+
+// === CARD DATA END ===
 
 
 // Settings screen removal kept for IONOS build.
@@ -26413,7 +26416,6 @@ const Game = {
         const codexBtn = document.getElementById('btn-codex');
         const replaysBtn = document.getElementById('btn-replays');
         const spectateBtn = document.getElementById('btn-spectate');
-        const drawWarningClose = document.getElementById('draw-phase-warning-close');
 
         const turnControls = document.getElementById('turn-controls');
         if (turnControls && !document.getElementById('btn-shard-surge')) {
@@ -26434,7 +26436,6 @@ const Game = {
         if (replaysBtn) replaysBtn.onclick = () => this.showReplayBrowser();
         if (spectateBtn) spectateBtn.onclick = () => this.showSpectateBrowser();
         if (shardSurgeBtn) shardSurgeBtn.onclick = () => this.activateShardSurge();
-        if (drawWarningClose) drawWarningClose.onclick = () => this.hideDrawPhaseWarning();
         
         document.querySelectorAll('.codex-tab').forEach(tab => {
             tab.onclick = () => this.switchCodexTab(tab.dataset.tab);
