@@ -2103,9 +2103,6 @@ const MainMenu = {
             case 'collection':
                 Collection.show();
                 break;
-            case 'settings':
-                this.showSettings();
-                break;
             case 'shop':
                 this.showShop();
                 break;
@@ -2118,15 +2115,13 @@ const MainMenu = {
     
     back() {
         document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'));
-        document.getElementById('settings-modal').classList.remove('visible');
         document.getElementById('main-menu').classList.remove('hidden');
         this.currentScreen = 'main';
         AudioManager.play('menu');
     },
-    
+
     show() {
         document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'));
-        document.getElementById('settings-modal').classList.remove('visible');
         document.getElementById('main-menu').classList.remove('hidden');
         this.updateProfile();
         AudioManager.play('menu');
@@ -2140,18 +2135,6 @@ const MainMenu = {
         this.playerData.shards += amount;
         localStorage.setItem('ec-player-data', JSON.stringify(this.playerData));
         this.updateProfile();
-    },
-    
-    // ========== SETTINGS FROM MENU ==========
-    showSettings() {
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('menu-settings-overlay').classList.remove('hidden');
-    },
-    
-    hideSettings() {
-        document.getElementById('menu-settings-overlay').classList.add('hidden');
-        document.getElementById('main-menu').classList.remove('hidden');
-        this.currentScreen = 'main';
     },
     
     // ========== SHARD SHOP FROM MENU ==========
@@ -6090,7 +6073,6 @@ const Game = {
         },
         rulesHelper: true,
         logVisible: false,
-        settingsVisible: false,
         codexVisible: false,
         zoomCard: null,
         matchMode: 'casual',
@@ -6264,22 +6246,18 @@ const Game = {
         const nextPhaseBtn = document.getElementById('btn-next-phase');
         const endTurnBtn = document.getElementById('btn-end-turn');
         const rulesBtn = document.getElementById('btn-rules-helper');
-        const settingsBtn = document.getElementById('btn-settings');
         const logBtn = document.getElementById('btn-log');
         const codexBtn = document.getElementById('btn-codex');
         const replaysBtn = document.getElementById('btn-replays');
         const spectateBtn = document.getElementById('btn-spectate');
-        const closeSettings = document.getElementById('close-settings');
         
         if (nextPhaseBtn) nextPhaseBtn.onclick = () => this.nextPhase();
         if (endTurnBtn) endTurnBtn.onclick = () => this.endTurn();
         if (rulesBtn) rulesBtn.onclick = () => this.toggleRulesHelper();
-        if (settingsBtn) settingsBtn.onclick = () => this.toggleSettings();
         if (logBtn) logBtn.onclick = () => this.toggleLog();
         if (codexBtn) codexBtn.onclick = () => this.toggleCodex();
         if (replaysBtn) replaysBtn.onclick = () => this.showReplayBrowser();
         if (spectateBtn) spectateBtn.onclick = () => this.showSpectateBrowser();
-        if (closeSettings) closeSettings.onclick = () => this.toggleSettings();
         
         document.querySelectorAll('.codex-tab').forEach(tab => {
             tab.onclick = () => this.switchCodexTab(tab.dataset.tab);
@@ -6323,10 +6301,6 @@ const Game = {
 
         document.querySelectorAll('#context-menu .context-option').forEach(item => {
             item.onclick = () => this.handleContextAction(item.dataset.action);
-        });
-
-        document.querySelectorAll('.toggle-switch').forEach(toggle => {
-            toggle.onclick = () => toggle.classList.toggle('active');
         });
 
         document.addEventListener('click', (e) => {
@@ -8234,12 +8208,6 @@ const Game = {
         if (logPanel) logPanel.classList.toggle('visible', this.state.logVisible);
         if (chroniclePanel) chroniclePanel.classList.toggle('open', this.state.logVisible);
         if (logBtn) logBtn.classList.toggle('active', this.state.logVisible);
-    },
-
-    toggleSettings() {
-        this.state.settingsVisible = !this.state.settingsVisible;
-        document.getElementById('settings-modal').classList.toggle('visible', this.state.settingsVisible);
-        document.getElementById('btn-settings').classList.toggle('active', this.state.settingsVisible);
     },
 
     // ==================== CODEX SYSTEM ====================

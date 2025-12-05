@@ -402,7 +402,6 @@
                         <div id="side-panel">
                             <button class="panel-btn" id="btn-codex" title="Codex">?</button>
                             <button class="panel-btn auto-btn" id="btn-rules-helper" title="Rules Helper">Auto</button>
-                            <button class="panel-btn" id="btn-settings" title="Settings">⚙</button>
                             <button class="panel-btn" id="btn-log" title="Game Log">📜</button>
                         </div>
                     </div>
@@ -587,7 +586,6 @@
                 <div class="pause-options">
                     <button class="pause-btn" onclick="GameControls.resume()">Resume Game</button>
                     <button class="pause-btn" onclick="GameControls.toggleFullscreen()">Toggle Fullscreen</button>
-                    <button class="pause-btn" onclick="MainMenu.selectMode('settings')">Settings</button>
                     <button class="pause-btn pause-btn--danger" onclick="GameControls.surrender()">Surrender Match</button>
                     <button class="pause-btn pause-btn--danger" onclick="GameControls.goHome()">Quit to Menu</button>
                 </div>
@@ -882,15 +880,8 @@
                     <div class="mode-badge hot">Shop</div>
                 </div>
                 
-                <div class="mode-card settings" onclick="MainMenu.selectMode('settings')">
-                    <div class="mode-icon">⚙</div>
-                    <div class="mode-info">
-                        <h3>SETTINGS</h3>
-                        <p>Options & accessibility</p>
-                    </div>
-                </div>
             </div>
-            
+
             <div class="menu-news">
                 <div class="news-banner">
                     <span class="news-label">NEWS</span>
@@ -1594,63 +1585,6 @@
     <div id="log-panel">
         <h3>Game Log</h3>
         <div id="log-content"></div>
-    </div>
-    
-    <!-- Settings Modal -->
-    <div id="settings-modal">
-        <button class="close-modal" id="close-settings-btn" onclick="Game.toggleSettings()">✕</button>
-        <h2>Settings</h2>
-        
-        <h3 class="settings-section-title">Gameplay</h3>
-        <div class="settings-option">
-            <label>Auto Wake Phase</label>
-            <div class="toggle-switch active" id="opt-auto-wake"></div>
-        </div>
-        <div class="settings-option">
-            <label>Auto Aspect Triggers</label>
-            <div class="toggle-switch active" id="opt-auto-aspect"></div>
-        </div>
-        <div class="settings-option">
-            <label>Combat Helpers</label>
-            <div class="toggle-switch active" id="opt-auto-combat"></div>
-        </div>
-        <div class="settings-option">
-            <label>Auto Overflow → God Code</label>
-            <div class="toggle-switch active" id="opt-auto-overflow"></div>
-        </div>
-        
-        <h3 class="settings-section-title">Accessibility</h3>
-        <div class="settings-option">
-            <label>Text Size</label>
-            <select id="opt-text-size" class="settings-select">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-            </select>
-        </div>
-        <div class="settings-option">
-            <label>Colorblind Mode</label>
-            <select id="opt-colorblind" class="settings-select">
-                <option value="off">Off</option>
-                <option value="deuteranopia">Deuteranopia (Red-Green)</option>
-                <option value="protanopia">Protanopia (Red-Green)</option>
-                <option value="tritanopia">Tritanopia (Blue-Yellow)</option>
-            </select>
-        </div>
-        <div class="settings-option">
-            <label>Low-FX Mode</label>
-            <div class="toggle-switch" id="opt-low-fx"></div>
-        </div>
-        <div class="settings-option">
-            <label>High Contrast</label>
-            <div class="toggle-switch" id="opt-high-contrast"></div>
-        </div>
-        <div class="settings-option">
-            <label>Reduce Motion</label>
-            <div class="toggle-switch" id="opt-reduce-motion"></div>
-        </div>
-        
-        <button class="close-modal" id="close-settings">Close</button>
     </div>
     
     <!-- Sandbox Mode Overlay -->

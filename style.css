@@ -3133,8 +3133,6 @@ html, body {
 .mode-card.multiplayer { border-left: 4px solid var(--pink); }
 .mode-card.deckbuilder { border-left: 4px solid #3b82f6; }
 .mode-card.collection { border-left: 4px solid #a855f7; }
-.mode-card.settings { border-left: 4px solid #6b7280; }
-
 .mode-icon {
     font-size: 3em;
     margin-bottom: 15px;
@@ -4394,89 +4392,6 @@ html, body {
     color: #ff8c00;
     border-left-color: #ff8c00;
     background: rgba(255, 140, 0, 0.08);
-}
-
-/* ===== SETTINGS MODAL ===== */
-#settings-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(10, 10, 15, 0.98);
-    border: 3px solid var(--gold);
-    border-radius: 18px;
-    padding: 25px;
-    z-index: 1000;
-    min-width: 360px;
-    display: none;
-}
-
-#settings-modal.visible {
-    display: block;
-}
-
-#settings-modal h2 {
-    font-family: 'Cinzel', serif;
-    color: var(--gold);
-    margin-bottom: 18px;
-    text-align: center;
-}
-
-.settings-option {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.settings-option label {
-    color: #fff;
-    font-size: 13px;
-}
-
-.toggle-switch {
-    width: 46px;
-    height: 24px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.toggle-switch.active {
-    background: var(--essence-glow);
-}
-
-.toggle-switch::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background: #fff;
-    border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    transition: left 0.3s;
-}
-
-.toggle-switch.active::after {
-    left: 24px;
-}
-
-.close-modal {
-    display: block;
-    width: 100%;
-    margin-top: 15px;
-    padding: 10px;
-    background: var(--gold);
-    color: #000;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Cinzel', serif;
-    font-weight: 600;
-    cursor: pointer;
 }
 
 /* ===== CONTEXT MENU ===== */
@@ -6670,7 +6585,6 @@ html, body {
     .overlay { padding: 10px; }
     #deckbuilder-overlay { width: 100%; max-width: 100%; max-height: 100%; }
     .deckbuilder-container { width: 100%; max-height: 100%; }
-    #settings-modal { padding: 20px; max-width: 90vw; }
 }
 
 .mobile-tabs {
@@ -9136,43 +9050,6 @@ body.high-contrast .panel-btn {
 body.reduce-motion * {
     animation: none !important;
     transition: none !important;
-}
-
-/* Settings Modal Enhancements */
-.settings-section-title {
-    color: var(--gold);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 20px 0 10px 0;
-    padding-bottom: 5px;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-}
-
-.settings-section-title:first-of-type {
-    margin-top: 10px;
-}
-
-.settings-select {
-    background: rgba(20, 20, 40, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    cursor: pointer;
-    min-width: 180px;
-}
-
-.settings-select:focus {
-    outline: none;
-    border-color: var(--gold);
-}
-
-.settings-select option {
-    background: #1a1a2e;
-    color: #fff;
 }
 
 /* ===== SANDBOX MODE ===== */
@@ -12806,7 +12683,6 @@ body.defeat-effect {
 .deckbuilder-overlay,
 .profile-overlay,
 .shop-overlay,
-.settings-overlay,
 .multiplayer-overlay {
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -12827,8 +12703,7 @@ body.defeat-effect {
 .panel-body,
 .collection-grid,
 .campaign-chapters,
-.shop-grid,
-.settings-content {
+.shop-grid {
     overflow-y: auto;
     max-height: calc(90vh - 120px);
     max-height: calc(90dvh - 120px);
