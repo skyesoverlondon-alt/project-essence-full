@@ -115,6 +115,22 @@ function hasHaste(card) {
     return card.haste === true;
 }
 
+function isBeastCard(card) {
+    if (!card) return false;
+
+    const aspects = card.aspects || card.template?.aspects || [];
+    let isFromAspects = false;
+
+    if (Array.isArray(aspects)) {
+        isFromAspects = aspects.some(a => typeof a === 'string' && a.toLowerCase() === 'beast');
+    }
+
+    const typeField = (card.type || card.cardType || '').toLowerCase();
+    const isFromType = typeField === 'beast';
+
+    return isFromAspects || isFromType;
+}
+
 // ===== SUN ALTAR VISUAL HELPERS =====
 const SunAltarUI = {
     domainMap: {
@@ -8164,13 +8180,13 @@ const Game = {
         const deity = p.deity;
         if (!deity || !deity.passive) return;
         
-        if (deity.passive === 'Packbond' && isBeast(card)) {
+        if (deity.passive === 'Packbond' && isBeastCard(card)) {
             this.adjustStat(playerIndex, 'essence', 1);
             this.log(`${deity.passive}: Beast entered - restored 1 Essence!`, 'heal');
         }
-        
+
         if (deity.passive === 'Familiar Swarm' && !p.passiveUsedThisTurn) {
-            if (isBeast(card) || card.cost <= 2) {
+            if (isBeastCard(card) || card.cost <= 2) {
                 p.passiveUsedThisTurn = true;
                 this.adjustStat(1 - playerIndex, 'essence', -1);
                 this.adjustStat(playerIndex, 'kl', 1);
@@ -9224,7 +9240,7 @@ const Game = {
             const opponent = this.state.players[1 - playerIndex];
             let destroyed = 0;
             opponent.avatarRow = opponent.avatarRow.filter(c => {
-                if (!isBeast(c) && destroyed < 2) {
+                if (!isBeastCard(c) && destroyed < 2) {
                     opponent.graveyard.push(c);
                     destroyed++;
                     return false;
@@ -9407,7 +9423,7 @@ const Game = {
         const healthPercent = hasStats ? ((card.healthCurrent || card.health) / card.health) * 100 : 100;
         
         const isGuardian = hasGuardian(card);
-        const isCardBeast = isBeast(card);
+        const isCardBeast = isBeastCard(card);
         
         el.innerHTML = `
             <div class="card-front">
@@ -11526,7 +11542,7 @@ const Game = {
         const deity = player.deity;
         if (!deity || !deity.passive) return;
         
-        if (deity.passive === 'Dark Bond' && isBeast(card)) {
+        if (deity.passive === 'Dark Bond' && isBeastCard(card)) {
             this.adjustStat(1 - ownerIndex, 'essence', -1);
             this.log(`${deity.passive}: Beast died - opponent lost 1 Essence!`, 'damage');
         }
