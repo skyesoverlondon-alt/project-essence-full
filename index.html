@@ -896,6 +896,75 @@
         </div>
     </div>
     
+    <!-- Menu Settings Overlay -->
+    <div id="menu-settings-overlay" class="overlay hidden">
+        <div class="menu-settings-container">
+            <button class="back-btn" onclick="MainMenu.hideSettings()">← Back to Menu</button>
+            <h1>SETTINGS</h1>
+            
+            <div class="settings-sections">
+                <div class="settings-section">
+                    <h3>Audio</h3>
+                    <div class="settings-option">
+                        <label>Music</label>
+                        <div class="toggle-switch" id="menu-opt-music" onclick="MainMenu.toggleSetting('music')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Sound Effects</label>
+                        <div class="toggle-switch" id="menu-opt-sfx" onclick="MainMenu.toggleSetting('sfx')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Volume</label>
+                        <input type="range" id="menu-opt-volume" min="0" max="100" value="60" class="settings-slider" onchange="MainMenu.setVolume(this.value)">
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Display</h3>
+                    <div class="settings-option">
+                        <label>Animations</label>
+                        <div class="toggle-switch active" id="menu-opt-animations" onclick="MainMenu.toggleSetting('animations')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Reduce Motion</label>
+                        <div class="toggle-switch" id="menu-opt-reduce-motion" onclick="MainMenu.toggleSetting('reduceMotion')"></div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Low-FX Mode</label>
+                        <div class="toggle-switch" id="menu-opt-low-fx" onclick="MainMenu.toggleSetting('lowFx')"></div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Accessibility</h3>
+                    <div class="settings-option">
+                        <label>Text Size</label>
+                        <select id="menu-opt-text-size" class="settings-select" onchange="MainMenu.setTextSize(this.value)">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                    <div class="settings-option">
+                        <label>Colorblind Mode</label>
+                        <select id="menu-opt-colorblind" class="settings-select" onchange="MainMenu.setColorblind(this.value)">
+                            <option value="off">Off</option>
+                            <option value="deuteranopia">Deuteranopia</option>
+                            <option value="protanopia">Protanopia</option>
+                            <option value="tritanopia">Tritanopia</option>
+                        </select>
+                    </div>
+                    <div class="settings-option">
+                        <label>High Contrast</label>
+                        <div class="toggle-switch" id="menu-opt-contrast" onclick="MainMenu.toggleSetting('contrast')"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="primary-btn" onclick="MainMenu.hideSettings()">Save & Close</button>
+        </div>
+    </div>
+    
     <!-- Solo Mode Selection -->
     <div id="solo-overlay" class="overlay hidden">
         <div class="solo-container">
