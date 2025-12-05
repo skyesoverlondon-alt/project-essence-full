@@ -1880,86 +1880,6 @@ html, body {
 }
 
 /* === BOARD CSS START === */
-.command-bridge-shell {
-    position: relative;
-    margin: 12px auto;
-    padding: 12px 12px 16px;
-    border-radius: 18px;
-    background:
-        radial-gradient(circle at top left, rgba(129, 140, 248, 0.15), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(251, 191, 36, 0.12), transparent 50%),
-        linear-gradient(180deg, #050012 0%, #0a0320 50%, #050012 100%);
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    box-shadow:
-        0 0 0 1px rgba(17, 24, 39, 0.65),
-        0 24px 48px rgba(0, 0, 0, 0.6);
-}
-
-.command-bridge-header {
-    text-align: center;
-    padding: 8px 6px 4px;
-    border-radius: 12px;
-    background: linear-gradient(90deg, rgba(14, 165, 233, 0.2), rgba(124, 58, 237, 0.18));
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    margin-bottom: 10px;
-}
-
-.command-bridge-title {
-    font-size: 18px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #fef9c3;
-    text-shadow: 0 0 12px rgba(250, 250, 210, 0.7);
-}
-
-.command-bridge-subtitle {
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    color: rgba(226, 232, 240, 0.72);
-}
-
-.command-bridge-body {
-    position: relative;
-}
-
-#board-layout-marker {
-    position: absolute;
-    top: 8px;
-    left: 10px;
-    padding: 4px 8px;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    background: rgba(14, 165, 233, 0.25);
-    border: 1px solid rgba(124, 58, 237, 0.55);
-    border-radius: 999px;
-    color: #e0f2fe;
-    box-shadow: 0 0 12px rgba(124, 58, 237, 0.55);
-    z-index: 5;
-}
-
-/* === NEW BOARD CSS START (from provided board code) === */
-/* Utility styling for the transplanted Command Bridge layout */
-.command-bridge-shell .top-bar,
-.command-bridge-shell .controls {
-    justify-content: center;
-}
-
-.command-bridge-shell .board {
-    border-radius: 20px;
-    padding: 10px;
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.94), #020617);
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.72);
-}
-
-.command-bridge-shell .player-section.is-active {
-    box-shadow:
-        0 0 0 1px rgba(129, 140, 248, 0.9),
-        0 0 28px rgba(129, 140, 248, 0.65),
-        0 20px 40px rgba(0, 0, 0, 0.85);
-}
-/* === NEW BOARD CSS END === */
 /* ===== GAME BOARD - NEW EARTH ARENA ===== */
 /* Legacy #game-board styles removed - now using .ec-frame */
 
@@ -18706,11 +18626,6 @@ console.log("Essence Crown – IONOS standalone loaded.");
 // Last updated: 2025-12-02
 
 // === CARD DATA START ===
-// Essence Crown: Shard Wars - Card Database
-// Generated from official card data
-// Total: 109 playable cards + 11 deities
-// Last updated: 2025-12-02
-
 const CARD_BACK_IMAGE = 'https://cdn1.sharemyimage.com/2025/12/02/Back.png';
 
 const CARD_DATABASE = [
@@ -20051,6 +19966,12 @@ const CARD_DATABASE = [
     },
 ];
 
+// Shardstorm expansion placeholder block (keeps engine object shape)
+const SHARDSTORM_EXPANSION = [];
+
+// Append expansion cards to the main database
+CARD_DATABASE.push(...SHARDSTORM_EXPANSION);
+
 const DEITY_DATABASE = [
     {
         id: 'EC-001',
@@ -20195,6 +20116,8 @@ const ALL_CARDS = [...CARD_DATABASE, ...DEITY_DATABASE].map(card => ({
     health: card.health ?? card.toughness ?? card.essence ?? 0
 }));
 
+// === CARD DATA END ===
+
 // Helper function to get all deities
 function getDeities() {
     return DEITY_DATABASE;
@@ -20216,6 +20139,7 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // === CARD DATA END ===
+
 
 // Settings screen removal kept for IONOS build.
 document.addEventListener('DOMContentLoaded', () => {
@@ -26505,7 +26429,6 @@ const Game = {
         const codexBtn = document.getElementById('btn-codex');
         const replaysBtn = document.getElementById('btn-replays');
         const spectateBtn = document.getElementById('btn-spectate');
-        const drawWarningClose = document.getElementById('draw-phase-warning-close');
 
         const turnControls = document.getElementById('turn-controls');
         if (turnControls && !document.getElementById('btn-shard-surge')) {
@@ -26526,7 +26449,6 @@ const Game = {
         if (replaysBtn) replaysBtn.onclick = () => this.showReplayBrowser();
         if (spectateBtn) spectateBtn.onclick = () => this.showSpectateBrowser();
         if (shardSurgeBtn) shardSurgeBtn.onclick = () => this.activateShardSurge();
-        if (drawWarningClose) drawWarningClose.onclick = () => this.hideDrawPhaseWarning();
         
         document.querySelectorAll('.codex-tab').forEach(tab => {
             tab.onclick = () => this.switchCodexTab(tab.dataset.tab);
