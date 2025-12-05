@@ -4616,6 +4616,20 @@ html, body {
 #action-prompt.visible {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+#action-prompt .action-prompt-message {
+    text-align: center;
+}
+
+.ec-dialog-close {
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 /* Card Selection States */
@@ -17206,7 +17220,12 @@ body.defeat-effect {
         <div id="turn-indicator" class="turn-indicator p1">Player 1's Turn</div>
 
         <!-- Action Prompt -->
-        <div id="action-prompt"></div>
+        <div id="action-prompt">
+            <div class="action-prompt-message" id="action-prompt-message"></div>
+            <button class="ec-dialog-close" id="draw-phase-warning-close">
+                OK
+            </button>
+        </div>
 
         <!-- Battle Overlay -->
         <div id="battle-overlay"></div>
@@ -20083,6 +20102,8 @@ const ALL_CARDS = [...CARD_DATABASE, ...DEITY_DATABASE].map(card => ({
     attack: card.attack ?? card.power ?? 0,
     health: card.health ?? card.toughness ?? card.essence ?? 0
 }));
+
+// === CARD DATA END ===
 
 // Helper function to get all deities
 function getDeities() {
@@ -31295,12 +31316,39 @@ const Game = {
             prompt.id = 'action-prompt';
             document.getElementById('game-container').appendChild(prompt);
         }
-        prompt.textContent = message;
+
+        let messageEl = document.getElementById('action-prompt-message');
+        if (!messageEl) {
+            messageEl = document.createElement('div');
+            messageEl.id = 'action-prompt-message';
+            messageEl.className = 'action-prompt-message';
+            prompt.prepend(messageEl);
+        }
+
+        let closeBtn = document.getElementById('draw-phase-warning-close');
+        if (!closeBtn) {
+            closeBtn = document.createElement('button');
+            closeBtn.id = 'draw-phase-warning-close';
+            closeBtn.className = 'ec-dialog-close';
+            closeBtn.textContent = 'OK';
+            prompt.appendChild(closeBtn);
+        }
+
+        closeBtn.onclick = () => this.hideDrawPhaseWarning();
+        messageEl.textContent = message;
+        prompt.style.display = 'block';
         prompt.classList.add('visible');
     },
 
     hidePrompt() {
-        document.getElementById('action-prompt')?.classList.remove('visible');
+        const prompt = document.getElementById('action-prompt');
+        if (!prompt) return;
+        prompt.classList.remove('visible');
+        prompt.style.display = 'none';
+    },
+
+    hideDrawPhaseWarning() {
+        this.hidePrompt();
     },
 
     checkWinCondition() {
