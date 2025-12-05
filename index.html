@@ -1982,6 +1982,21 @@
     </div>
     
     <script src="cards.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const settingsHeading = Array.from(document.querySelectorAll('h1, h2, h3')).find(el => el.textContent.trim().toUpperCase() === 'SETTINGS');
+            if (settingsHeading) {
+                const settingsContainer = settingsHeading.closest('section, div');
+                if (settingsContainer) {
+                    const previousId = settingsContainer.id;
+                    if (previousId && previousId !== 'settings-screen') {
+                        settingsContainer.dataset.previousId = previousId;
+                    }
+                    settingsContainer.id = 'settings-screen';
+                }
+            }
+        });
+    </script>
     <script src="main.js"></script>
 </body>
 </html>
