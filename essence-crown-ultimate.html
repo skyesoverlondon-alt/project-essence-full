@@ -628,132 +628,6 @@ html, body {
   color: white;
 }
 
-.settings-panel {
-  position: fixed;
-  top: 60px;
-  right: 10px;
-  width: 320px;
-  max-height: 80vh;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 1rem;
-  z-index: 999;
-  backdrop-filter: blur(15px);
-  overflow-y: auto;
-  box-shadow: 0 10px 40px var(--shadow-color);
-}
-
-.settings-panel.hidden {
-  display: none;
-}
-
-.settings-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.settings-header h3 {
-  font-family: 'Orbitron', sans-serif;
-  color: var(--accent-gold);
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-
-.close-btn:hover {
-  color: var(--danger-color);
-}
-
-.settings-section {
-  margin-bottom: 1.5rem;
-}
-
-.settings-section h4 {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.theme-selector {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.theme-btn {
-  flex: 1;
-  padding: 0.5rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.75rem;
-  transition: all var(--transition-fast);
-}
-
-.theme-btn:hover,
-.theme-btn.active {
-  background: var(--accent-primary);
-  color: white;
-  border-color: var(--accent-primary);
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.toggle-label input {
-  display: none;
-}
-
-.toggle-slider {
-  width: 44px;
-  height: 24px;
-  background: var(--bg-tertiary);
-  border-radius: 12px;
-  position: relative;
-  transition: background var(--transition-fast);
-}
-
-.toggle-slider::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background: var(--text-secondary);
-  border-radius: 50%;
-  transition: all var(--transition-fast);
-}
-
-.toggle-label input:checked + .toggle-slider {
-  background: var(--accent-primary);
-}
-
-.toggle-label input:checked + .toggle-slider::after {
-  left: 22px;
-  background: white;
-}
-
 .player-area {
   display: flex;
   flex-direction: column;
@@ -1180,25 +1054,6 @@ html, body {
 .phase-controls {
   display: flex;
   gap: 0.5rem;
-}
-
-.btn-settings {
-  position: absolute;
-  right: 60px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 1.3rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-settings:hover {
-  background: var(--accent-primary);
-  color: white;
 }
 
 .game-log {
@@ -1806,69 +1661,6 @@ html, body {
         <span class="fs-icon">&#x26F6;</span>
       </button>
 
-      <div id="settings-panel" class="settings-panel hidden">
-        <div class="settings-header">
-          <h3>Settings</h3>
-          <button class="close-btn" onclick="toggleSettings()">&times;</button>
-        </div>
-        <div class="settings-content">
-          <div class="settings-section">
-            <h4>Theme</h4>
-            <div class="theme-selector">
-              <button class="theme-btn active" data-theme="dark-void">Dark Void</button>
-              <button class="theme-btn" data-theme="bright-solar">Bright Solar</button>
-              <button class="theme-btn" data-theme="gray-court">Gray Court</button>
-            </div>
-          </div>
-          <div class="settings-section">
-            <h4>Rules Helper</h4>
-            <label class="toggle-label">
-              <input type="checkbox" id="toggle-rules-helper" checked>
-              <span class="toggle-slider"></span>
-              Enable Rules Helper
-            </label>
-          </div>
-          <div class="settings-section helper-options">
-            <h4>Helper Options</h4>
-            <label class="toggle-label">
-              <input type="checkbox" id="toggle-auto-wake" checked>
-              <span class="toggle-slider"></span>
-              Auto Wake Phase
-            </label>
-            <label class="toggle-label">
-              <input type="checkbox" id="toggle-auto-aspect" checked>
-              <span class="toggle-slider"></span>
-              Auto Aspect Triggers
-            </label>
-            <label class="toggle-label">
-              <input type="checkbox" id="toggle-auto-kl" checked>
-              <span class="toggle-slider"></span>
-              Auto KL Payment
-            </label>
-            <label class="toggle-label">
-              <input type="checkbox" id="toggle-auto-combat" checked>
-              <span class="toggle-slider"></span>
-              Auto Combat Resolution
-            </label>
-            <label class="toggle-label">
-              <input type="checkbox" id="toggle-auto-overflow" checked>
-              <span class="toggle-slider"></span>
-              Auto Overflow → Crown
-            </label>
-            <label class="toggle-label">
-              <input type="checkbox" id="toggle-helper-log" checked>
-              <span class="toggle-slider"></span>
-              Show Helper Log
-            </label>
-          </div>
-          <div class="settings-section">
-            <h4>Animation Speed</h4>
-            <input type="range" id="animation-speed" min="0.5" max="2" step="0.25" value="1">
-            <span id="speed-label">1x</span>
-          </div>
-        </div>
-      </div>
-
       <div id="opponent-area" class="player-area opponent">
         <div class="deity-panel">
           <div class="deity-card" id="p2-deity-display"></div>
@@ -1956,7 +1748,6 @@ html, body {
             <button class="btn btn-phase" id="btn-end-turn">End Turn</button>
           </div>
         </div>
-        <button class="btn btn-settings" id="btn-settings" onclick="toggleSettings()">&#x2699;</button>
       </div>
 
       <div id="player-area" class="player-area player">
@@ -2425,10 +2216,6 @@ function showScreen(screenName) {
   if (screenName === 'deity-selection') {
     populateDeityGrids();
   }
-}
-
-function toggleSettings() {
-  document.getElementById('settings-panel').classList.toggle('hidden');
 }
 
 function initParticleBackground() {
