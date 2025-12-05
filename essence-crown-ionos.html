@@ -1879,6 +1879,7 @@ html, body {
     z-index: 0;
 }
 
+/* === BOARD CSS START === */
 /* ===== GAME BOARD - NEW EARTH ARENA ===== */
 /* Legacy #game-board styles removed - now using .ec-frame */
 
@@ -2558,6 +2559,7 @@ html, body {
     min-height: 120px;
 }
 
+/* === BOARD CSS END === */
 /* ===== CARDS ===== */
 .game-card {
     width: 95px;
@@ -4614,6 +4616,20 @@ html, body {
 #action-prompt.visible {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+#action-prompt .action-prompt-message {
+    text-align: center;
+}
+
+.ec-dialog-close {
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 /* Card Selection States */
@@ -16686,6 +16702,7 @@ body.defeat-effect {
     </style>
 </head>
 <body>
+    <!-- === BOARD LAYOUT START === -->
     <div id="game-container">
         <!-- SUN ALTAR ARENA LAYOUT -->
         <div class="ec-frame sun-altar" id="ec-arena-frame" data-domain="second-sun">
@@ -17178,6 +17195,8 @@ body.defeat-effect {
         <!-- Legacy IDs for JS compatibility -->
         <div id="p1-life-badge" class="hidden-badge" data-player="0"></div>
         <div id="p2-life-badge" class="hidden-badge" data-player="1"></div>
+        <div id="p1-kl-badge" class="hidden-badge" data-player="0"></div>
+        <div id="p2-kl-badge" class="hidden-badge" data-player="1"></div>
         <div id="p1-banished" class="hidden-badge"><span id="p1-banished-count">0</span></div>
         <div id="p2-banished" class="hidden-badge"><span id="p2-banished-count">0</span></div>
 
@@ -17204,7 +17223,12 @@ body.defeat-effect {
         <div id="turn-indicator" class="turn-indicator p1">Player 1's Turn</div>
 
         <!-- Action Prompt -->
-        <div id="action-prompt"></div>
+        <div id="action-prompt">
+            <div class="action-prompt-message" id="action-prompt-message"></div>
+            <button class="ec-dialog-close" id="draw-phase-warning-close">
+                OK
+            </button>
+        </div>
 
         <!-- Battle Overlay -->
         <div id="battle-overlay"></div>
@@ -17264,6 +17288,7 @@ body.defeat-effect {
             </div>
         </div>
     </div>
+    <!-- === BOARD LAYOUT END === -->
     
     <!-- Enhanced Profile Modal -->
     <div id="profile-modal" class="modal hidden">
@@ -18586,6 +18611,12 @@ body.defeat-effect {
     
     <script>
 console.log("Essence Crown – IONOS standalone loaded.");
+// Essence Crown: Shard Wars - Card Database
+// Generated from official card data
+// Total: 109 playable cards + 11 deities
+// Last updated: 2025-12-02
+
+// === CARD DATA START ===
 // Essence Crown: Shard Wars - Card Database
 // Generated from official card data
 // Total: 109 playable cards + 11 deities
@@ -20074,6 +20105,8 @@ const ALL_CARDS = [...CARD_DATABASE, ...DEITY_DATABASE].map(card => ({
     attack: card.attack ?? card.power ?? 0,
     health: card.health ?? card.toughness ?? card.essence ?? 0
 }));
+
+// === CARD DATA END ===
 
 // Helper function to get all deities
 function getDeities() {
@@ -24069,6 +24102,8 @@ const SandboxMode = {
             p.overflow = ps.overflow;
             p.godCodeCharges = ps.godCodeCharges ?? 1;
             p.godCodeUsed = ps.godCodeUsed ?? false;
+            p.shards = ps.shards ?? 0;
+            p.shardSurgeUsedThisTurn = ps.shardSurgeUsedThisTurn ?? false;
             
             if (ps.deity) {
                 const deity = ALL_CARDS.find(c => c.id === ps.deity.id || c.id === ps.deity);
@@ -26171,6 +26206,8 @@ const ShardPath = {
     }
 };
 
+// === ENGINE LOGIC START ===
+console.log("Essence Crown IONOS engine: upgraded from engine_src.");
 const Game = {
     state: {
         currentPlayer: 0,
@@ -26212,33 +26249,39 @@ const Game = {
         customLobbySettings: null,
         playerName: 'Player',
         players: [
-            { 
-                essence: 23, klCurrent: 3, klMax: 3, overflow: 0, godCodeCharges: 1, godCodeUsed: false,
-                deity: null, 
-                hand: [], 
-                deck: [], 
-                graveyard: [], 
+            {
+                essence: 23, klCurrent: 3, klMax: 3, baseKl: 3, currentKl: 3, klThresholdTriggeredThisTurn: false, godCharges: 0, overflow: 0, godCodeCharges: 1, godCodeUsed: false,
+                deity: null,
+                hand: [],
+                deck: [],
+                graveyard: [],
                 banished: [],
                 avatarRow: [],
                 domainRow: [],
                 relicRow: [],
+                shardRow: [],
                 spellRow: [],
                 passiveUsedThisTurn: false,
-                hasDrawnThisTurn: false
+                hasDrawnThisTurn: false,
+                shards: 0,
+                shardSurgeUsedThisTurn: false
             },
-            { 
-                essence: 23, klCurrent: 3, klMax: 3, overflow: 0, godCodeCharges: 1, godCodeUsed: false,
-                deity: null, 
-                hand: [], 
-                deck: [], 
-                graveyard: [], 
+            {
+                essence: 23, klCurrent: 3, klMax: 3, baseKl: 3, currentKl: 3, klThresholdTriggeredThisTurn: false, godCharges: 0, overflow: 0, godCodeCharges: 1, godCodeUsed: false,
+                deity: null,
+                hand: [],
+                deck: [],
+                graveyard: [],
                 banished: [],
                 avatarRow: [],
                 domainRow: [],
                 relicRow: [],
+                shardRow: [],
                 spellRow: [],
                 passiveUsedThisTurn: false,
-                hasDrawnThisTurn: false
+                hasDrawnThisTurn: false,
+                shards: 0,
+                shardSurgeUsedThisTurn: false
             }
         ],
         selectedDeities: [],
@@ -26374,7 +26417,19 @@ const Game = {
         const codexBtn = document.getElementById('btn-codex');
         const replaysBtn = document.getElementById('btn-replays');
         const spectateBtn = document.getElementById('btn-spectate');
-        
+        const drawWarningClose = document.getElementById('draw-phase-warning-close');
+
+        const turnControls = document.getElementById('turn-controls');
+        if (turnControls && !document.getElementById('btn-shard-surge')) {
+            const shardBtn = document.createElement('button');
+            shardBtn.className = 'turn-btn';
+            shardBtn.id = 'btn-shard-surge';
+            shardBtn.textContent = 'Shard Surge (Draw 1)';
+            turnControls.insertBefore(shardBtn, endTurnBtn ? endTurnBtn.nextSibling : null);
+        }
+
+        const shardSurgeBtn = document.getElementById('btn-shard-surge');
+
         if (nextPhaseBtn) nextPhaseBtn.onclick = () => this.nextPhase();
         if (endTurnBtn) endTurnBtn.onclick = () => this.endTurn();
         if (rulesBtn) rulesBtn.onclick = () => this.toggleRulesHelper();
@@ -26382,6 +26437,8 @@ const Game = {
         if (codexBtn) codexBtn.onclick = () => this.toggleCodex();
         if (replaysBtn) replaysBtn.onclick = () => this.showReplayBrowser();
         if (spectateBtn) spectateBtn.onclick = () => this.showSpectateBrowser();
+        if (shardSurgeBtn) shardSurgeBtn.onclick = () => this.activateShardSurge();
+        if (drawWarningClose) drawWarningClose.onclick = () => this.hideDrawPhaseWarning();
         
         document.querySelectorAll('.codex-tab').forEach(tab => {
             tab.onclick = () => this.switchCodexTab(tab.dataset.tab);
@@ -26565,9 +26622,16 @@ const Game = {
             this.state.players[p].essence = startingEssence;
             this.state.players[p].klMax = startingKL;
             this.state.players[p].klCurrent = startingKL;
+            this.state.players[p].baseKl = startingKL;
+            this.state.players[p].currentKl = startingKL;
+            this.state.players[p].klThresholdTriggeredThisTurn = false;
+            this.state.players[p].godCharges = 0;
+            this.state.players[p].shardRow = [];
             this.state.players[p].overflow = 0;
             this.state.players[p].godCodeCharges = 1;
             this.state.players[p].godCodeUsed = false;
+            this.state.players[p].shards = 0;
+            this.state.players[p].shardSurgeUsedThisTurn = false;
             
             if (useSealedDeck && p === 0) {
                 this.state.players[p].deck = this.state.sealedDeck.map(c => this.createCardInstance(c));
@@ -26608,6 +26672,36 @@ const Game = {
         this.log('Game started! Shard Wars begin!', 'phase');
         MatchRecorder.recordAction('TURN_START', { turn: 1, player: 0 }, 0);
         this.render();
+    },
+
+    recalculateKl(player) {
+        const base = player.baseKl ?? player.klMax ?? player.klCurrent ?? 0;
+        const shardBonus = Array.isArray(player.shardRow) ? player.shardRow.length : 0;
+        let kl = base + shardBonus;
+        if (kl > 31) kl = 31;
+        if (kl < 0) kl = 0;
+        return kl;
+    },
+
+    checkGodThreshold(player, oldKl, newKl) {
+        const alreadyTriggered = player.klThresholdTriggeredThisTurn;
+        const crossed = oldKl < 13 && newKl >= 13;
+        if (alreadyTriggered || !crossed) return;
+        if (player.godCharges === undefined) player.godCharges = player.godCodeCharges ?? 0;
+        if (player.godCharges < 3) {
+            player.godCharges += 1;
+        }
+        player.klThresholdTriggeredThisTurn = true;
+    },
+
+    readyAllPermanents(player) {
+        const zones = [player.avatarRow, player.domainRow, player.relicRow, player.shardRow];
+        zones.forEach(zone => {
+            if (!zone) return;
+            if (Array.isArray(zone)) {
+                zone.forEach(card => { card.tapped = false; });
+            }
+        });
     },
 
     createCardInstance(template) {
@@ -27386,24 +27480,29 @@ const Game = {
     handleDawnPhase() {
         const playerIndex = this.state.currentPlayer;
         const p = this.state.players[playerIndex];
-        
-        // Restore KL (max increases by 1 each turn, up to 13)
-        if (p.klMax < 13) {
-            p.klMax++;
-        }
-        p.klCurrent = p.klMax;
-        
+
+        p.shardSurgeUsedThisTurn = false;
+        p.klThresholdTriggeredThisTurn = false;
+
+        const oldKl = p.currentKl ?? p.klCurrent ?? 0;
+        const recalculatedKl = this.recalculateKl(p);
+        p.currentKl = recalculatedKl;
+        p.klCurrent = recalculatedKl;
+        p.klMax = Math.max(p.klMax ?? 0, recalculatedKl);
+
         // Reset turn counters
         this.state.drawsThisTurn = 0;
-        
-        // Untap all permanents (Avatars and Domains)
-        p.avatarRow.forEach(c => c.tapped = false);
-        p.domainRow.forEach(c => c.tapped = false);
-        
+
+        // Ready all permanents (avatars, domains, relics, shards)
+        this.readyAllPermanents(p);
+
         // Check deity dawn passives
         this.handleDawnPassives(playerIndex);
-        
-        this.log(`${p.deity.name}: KL restored to ${p.klMax}`, 'action');
+
+        // God threshold check based on KL movement
+        this.checkGodThreshold(p, oldKl, recalculatedKl);
+
+        this.log(`${p.deity.name}: KL recalculated to ${recalculatedKl}`, 'action');
         this.render();
     },
     
@@ -27492,20 +27591,20 @@ const Game = {
         };
     },
 
-    drawCard(playerIndex, count = 1, isMandatory = false) {
+    drawCard(playerIndex, count = 1, isMandatory = false, bypassTurnLimit = false) {
         if (this.state.isReplayMode || this.state.isSpectatorMode) return;
         const p = this.state.players[playerIndex];
-        
-        if (this.state.rulesHelper && playerIndex === this.state.currentPlayer) {
+
+        if (this.state.rulesHelper && playerIndex === this.state.currentPlayer && !bypassTurnLimit) {
             if (this.state.drawsThisTurn + count > 1) {
                 this.log(`Can only draw 1 card per turn (unless card effects allow it)`, 'damage');
                 return;
             }
         }
-        
+
         for (let i = 0; i < count; i++) {
             if (p.deck.length > 0) {
-                const card = p.deck.pop();
+                const card = p.deck.shift();
                 p.hand.push(card);
                 this.state.drawsThisTurn++;
                 this.log(`Player ${playerIndex + 1} drew ${card.name}`, 'action');
@@ -27565,7 +27664,7 @@ const Game = {
 
     adjustStat(playerIndex, stat, delta) {
         const p = this.state.players[playerIndex];
-        
+
         if (stat === 'essence') {
             const oldEssence = p.essence;
             p.essence = Math.max(0, p.essence + delta);
@@ -27579,22 +27678,29 @@ const Game = {
                 this.checkWinCondition();
             }
         } else if (stat === 'kl') {
-            const newKL = p.klCurrent + delta;
-            if (newKL > p.klMax) {
-                const excess = newKL - p.klMax;
-                p.klCurrent = p.klMax;
+            const currentKlValue = p.currentKl ?? p.klCurrent ?? 0;
+            const klCap = Math.min(31, Math.max(p.klMax ?? 0, currentKlValue));
+            const newKL = currentKlValue + delta;
+            if (newKL > klCap) {
+                const excess = newKL - klCap;
+                p.currentKl = klCap;
+                p.klCurrent = klCap;
                 this.adjustStat(playerIndex, 'overflow', excess);
             } else {
-                p.klCurrent = Math.max(0, newKL);
+                const bounded = Math.max(0, newKL);
+                p.currentKl = bounded;
+                p.klCurrent = bounded;
             }
         } else if (stat === 'klMax') {
             const newMax = p.klMax + delta;
             if (newMax > 13) {
                 const excess = newMax - 13;
                 p.klMax = 13;
+                p.baseKl = p.klMax;
                 this.adjustStat(playerIndex, 'overflow', excess);
             } else {
                 p.klMax = Math.max(1, newMax);
+                p.baseKl = p.klMax;
             }
         } else if (stat === 'overflow') {
             p.overflow = Math.max(0, p.overflow + delta);
@@ -27605,7 +27711,53 @@ const Game = {
                 this.spawnParticles({ type: 'effect' }, 'gold');
             }
         }
-        
+
+        this.render();
+    },
+
+    adjustShards(playerIndex, delta) {
+        const player = this.state.players[playerIndex];
+        const before = player.shards ?? 0;
+        const updated = Math.max(0, Math.min(6, before + delta));
+        player.shards = updated;
+
+        if (updated !== before) {
+            this.renderStats();
+        }
+    },
+
+    maybeGrantShardOnPlay(card, playerIndex) {
+        if (!card || card.type === 'Deity') return;
+        const aspects = Array.isArray(card.aspects) ? card.aspects : [];
+        const gainsShard = aspects.some(a => typeof a === 'string' && ['shard', 'sun'].includes(a.toLowerCase()));
+        if (!gainsShard) return;
+
+        const player = this.state.players[playerIndex];
+        if ((player.shards ?? 0) >= 6) return;
+
+        this.adjustShards(playerIndex, 1);
+        this.log(`Shard attuned! Player ${playerIndex + 1} gains 1 Shard (${this.state.players[playerIndex].shards}/6).`, 'action');
+    },
+
+    canUseShardSurge(playerIndex) {
+        const player = this.state.players[playerIndex];
+        return this.state.currentPlayer === playerIndex && player.shards >= 3 && !player.shardSurgeUsedThisTurn;
+    },
+
+    activateShardSurge() {
+        if (this.state.isReplayMode || this.state.isSpectatorMode) return;
+        const playerIndex = this.state.currentPlayer;
+        const player = this.state.players[playerIndex];
+
+        if (!this.canUseShardSurge(playerIndex)) {
+            this.log('Shard Surge unavailable (requires 3 Shards, your turn, and unused this turn).', 'damage');
+            return;
+        }
+
+        this.adjustShards(playerIndex, -3);
+        player.shardSurgeUsedThisTurn = true;
+        this.drawCard(playerIndex, 1, false, true);
+        this.log(`Player ${playerIndex + 1} unleashes Shard Surge and draws 1 card!`, 'action');
         this.render();
     },
 
@@ -27613,18 +27765,21 @@ const Game = {
         if (this.state.isReplayMode || this.state.isSpectatorMode) return;
         const p = this.state.players[playerIndex];
         const handIndex = p.hand.findIndex(c => c.instanceId === card.instanceId);
-        
+
         if (handIndex === -1) return;
-        
-        if (this.state.rulesHelper && card.cost > p.klCurrent) {
-            this.log(`Not enough KL! Need ${card.cost}, have ${p.klCurrent}`, 'damage');
+
+        const availableKl = p.currentKl ?? p.klCurrent;
+
+        if (this.state.rulesHelper && card.cost > availableKl) {
+            this.log(`Not enough KL! Need ${card.cost}, have ${availableKl}`, 'damage');
             return;
         }
-        
-        const klBeforePlay = p.klCurrent;
+
+        const klBeforePlay = availableKl;
         p.hand.splice(handIndex, 1);
-        p.klCurrent -= card.cost;
-        
+        p.currentKl = klBeforePlay - card.cost;
+        p.klCurrent = p.currentKl;
+
         this.state.cardsPlayedThisTurn++;
         
         if (card.type === 'Avatar') {
@@ -27644,7 +27799,8 @@ const Game = {
             if (this.state.rulesHelper && !this.canPlayDomain(playerIndex)) {
                 this.log(`Cannot play another Domain this turn! (Limit: ${this.state.combat.maxDomainsPerTurn})`, 'damage');
                 p.hand.push(card);
-                p.klCurrent += card.cost;
+                p.currentKl += card.cost;
+                p.klCurrent = p.currentKl;
                 this.state.cardsPlayedThisTurn--;
                 return;
             }
@@ -27662,7 +27818,8 @@ const Game = {
                 this.state.spell.mode = 'selectTarget';
                 this.state.spell.pendingSpell = card;
                 this.state.spell.targetType = targetType;
-                p.klCurrent += card.cost;
+                p.currentKl += card.cost;
+                p.klCurrent = p.currentKl;
                 p.hand.push(card);
                 this.state.cardsPlayedThisTurn--;
                 this.showPrompt(`Select a target for ${card.name}`);
@@ -27676,13 +27833,20 @@ const Game = {
             MatchRecorder.recordAction('CARD_PLAYED', { cardId: card.id, cardName: card.name, type: card.type, zone: 'graveyard' }, playerIndex);
             this.handleSpellEffect(card, playerIndex);
             this.handleDeitySpellPassive(playerIndex);
+            this.handleSecondCardPassive(playerIndex);
+            if (p.currentKl === 0 && klBeforePlay === card.cost) {
+                this.handleExactKLSpendPassive(playerIndex);
+            }
+            this.log(`${card.name}: Spell resolved`, 'phase');
         }
-        
+
+        this.maybeGrantShardOnPlay(card, playerIndex);
+
         if (this.state.cardsPlayedThisTurn === 2) {
             this.handleSecondCardPassive(playerIndex);
         }
-        
-        if (p.klCurrent === 0 && klBeforePlay === card.cost) {
+
+        if (p.currentKl === 0 && klBeforePlay === card.cost) {
             this.handleExactKLSpendPassive(playerIndex);
         }
         
@@ -28483,11 +28647,31 @@ const Game = {
         this.highlightLegalPlays();
     },
 
+    ensureShardPills() {
+        ['p1', 'p2'].forEach(prefix => {
+            const deckPill = document.getElementById(`${prefix}-deck`);
+            const hudStats = deckPill?.parentElement;
+            if (hudStats && !document.getElementById(`${prefix}-shards`)) {
+                const shardPill = document.createElement('div');
+                shardPill.className = 'ec-pill ec-pill--shard';
+                shardPill.id = `${prefix}-shards`;
+                shardPill.innerHTML = `
+                    <span class="ec-pill-icon">💠</span>
+                    <span class="ec-pill-value" id="${prefix}-shard-count">0</span>
+                    <span class="ec-pill-label">Shards</span>
+                `;
+                hudStats.appendChild(shardPill);
+            }
+        });
+    },
+
     renderStats() {
+        this.ensureShardPills();
+
         for (let p = 0; p < 2; p++) {
             const prefix = p === 0 ? 'p1' : 'p2';
             const player = this.state.players[p];
-            
+
             const essenceEl = document.getElementById(`${prefix}-essence`);
             const klEl = document.getElementById(`${prefix}-kl`);
             const deckEl = document.getElementById(`${prefix}-deck-count`);
@@ -28503,14 +28687,20 @@ const Game = {
                 const percent = Math.min(100, (player.essence / 23) * 100);
                 essenceBar.style.width = `${percent}%`;
             }
-            
+
             const playmatEssence = document.getElementById(`${prefix}-essence-display`);
             if (playmatEssence) playmatEssence.textContent = player.essence;
-            
+
             const playmatDeck = document.getElementById(`${prefix}-deck-count-display`);
             if (playmatDeck) playmatDeck.textContent = player.deck.length;
+
+            const shardCountEl = document.getElementById(`${prefix}-shard-count`);
+            if (shardCountEl) shardCountEl.textContent = player.shards ?? 0;
+
+            const statusTokens = document.getElementById(`${prefix}-status-tokens`);
+            if (statusTokens) statusTokens.textContent = `Shards: ${player.shards ?? 0}`;
         }
-        
+
         const handInfo = document.getElementById('hand-info');
         if (handInfo && this.state.players[0]) {
             const p = this.state.players[0];
@@ -28529,14 +28719,21 @@ const Game = {
         
         const deckPile = document.getElementById('deck-pile');
         if (deckPile) {
-            if (this.state.currentPhase === 'draw' && 
-                this.state.currentPlayer === 0 && 
+            if (this.state.currentPhase === 'draw' &&
+                this.state.currentPlayer === 0 &&
                 this.state.drawsThisTurn < 1 &&
                 this.state.players[0].deck.length > 0) {
                 deckPile.classList.add('can-draw');
             } else {
                 deckPile.classList.remove('can-draw');
             }
+        }
+
+        const shardBtn = document.getElementById('btn-shard-surge');
+        if (shardBtn) {
+            const canUse = this.canUseShardSurge(this.state.currentPlayer);
+            shardBtn.disabled = !canUse;
+            shardBtn.classList.toggle('disabled', !canUse);
         }
     },
 
@@ -31122,12 +31319,39 @@ const Game = {
             prompt.id = 'action-prompt';
             document.getElementById('game-container').appendChild(prompt);
         }
-        prompt.textContent = message;
+
+        let messageEl = document.getElementById('action-prompt-message');
+        if (!messageEl) {
+            messageEl = document.createElement('div');
+            messageEl.id = 'action-prompt-message';
+            messageEl.className = 'action-prompt-message';
+            prompt.prepend(messageEl);
+        }
+
+        let closeBtn = document.getElementById('draw-phase-warning-close');
+        if (!closeBtn) {
+            closeBtn = document.createElement('button');
+            closeBtn.id = 'draw-phase-warning-close';
+            closeBtn.className = 'ec-dialog-close';
+            closeBtn.textContent = 'OK';
+            prompt.appendChild(closeBtn);
+        }
+
+        closeBtn.onclick = () => this.hideDrawPhaseWarning();
+        messageEl.textContent = message;
+        prompt.style.display = 'block';
         prompt.classList.add('visible');
     },
 
     hidePrompt() {
-        document.getElementById('action-prompt')?.classList.remove('visible');
+        const prompt = document.getElementById('action-prompt');
+        if (!prompt) return;
+        prompt.classList.remove('visible');
+        prompt.style.display = 'none';
+    },
+
+    hideDrawPhaseWarning() {
+        this.hidePrompt();
     },
 
     checkWinCondition() {
@@ -31480,10 +31704,12 @@ const Game = {
     canPlayDuringShardChain(card, playerIndex) {
         if (!this.state.shardChain.active) return false;
         if (this.state.shardChain.priority !== playerIndex) return false;
-        
+
         return this.isFastSpell(card);
     }
 };
+
+// === ENGINE LOGIC END ===
 
 document.addEventListener('DOMContentLoaded', () => {
     BattleEffects.init();
