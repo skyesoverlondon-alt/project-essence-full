@@ -20119,6 +20119,29 @@ const ALL_CARDS = [...CARD_DATABASE, ...DEITY_DATABASE].map(card => ({
 
 // === CARD DATA END ===
 
+// Card data from ec_cards_ionos.js exposed for the inlined engine
+window.EC_CARDS_RAW = [...ALL_CARDS];
+window.EC_CARDS = ALL_CARDS.map(card => ({
+    ...card,
+    cardId: card.id,
+    typeLine: (card.type || card.typeLine || '').toUpperCase(),
+    subtypes: card.aspects || card.subtypes || [],
+    domainTag: card.domain || card.domainTag,
+    klCost: card.cost ?? card.klCost ?? card.startingKL ?? 0,
+    power: card.attack ?? card.power ?? 0,
+    guard: card.health ?? card.toughness ?? card.guard ?? card.essence ?? 0,
+    startingEssence: card.essence ?? card.startingEssence,
+    baseKl: card.startingKL ?? card.baseKl ?? 0,
+    abilities: card.abilities || [],
+    isToken: card.rarity === 'Token' || card.type === 'Token' || card.isToken || false,
+    ownerId: '',
+    controllerId: '',
+    zone: 'VEILED_DECK',
+    damageMarked: 0,
+    tapped: false,
+    temporaryModifiers: card.temporaryModifiers || []
+}));
+
 // Helper function to get all deities
 function getDeities() {
     return DEITY_DATABASE;
@@ -20162,6 +20185,399 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+    </script>
+    <script>
+    // === Inlined EC Engine (from engine.zip, browser-adapted) ===
+    (function(global) {
+        const Zone = {
+            DEITY_ZONE: "DEITY_ZONE",
+            DOMAIN_ZONE: "DOMAIN_ZONE",
+            SHARD_ROW: "SHARD_ROW",
+            AVATAR_LINE: "AVATAR_LINE",
+            RELIC_SUPPORT_ZONE: "RELIC_SUPPORT_ZONE",
+            HAND: "HAND",
+            VEILED_DECK: "VEILED_DECK",
+            CRYPT: "CRYPT",
+            NULL_ZONE: "NULL_ZONE"
+        };
+
+        const GOD_THRESHOLD_KL = 13;
+        const ABSOLUTE_KL_CAP = 31;
+        const MIN_KL = 0;
+        const MAX_GOD_CHARGES = 3;
+        const MIN_TURN_FOR_GOD_CHARGE_SPEND = 4;
+
+        function getStaticKlBonuses(_player) {
+            return 0;
+        }
+
+        function getStartOfTurnKlEffects(_player) {
+            return 0;
+        }
+
+        function recalculateKl(player) {
+            let kl = player.baseKl;
+            kl += player.shardRow.length;
+            kl += getStaticKlBonuses(player);
+            kl += getStartOfTurnKlEffects(player);
+
+            if (kl > ABSOLUTE_KL_CAP) kl = ABSOLUTE_KL_CAP;
+            if (kl < MIN_KL) kl = MIN_KL;
+            return kl;
+        }
+
+        function checkGodThreshold(player, oldKl, newKl) {
+            if (player.klThresholdTriggeredThisTurn) return;
+            const crossedThreshold = oldKl < GOD_THRESHOLD_KL && newKl >= GOD_THRESHOLD_KL;
+            if (crossedThreshold) {
+                if (player.godCharges < MAX_GOD_CHARGES) {
+                    player.godCharges += 1;
+                }
+                player.klThresholdTriggeredThisTurn = true;
+            }
+        }
+
+        function canSpendGodCharges(player, amount, turnNumber) {
+            if (amount <= 0) return false;
+            if (turnNumber < MIN_TURN_FOR_GOD_CHARGE_SPEND) return false;
+            if (player.godCharges < amount) return false;
+            return true;
+        }
+
+        function spendGodCharges(player, amount, turnNumber) {
+            if (!canSpendGodCharges(player, amount, turnNumber)) {
+                throw new Error(`Cannot spend ${amount} God Charge(s) on turn ${turnNumber} with ${player.godCharges} available.`);
+            }
+            player.godCharges -= amount;
+        }
+
+        function readyAllPermanents(player) {
+            const zones = [player.domainZone, player.shardRow, player.avatarLine, player.relicSupportZone];
+            zones.forEach(zone => {
+                if (!zone) return;
+                if (Array.isArray(zone)) {
+                    zone.forEach(card => { card.tapped = false; });
+                } else {
+                    zone.tapped = false;
+                }
+            });
+        }
+
+        function drawCardInternal(player) {
+            if (player.veiledDeck.length === 0) return undefined;
+            const card = player.veiledDeck.shift();
+            card.zone = Zone.HAND;
+            player.hand.push(card);
+            return card;
+        }
+
+        function startPhase(state) {
+            const player = state.players.find(p => p.id === state.activePlayerId);
+            if (!player) {
+                throw new Error(`Active player with id ${state.activePlayerId} not found in GameState.`);
+            }
+
+            readyAllPermanents(player);
+
+            const isFirstTurn = state.turnNumber === 1;
+            const isFirstPlayer = player.id === state.firstPlayerId;
+            const shouldSkipDraw = isFirstTurn && isFirstPlayer;
+
+            if (!shouldSkipDraw) {
+                drawCardInternal(player);
+            }
+
+            player.klThresholdTriggeredThisTurn = false;
+            const oldKl = player.currentKl ?? player.baseKl;
+            const newKl = recalculateKl(player);
+            player.currentKl = newKl;
+            checkGodThreshold(player, oldKl, newKl);
+        }
+
+        function startTurn(state) {
+            if (state.players.length === 0) {
+                throw new Error("GameState has no players.");
+            }
+
+            if (state.turnNumber === 0) {
+                state.turnNumber = 1;
+                state.activePlayerId = state.firstPlayerId;
+            } else {
+                state.turnNumber += 1;
+                const currentIndex = state.players.findIndex(p => p.id === state.activePlayerId);
+                const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % state.players.length;
+                state.activePlayerId = state.players[nextIndex].id;
+            }
+
+            startPhase(state);
+        }
+
+        function getPlayer(state, playerId) {
+            const player = state.players.find(p => p.id === playerId);
+            if (!player) throw new Error(`Player with id ${playerId} not found.`);
+            return player;
+        }
+
+        function findCardInZone(zone, cardId) {
+            const index = zone.findIndex(c => c.cardId === cardId);
+            if (index === -1) {
+                throw new Error(`Card ${cardId} not found in expected zone.`);
+            }
+            return { card: zone[index], index };
+        }
+
+        function spendKlForCard(player, card) {
+            const cost = card.klCost ?? 0;
+            if (cost < 0) throw new Error(`Card ${card.cardId} has negative KL cost, which is invalid.`);
+            if (player.currentKl < cost) {
+                throw new Error(`Player ${player.id} cannot pay KL cost ${cost} for card ${card.cardId} (only ${player.currentKl} KL available).`);
+            }
+            player.currentKl -= cost;
+        }
+
+        function moveFromHandToZone(player, cardId, targetZoneArray, zoneType) {
+            const { card, index } = findCardInZone(player.hand, cardId);
+            spendKlForCard(player, card);
+            player.hand.splice(index, 1);
+            card.zone = zoneType;
+            card.controllerId = player.id;
+            targetZoneArray.push(card);
+        }
+
+        function playDomain(state, playerId, cardId) {
+            const player = getPlayer(state, playerId);
+            if (player.domainZone) {
+                const oldDomain = player.domainZone;
+                oldDomain.zone = Zone.CRYPT;
+                player.crypt.push(oldDomain);
+                player.domainZone = null;
+            }
+            const { card, index } = findCardInZone(player.hand, cardId);
+            spendKlForCard(player, card);
+            player.hand.splice(index, 1);
+            card.zone = Zone.DOMAIN_ZONE;
+            card.controllerId = player.id;
+            player.domainZone = card;
+        }
+
+        function playShard(state, playerId, cardId) {
+            const player = getPlayer(state, playerId);
+            moveFromHandToZone(player, cardId, player.shardRow, Zone.SHARD_ROW);
+        }
+
+        function playAvatar(state, playerId, cardId) {
+            const player = getPlayer(state, playerId);
+            moveFromHandToZone(player, cardId, player.avatarLine, Zone.AVATAR_LINE);
+        }
+
+        function playRelicOrSupport(state, playerId, cardId) {
+            const player = getPlayer(state, playerId);
+            moveFromHandToZone(player, cardId, player.relicSupportZone, Zone.RELIC_SUPPORT_ZONE);
+        }
+
+        function sendToCrypt(state, playerId, cardId) {
+            const player = getPlayer(state, playerId);
+            const zones = [
+                { array: player.shardRow },
+                { array: player.avatarLine },
+                { array: player.relicSupportZone },
+                {
+                    single: player.domainZone,
+                    setSingle: c => { player.domainZone = c; }
+                }
+            ];
+
+            for (const zoneInfo of zones) {
+                if (zoneInfo.array) {
+                    const index = zoneInfo.array.findIndex(c => c.cardId === cardId);
+                    if (index !== -1) {
+                        const [card] = zoneInfo.array.splice(index, 1);
+                        card.zone = Zone.CRYPT;
+                        player.crypt.push(card);
+                        return;
+                    }
+                } else if (zoneInfo.single && zoneInfo.single.cardId === cardId) {
+                    const card = zoneInfo.single;
+                    zoneInfo.setSingle(null);
+                    card.zone = Zone.CRYPT;
+                    player.crypt.push(card);
+                    return;
+                }
+            }
+
+            throw new Error(`Card ${cardId} not found on board to send to Crypt.`);
+        }
+
+        function sendToNull(state, playerId, cardId) {
+            const player = getPlayer(state, playerId);
+            const handIndex = player.hand.findIndex(c => c.cardId === cardId);
+            if (handIndex !== -1) {
+                const [card] = player.hand.splice(handIndex, 1);
+                card.zone = Zone.NULL_ZONE;
+                player.nullZone.push(card);
+                return;
+            }
+
+            const zones = [
+                { array: player.shardRow },
+                { array: player.avatarLine },
+                { array: player.relicSupportZone },
+                {
+                    single: player.domainZone,
+                    setSingle: c => { player.domainZone = c; }
+                }
+            ];
+
+            for (const zoneInfo of zones) {
+                if (zoneInfo.array) {
+                    const index = zoneInfo.array.findIndex(c => c.cardId === cardId);
+                    if (index !== -1) {
+                        const [card] = zoneInfo.array.splice(index, 1);
+                        card.zone = Zone.NULL_ZONE;
+                        player.nullZone.push(card);
+                        return;
+                    }
+                } else if (zoneInfo.single && zoneInfo.single.cardId === cardId) {
+                    const card = zoneInfo.single;
+                    zoneInfo.setSingle(null);
+                    card.zone = Zone.NULL_ZONE;
+                    player.nullZone.push(card);
+                    return;
+                }
+            }
+
+            throw new Error(`Card ${cardId} not found to send to Null.`);
+        }
+
+        function resolveCombat(state, attackingPlayerId, defendingPlayerId, assignments) {
+            const attackerPlayer = getPlayer(state, attackingPlayerId);
+            const defenderPlayer = getPlayer(state, defendingPlayerId);
+            const attackerMap = new Map();
+            for (const assign of assignments) {
+                const attackerCard = attackerPlayer.avatarLine.find(c => c.cardId === assign.attackerCardId);
+                if (!attackerCard) throw new Error(`Avatar ${assign.attackerCardId} not found on avatarLine for player ${attackerPlayer.id}.`);
+                attackerCard.tapped = true;
+                attackerMap.set(assign.attackerCardId, attackerCard);
+            }
+
+            let totalUnblockedDamageToEssence = 0;
+            for (const assign of assignments) {
+                const attackerCard = attackerMap.get(assign.attackerCardId);
+                const attackerPower = attackerCard.power ?? 0;
+
+                if (assign.blockerCardId) {
+                    const blockerCard = defenderPlayer.avatarLine.find(c => c.cardId === assign.blockerCardId);
+                    if (!blockerCard) throw new Error(`Avatar ${assign.blockerCardId} not found on avatarLine for player ${defenderPlayer.id}.`);
+                    const blockerPower = blockerCard.power ?? 0;
+                    attackerCard.damageMarked += blockerPower;
+                    blockerCard.damageMarked += attackerPower;
+                } else {
+                    totalUnblockedDamageToEssence += attackerPower;
+                }
+            }
+
+            if (totalUnblockedDamageToEssence > 0) {
+                defenderPlayer.essence -= totalUnblockedDamageToEssence;
+                if (defenderPlayer.essence < 0) defenderPlayer.essence = 0;
+            }
+
+            const deadAttackers = attackerPlayer.avatarLine.filter(c => (c.guard ?? 1) <= (c.damageMarked ?? 0)).map(c => c.cardId);
+            const deadDefenders = defenderPlayer.avatarLine.filter(c => (c.guard ?? 1) <= (c.damageMarked ?? 0)).map(c => c.cardId);
+            deadAttackers.forEach(id => sendToCrypt(state, attackingPlayerId, id));
+            deadDefenders.forEach(id => sendToCrypt(state, defendingPlayerId, id));
+        }
+
+        function createPlayerFromSetup(setup) {
+            const { id, deity, veiledDeck } = setup;
+            const startingEssence = deity.startingEssence ?? 0;
+            const baseKl = deity.baseKl ?? 0;
+            return {
+                id,
+                deity,
+                essence: startingEssence,
+                baseKl,
+                currentKl: baseKl,
+                godCharges: 0,
+                klThresholdTriggeredThisTurn: false,
+                hand: [],
+                veiledDeck: [...veiledDeck],
+                crypt: [],
+                nullZone: [],
+                domainZone: null,
+                shardRow: [],
+                avatarLine: [],
+                relicSupportZone: [],
+                turnsTaken: 0
+            };
+        }
+
+        function createGameFromSetups(setups, firstPlayerId) {
+            if (!setups.length) throw new Error("createGameFromSetups requires at least one PlayerSetup.");
+            const players = setups.map(createPlayerFromSetup);
+            const resolvedFirstPlayerId = firstPlayerId ?? players[0].id;
+            return {
+                players,
+                activePlayerId: "",
+                firstPlayerId: resolvedFirstPlayerId,
+                turnNumber: 0
+            };
+        }
+
+        function getActivePlayer(state) {
+            const player = state.players.find(p => p.id === state.activePlayerId);
+            if (!player) throw new Error(`Active player with id ${state.activePlayerId} not found in GameState.`);
+            return player;
+        }
+
+        function getOpponent(state, playerId) {
+            if (state.players.length !== 2) throw new Error("getOpponent is only valid for 2-player games at the moment.");
+            const opponent = state.players.find(p => p.id !== playerId);
+            if (!opponent) throw new Error(`Opponent of player ${playerId} not found in GameState (2-player assumption).`);
+            return opponent;
+        }
+
+        function dealStartingHands(state, handSize = 5) {
+            state.players.forEach(player => {
+                for (let i = 0; i < handSize; i++) {
+                    drawCardInternal(player);
+                }
+            });
+        }
+
+        function drawCard(state, playerId) {
+            const player = getPlayer(state, playerId);
+            return drawCardInternal(player);
+        }
+
+        global.ECGameEngine = {
+            Zone,
+            GOD_THRESHOLD_KL,
+            ABSOLUTE_KL_CAP,
+            MIN_KL,
+            MAX_GOD_CHARGES,
+            MIN_TURN_FOR_GOD_CHARGE_SPEND,
+            recalculateKl,
+            checkGodThreshold,
+            canSpendGodCharges,
+            spendGodCharges,
+            readyAllPermanents,
+            startPhase,
+            startTurn,
+            playDomain,
+            playShard,
+            playAvatar,
+            playRelicOrSupport,
+            sendToCrypt,
+            sendToNull,
+            resolveCombat,
+            createPlayerFromSetup,
+            createGameFromSetups,
+            getActivePlayer,
+            getOpponent,
+            dealStartingHands,
+            drawCard
+        };
+    })(window);
     </script>
     <script>
 /**
@@ -26340,8 +26756,11 @@ const Game = {
             ON_TURN_START: [],
             ON_TURN_END: [],
             ON_PHASE_CHANGE: []
-        }
+        } 
     },
+
+    engineState: null,
+    enginePlayerIds: [],
 
     init() {
         console.log('Initializing Essence Crown TCG...');
@@ -26560,7 +26979,7 @@ const Game = {
         const p1Deity = this.state.selectedDeities[0];
         const p2Deity = this.state.selectedDeities[1];
         const opponentName = this.state.isAIMatch ? 'AI Opponent' : (this.state.challengeFriend || 'Opponent');
-        
+
         await MatchIntro.show(PlayerProfile.data.name, opponentName, p1Deity, p2Deity);
         
         this.startGame();
@@ -26571,12 +26990,94 @@ const Game = {
         }
     },
 
+    normalizeEngineType(card) {
+        const raw = (card?.type || card?.typeLine || '').toUpperCase();
+        const map = {
+            DEITY: 'DEITY',
+            DOMAIN: 'DOMAIN',
+            SHARD: 'SHARD',
+            AVATAR: 'AVATAR',
+            SPELL: 'SPELL',
+            RITE: 'RITE',
+            RELIC: 'RELIC',
+            SUPPORT: 'SUPPORT',
+            TOKEN: 'TOKEN'
+        };
+        return map[raw] || raw || 'TOKEN';
+    },
+
+    toEngineCard(template, ownerId) {
+        if (!template) return null;
+        const typeLine = this.normalizeEngineType(template);
+        const guard = template.guard ?? template.health ?? template.toughness ?? template.essence ?? 0;
+        const power = template.power ?? template.attack ?? 0;
+        const cardId = template.cardId || template.instanceId || template.id;
+        return {
+            ...template,
+            cardId,
+            id: template.id || cardId,
+            typeLine,
+            subtypes: template.aspects || template.subtypes || [],
+            domainTag: template.domain || template.domainTag,
+            klCost: template.klCost ?? template.cost ?? template.startingKL ?? 0,
+            power,
+            guard,
+            startingEssence: template.startingEssence ?? template.essence ?? (typeLine === 'DEITY' ? template.health : undefined),
+            baseKl: template.baseKl ?? template.startingKL ?? template.klCurrent ?? template.klMax ?? 0,
+            abilities: template.abilities || [],
+            isToken: template.isToken || template.rarity === 'Token' || template.type === 'Token',
+            ownerId,
+            controllerId: ownerId,
+            zone: ECGameEngine.Zone.VEILED_DECK,
+            damageMarked: template.damageMarked || 0,
+            tapped: template.tapped || false,
+            temporaryModifiers: template.temporaryModifiers || []
+        };
+    },
+
+    buildEngineState() {
+        const setups = this.state.players.map((player, idx) => {
+            const ownerId = `P${idx + 1}`;
+            const deckCards = (player.deck || []).map(card => this.toEngineCard(card, ownerId));
+            const deityCard = this.toEngineCard(player.deity || this.state.selectedDeities[idx], ownerId);
+            return { id: ownerId, deity: deityCard, veiledDeck: deckCards };
+        });
+
+        this.enginePlayerIds = setups.map(s => s.id);
+        this.engineState = ECGameEngine.createGameFromSetups(setups, setups[0]?.id);
+        ECGameEngine.dealStartingHands(this.engineState, 5);
+        this.syncFromEngine();
+    },
+
+    syncFromEngine() {
+        if (!this.engineState) return;
+        this.engineState.players.forEach((enginePlayer, idx) => {
+            const player = this.state.players[idx];
+            if (!player) return;
+            player.deity = enginePlayer.deity;
+            player.hand = enginePlayer.hand;
+            player.deck = enginePlayer.veiledDeck;
+            player.graveyard = enginePlayer.crypt;
+            player.banished = enginePlayer.nullZone;
+            player.domainRow = enginePlayer.domainZone ? [enginePlayer.domainZone] : [];
+            player.shardRow = enginePlayer.shardRow;
+            player.avatarRow = enginePlayer.avatarLine;
+            player.relicRow = enginePlayer.relicSupportZone;
+            player.klCurrent = enginePlayer.currentKl;
+            player.klMax = enginePlayer.baseKl;
+            player.baseKl = enginePlayer.baseKl;
+            player.essence = enginePlayer.essence;
+        });
+    },
+
     startGame() {
         document.getElementById('game-container').style.display = '';
         document.getElementById('game-controls').style.display = 'flex';
         const matchId = 'match-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
         this.state.matchId = matchId;
-        
+        this.engineState = null;
+        this.enginePlayerIds = [];
+
         if (this.state.matchMode === 'campaign') {
             AudioManager.play('campaign');
         } else {
@@ -26635,6 +27136,10 @@ const Game = {
             this.state.players[p].klCurrent = startingKL;
             this.state.players[p].baseKl = startingKL;
             this.state.players[p].currentKl = startingKL;
+            this.state.players[p].deity.startingKL = startingKL;
+            this.state.players[p].deity.baseKl = startingKL;
+            this.state.players[p].deity.essence = startingEssence;
+            this.state.players[p].deity.startingEssence = startingEssence;
             this.state.players[p].klThresholdTriggeredThisTurn = false;
             this.state.players[p].godCharges = 0;
             this.state.players[p].shardRow = [];
@@ -26665,13 +27170,12 @@ const Game = {
             }
             this.shuffleDeck(p);
             MatchRecorder.recordDeckContents(p, this.state.players[p].deck);
-            
+
             this.log(`${deity.name}: ${startingEssence} Essence, ${startingKL} KL`, 'action');
         }
 
-        this.drawCard(0, 5);
-        this.drawCard(1, 5);
-        
+        this.buildEngineState();
+
         // Start battle ambience effects
         BattleEffects.startBattleAmbience();
         
@@ -27605,6 +28109,8 @@ const Game = {
     drawCard(playerIndex, count = 1, isMandatory = false, bypassTurnLimit = false) {
         if (this.state.isReplayMode || this.state.isSpectatorMode) return;
         const p = this.state.players[playerIndex];
+        const playerIdForEngine = this.enginePlayerIds[playerIndex];
+        const usingEngine = !!this.engineState && !!playerIdForEngine;
 
         if (this.state.rulesHelper && playerIndex === this.state.currentPlayer && !bypassTurnLimit) {
             if (this.state.drawsThisTurn + count > 1) {
@@ -27614,25 +28120,34 @@ const Game = {
         }
 
         for (let i = 0; i < count; i++) {
-            if (p.deck.length > 0) {
-                const card = p.deck.shift();
+            let card = null;
+
+            if (usingEngine) {
+                card = ECGameEngine.drawCard(this.engineState, playerIdForEngine);
+                this.syncFromEngine();
+            } else if (p.deck.length > 0) {
+                card = p.deck.shift();
                 p.hand.push(card);
+            }
+
+            if (card) {
                 this.state.drawsThisTurn++;
                 this.log(`Player ${playerIndex + 1} drew ${card.name}`, 'action');
-                MatchRecorder.recordAction('DRAW', { cardId: card.id, cardName: card.name }, playerIndex);
+                MatchRecorder.recordAction('DRAW', { cardId: card.id || card.cardId, cardName: card.name }, playerIndex);
                 this.animateCardDraw(card, playerIndex);
                 this.emitEvent('ON_CARD_DRAWN', { card, playerIndex });
             } else {
-                // === ESSENCE CROWN: Deck-out loss condition ===
-                // If player must draw but deck is empty, they lose the game
-                if (isMandatory) {
-                    this.log(`${playerIndex === 0 ? 'You' : 'Opponent'} cannot draw - deck is empty!`, 'damage');
-                    this.log(`DECK OUT! ${playerIndex === 0 ? 'You lose' : 'Opponent loses'}!`, 'phase');
-                    BattleEffects.screenFlash('#ff000055', 500);
-                    this.triggerGameEnd(1 - playerIndex, 'deck_out');
-                    return;
-                } else {
-                    this.log(`${playerIndex === 0 ? 'Your' : 'Opponent\'s'} deck is empty!`, 'damage');
+                const deckEmpty = usingEngine ? !(this.state.players[playerIndex].deck || []).length : p.deck.length === 0;
+                if (deckEmpty) {
+                    if (isMandatory) {
+                        this.log(`${playerIndex === 0 ? 'You' : 'Opponent'} cannot draw - deck is empty!`, 'damage');
+                        this.log(`DECK OUT! ${playerIndex === 0 ? 'You lose' : 'Opponent loses'}!`, 'phase');
+                        BattleEffects.screenFlash('#ff000055', 500);
+                        this.triggerGameEnd(1 - playerIndex, 'deck_out');
+                        return;
+                    } else {
+                        this.log(`${playerIndex === 0 ? 'Your' : 'Opponent\'s'} deck is empty!`, 'damage');
+                    }
                 }
             }
         }
