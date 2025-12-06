@@ -1,24 +1,3460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Essence Crown: Shard Wars</title>
-    <style>
-        :root {
-            color-scheme: dark;
-            background-color: #050012;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Essence Crown: Shard Wars</title>
+  <style>
+    :root {
+      --bg-main: radial-gradient(circle at center top, #120729 0%, #050012 45%, #03000a 100%);
+      --panel: rgba(22, 16, 38, 0.9);
+      --panel-strong: rgba(15, 10, 24, 0.9);
+      --accent: #f6c453;
+      --accent-strong: #ffd76a;
+      --accent-soft: #b891ff;
+      --text-main: #f6e4ff;
+      --text-muted: #b9a8d9;
+      --tile-glow: 0 0 22px rgba(255, 215, 106, 0.5);
+    }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: #050012;
-            color: #f6c453;
-            font-family: Arial, sans-serif;
-        }
-    </style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1400px;
+      min-height: 90vh;
+    }
+
+    section { width: 100%; }
+
+    #screen-home { display: block; }
+
+    .home-shell {
+      background: linear-gradient(145deg, rgba(18, 7, 41, 0.9), rgba(8, 3, 18, 0.95));
+      border: 1px solid rgba(246, 196, 83, 0.2);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      padding: 18px 22px 28px;
+    }
+
+    .home-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(246, 196, 83, 0.18);
+    }
+
+    .logo-block { display: flex; flex-direction: column; gap: 4px; }
+    .logo-main {
+      letter-spacing: 0.24em;
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 700;
+      color: var(--accent-strong);
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(246, 196, 83, 0.45);
+    }
+    .logo-sub { letter-spacing: 0.3em; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; }
+
+    .profile-placeholder {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(246, 196, 83, 0.15);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      min-width: 140px;
+      text-align: right;
+    }
+
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .menu-tile {
+      background: linear-gradient(160deg, rgba(39, 22, 74, 0.92), rgba(18, 8, 38, 0.94));
+      border: 1px solid rgba(246, 196, 83, 0.4);
+      border-radius: 14px;
+      padding: 18px 16px;
+      color: var(--accent-strong);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-tile::after {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(circle at center, rgba(246, 196, 83, 0.12), transparent 50%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .menu-tile:hover { transform: translateY(-4px); border-color: rgba(255, 215, 106, 0.8); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), var(--tile-glow); }
+    .menu-tile:hover::after { opacity: 1; }
+    .menu-tile span { display: block; font-size: 0.82rem; color: var(--text-muted); letter-spacing: 0.12em; margin-top: 8px; }
+
+    #screen-battle { display: none; }
+    .battle-shell {
+      background: rgba(10, 6, 18, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+      padding: 12px;
+    }
+    .battle-topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .battle-topbar h2 { margin: 0; letter-spacing: 0.24em; text-transform: uppercase; font-size: 1rem; color: var(--accent-strong); }
+    .ghost-btn {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.16), rgba(129, 140, 248, 0.12));
+      border: 1px solid rgba(129, 140, 248, 0.7);
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+    .ghost-btn:hover { transform: translateY(-2px); border-color: rgba(255, 215, 106, 0.8); }
+
+    /* Board CSS */
+
+:root { --bg-deep: #020617; --bg-space: #050017; --panel-bg: rgba(15, 23, 42, 0.98); --panel-bg-soft: rgba(15, 23, 42, 0.9); --panel-outline: rgba(148, 163, 184, 0.55); --purple-soft: #1e1636; --purple-bright: #8b5cf6; --purple-neon: #c4b5fd; --cyan-soft: #22d3ee; --cyan-deep: #0ea5e9; --gold-soft: #fbbf24; --gold-strong: #facc15; --gold-deep: #92400e; --fg-main: #e5e7eb; --fg-muted: #9ca3af; --danger: #f97373; --border-soft: rgba(148, 163, 184, 0.6); --radius-lg: 18px; --radius-md: 12px; --radius-sm: 8px; }
+
+* { box-sizing: border-box; }
+
+body { margin: 0px; padding: 0px; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--fg-main); background: radial-gradient(circle at center top, rgb(17, 24, 39) 0px, rgb(2, 6, 23) 45%, rgb(0, 0, 0) 100%); }
+
+h1 { text-align: center; margin: 10px 0px 4px; font-size: 1.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(254, 249, 195); text-shadow: rgba(250, 250, 210, 0.7) 0px 0px 20px; }
+
+#subtitle { text-align: center; font-size: 0.8rem; color: var(--fg-muted); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; }
+
+#app { max-width: 1280px; margin: 0px auto 24px; padding: 0px 10px 16px; }
+
+.top-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin-bottom: 10px; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+button { border-radius: 999px; border: 1px solid rgba(248, 250, 252, 0.18); background: radial-gradient(circle at left top, rgb(124, 58, 237), rgb(76, 29, 149)); color: rgb(249, 250, 251); padding: 6px 16px; font-size: 0.8rem; cursor: pointer; box-shadow: rgba(15, 23, 42, 0.9) 0px 0px 0px 1px, rgba(15, 23, 42, 0.95) 0px 10px 22px; text-transform: uppercase; letter-spacing: 0.18em; transition: transform 0.15s, box-shadow 0.15s, background 0.15s, border-color 0.15s; outline: none; }
+
+button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: rgb(15, 23, 42) 0px 0px 0px 1px, rgb(15, 23, 42) 0px 14px 28px; background: radial-gradient(circle at left top, rgb(168, 85, 247), rgb(109, 40, 217)); }
+
+button:active:not(:disabled) { transform: translateY(0px); box-shadow: rgb(15, 23, 42) 0px 0px 0px 1px, rgb(15, 23, 42) 0px 8px 16px; }
+
+button:disabled { opacity: 0.45; cursor: default; background: rgb(17, 24, 39); border-color: rgb(75, 85, 99); box-shadow: none; }
+
+.toggle-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.7); background: radial-gradient(circle at left top, rgb(2, 6, 23), rgb(2, 6, 23)); font-size: 0.74rem; color: var(--fg-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+.toggle-pill span.mode-label { color: var(--fg-main); font-weight: 500; }
+
+.toggle-switch { width: 32px; height: 16px; border-radius: 999px; background: rgb(17, 24, 39); border: 1px solid rgb(75, 85, 99); position: relative; cursor: pointer; flex-shrink: 0; }
+
+.toggle-knob { position: absolute; top: 1px; left: 1px; width: 12px; height: 12px; border-radius: 999px; background: rgb(156, 163, 175); transition: transform 0.15s, background 0.15s; }
+
+.toggle-switch.guided { background: radial-gradient(circle at left top, rgb(34, 197, 94), rgb(21, 128, 61)); border-color: rgb(34, 197, 94); }
+
+.toggle-switch.guided .toggle-knob { transform: translateX(14px); background: rgb(249, 250, 251); }
+
+.turn-indicator { text-align: center; font-size: 0.78rem; color: var(--fg-muted); margin-top: 8px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.16em; }
+
+.board { border-radius: 26px; padding: 10px 12px 12px; background: radial-gradient(circle at left top, rgba(168, 85, 247, 0.26), transparent 60%), radial-gradient(circle at right bottom, rgba(251, 191, 36, 0.2), transparent 55%), radial-gradient(circle, rgba(15, 23, 42, 0.96), rgb(2, 6, 23)); border: 1px solid rgba(148, 163, 184, 0.55); box-shadow: rgb(17, 24, 39) 0px 0px 0px 1px, rgba(0, 0, 0, 0.98) 0px 36px 72px; display: grid; grid-template-rows: auto auto auto; gap: 10px; min-height: 580px; }
+
+.player-section { max-width: 1160px; margin: 0px auto; border-radius: 18px; padding: 8px 10px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.99)); border: 1px solid rgba(148, 163, 184, 0.5); box-shadow: rgba(0, 0, 0, 0.9) 0px 18px 32px; position: relative; overflow: hidden; }
+
+.player-section::before { content: ""; position: absolute; inset: 0px; background: radial-gradient(circle at left top, rgba(56, 189, 248, 0.12), transparent 55%), radial-gradient(circle at right bottom, rgba(251, 191, 36, 0.12), transparent 55%); opacity: 0.5; pointer-events: none; }
+
+.player-section-inner { position: relative; z-index: 1; }
+
+.player-section.top { border-image: linear-gradient(to right, rgb(107, 33, 168), rgb(14, 165, 233)) 1 / 1 / 0 stretch; }
+
+.player-section.bottom { border-image: linear-gradient(to right, rgb(251, 191, 36), rgb(34, 197, 94)) 1 / 1 / 0 stretch; }
+
+.player-section.is-active { box-shadow: rgba(129, 140, 248, 0.9) 0px 0px 0px 1px, rgba(129, 140, 248, 0.7) 0px 0px 32px, rgba(0, 0, 0, 0.95) 0px 26px 52px; }
+
+.player-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+
+.player-id-block { display: flex; flex-direction: column; gap: 2px; }
+
+.player-label { font-size: 0.7rem; color: var(--fg-muted); letter-spacing: 0.16em; text-transform: uppercase; }
+
+.player-name { font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: var(--purple-neon); }
+
+.badge-active { font-size: 0.65rem; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--gold-soft); background: radial-gradient(circle at left top, rgb(250, 204, 21), rgb(146, 64, 14)); color: rgb(17, 24, 39); letter-spacing: 0.12em; text-transform: uppercase; box-shadow: rgba(250, 204, 21, 0.9) 0px 0px 16px; animation: 1.6s ease-in-out 0s infinite normal none running pulseGlow; }
+
+@keyframes pulseGlow { 
+  0% { box-shadow: rgba(250, 204, 21, 0.6) 0px 0px 10px; }
+  50% { box-shadow: rgba(250, 204, 21, 0.95) 0px 0px 24px; }
+  100% { box-shadow: rgba(250, 204, 21, 0.6) 0px 0px 10px; }
+}
+
+.player-stats-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+
+.stat-pill { padding: 2px 7px; border-radius: 999px; background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(148, 163, 184, 0.7); font-size: 0.7rem; white-space: nowrap; cursor: default; }
+
+.stat-pill.essence { border-color: rgba(248, 250, 252, 0.95); }
+
+.stat-pill.kl { border-color: rgba(96, 165, 250, 0.95); }
+
+.stat-pill.god { border-color: rgba(251, 191, 36, 0.95); }
+
+.stat-pill.danger { border-color: var(--danger); color: var(--danger); }
+
+.meter-row { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+
+.meter { flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; }
+
+.meter-label { font-size: 0.7rem; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.13em; }
+
+.meter-track { position: relative; border-radius: 999px; height: 6px; background: radial-gradient(circle at center top, rgb(2, 6, 23), rgb(2, 6, 23)); overflow: hidden; border: 1px solid rgba(55, 65, 81, 0.9); }
+
+.meter-fill { position: absolute; inset: 0px; border-radius: inherit; background: linear-gradient(to right, rgb(34, 197, 94), rgb(132, 204, 22), rgb(250, 204, 21), rgb(249, 115, 22), rgb(239, 68, 68)); transform-origin: left center; transform: scaleX(0); transition: transform 0.2s ease-out; }
+
+.meter-fill.kl { background: linear-gradient(to right, rgb(14, 165, 233), rgb(34, 211, 238), rgb(168, 85, 247), rgb(249, 115, 22)); }
+
+.kl-threshold-marker { position: absolute; top: -2px; bottom: -2px; width: 2px; background: rgba(250, 204, 21, 0.9); box-shadow: rgba(250, 204, 21, 0.9) 0px 0px 6px; }
+
+.kl-cap-marker { position: absolute; top: -3px; bottom: -3px; width: 3px; right: -1px; background: rgba(129, 140, 248, 0.95); box-shadow: rgba(129, 140, 248, 0.95) 0px 0px 6px; }
+
+.zones-grid { display: grid; grid-template-columns: 1.1fr 1.4fr 1.1fr; gap: 8px; align-items: stretch; }
+
+@media (max-width: 900px) {
+  .zones-grid { grid-template-columns: 1fr; }
+}
+
+.zone-column { display: flex; flex-direction: column; gap: 6px; }
+
+.zone-card { flex: 1 1 0%; border-radius: 12px; padding: 6px 8px; background: var(--panel-bg); border: 1px solid rgba(75, 85, 99, 0.85); display: flex; flex-direction: column; min-height: 46px; position: relative; overflow: hidden; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s; }
+
+.zone-card.compact { min-height: 34px; }
+
+.zone-card::before { content: ""; position: absolute; inset: -40%; background: radial-gradient(circle at left top, rgba(129, 140, 248, 0.18), transparent 60%); opacity: 0; pointer-events: none; transition: opacity 0.18s; }
+
+.zone-card:hover { transform: translateY(-1px); box-shadow: rgba(15, 23, 42, 0.95) 0px 16px 26px; border-color: rgba(129, 140, 248, 0.9); }
+
+.zone-card:hover::before { opacity: 1; }
+
+.zone-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--fg-muted); margin-bottom: 4px; z-index: 1; }
+
+.zone-body { font-size: 0.76rem; color: var(--fg-main); display: flex; flex-direction: column; gap: 4px; z-index: 1; }
+
+.zone-count-badge { padding: 2px 6px; border-radius: 999px; border: 1px dashed rgba(148, 163, 184, 0.8); font-size: 0.7rem; white-space: nowrap; align-self: flex-start; }
+
+.zone-note { font-size: 0.7rem; color: var(--fg-muted); }
+
+.god-charge-row { display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 0.72rem; color: var(--fg-muted); }
+
+.god-orbs { display: flex; gap: 3px; }
+
+.god-orb { width: 12px; height: 12px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.7); background: radial-gradient(circle, rgb(2, 6, 23), rgb(2, 6, 23)); box-shadow: rgb(15, 23, 42) 0px 0px 3px inset; }
+
+.god-orb.charged { border-color: rgba(250, 204, 21, 0.95); background: radial-gradient(circle, rgb(250, 204, 21), rgb(146, 64, 14)); box-shadow: rgba(250, 204, 21, 0.9) 0px 0px 8px; }
+
+.god-orb.spent { border-color: rgba(148, 163, 184, 0.7); background: radial-gradient(circle, rgb(17, 24, 39), rgb(2, 6, 23)); opacity: 0.5; }
+
+.center-block { max-width: 1160px; margin: 0px auto; display: flex; flex-direction: column; gap: 8px; }
+
+.center-strip { display: grid; grid-template-columns: 1.4fr 1.6fr; gap: 8px; }
+
+@media (max-width: 860px) {
+  .center-strip { grid-template-columns: 1fr; }
+}
+
+.center-panel { border-radius: 14px; padding: 6px 8px; background: radial-gradient(circle, rgba(15, 23, 42, 0.98), rgb(3, 7, 18)); border: 1px solid rgba(55, 65, 81, 0.9); min-height: 40px; }
+
+.center-title { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--fg-muted); margin-bottom: 3px; }
+
+.center-line { font-size: 0.76rem; color: var(--fg-main); }
+
+.phase-bar { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+.phase-pill { padding: 2px 6px; border-radius: 999px; border: 1px dashed rgba(148, 163, 184, 0.7); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-muted); }
+
+.phase-pill.active { border-style: solid; border-color: rgba(129, 140, 248, 0.95); color: var(--gold-strong); background: radial-gradient(circle at left top, rgb(30, 41, 59), rgb(2, 6, 23)); box-shadow: rgba(129, 140, 248, 0.8) 0px 0px 10px; }
+
+.guided-hint { margin-top: 4px; font-size: 0.72rem; color: var(--fg-muted); }
+
+.battlefield-panel { border-radius: 18px; padding: 8px 10px; background: radial-gradient(circle, rgb(2, 6, 23), rgb(2, 6, 23)); border: 1px solid rgba(148, 163, 184, 0.7); box-shadow: rgba(0, 0, 0, 0.9) 0px 16px 30px; position: relative; overflow: hidden; cursor: pointer; }
+
+.battlefield-panel::before { content: ""; position: absolute; inset: -40%; background: radial-gradient(circle at center top, rgba(56, 189, 248, 0.16), transparent 60%), radial-gradient(circle at center bottom, rgba(251, 191, 36, 0.16), transparent 60%); opacity: 0.7; pointer-events: none; }
+
+.battlefield-inner { position: relative; z-index: 1; }
+
+.battlefield-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+
+.battlefield-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--fg-muted); }
+
+.battlefield-center-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--fg-main); text-align: center; margin: 2px 0px 4px; }
+
+.centerline { height: 1px; background: linear-gradient(to right, rgba(56, 189, 248, 0), rgba(56, 189, 248, 0.9), rgba(251, 191, 36, 0.9), rgba(251, 191, 36, 0)); box-shadow: rgba(129, 140, 248, 0.8) 0px 0px 10px; margin: 4px 0px 6px; }
+
+.frontline-row-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--fg-muted); margin: 2px 0px; }
+
+.frontline-row { display: flex; gap: 4px; margin-bottom: 4px; }
+
+.battle-slot { flex: 1 1 0px; border-radius: 10px; border: 1px dashed rgba(148, 163, 184, 0.7); background: rgba(15, 23, 42, 0.95); font-size: 0.7rem; padding: 4px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, background 0.15s; cursor: pointer; }
+
+.battle-slot.has-card { border-style: solid; border-color: rgba(96, 165, 250, 0.95); background: radial-gradient(circle at center top, rgb(2, 6, 23), rgb(2, 6, 23)); }
+
+.battle-slot.has-card:hover { transform: translateY(-1px); border-color: rgba(56, 189, 248, 0.95); box-shadow: rgba(15, 23, 42, 0.95) 0px 10px 20px; }
+
+.battle-slot.empty:hover { border-color: rgba(129, 140, 248, 0.9); }
+
+.hand-wrapper { margin: 10px auto 8px; max-width: 1160px; padding: 6px 8px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.5); background: radial-gradient(circle at left top, rgb(2, 6, 23), rgb(2, 6, 23)); box-shadow: rgba(0, 0, 0, 0.9) 0px 18px 32px; }
+
+.hand-title { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--fg-muted); margin-bottom: 4px; }
+
+.hand-cards { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.card-button { font-size: 0.72rem; padding: 4px 9px; border-radius: 999px; border: 1px solid rgba(96, 165, 250, 0.9); background: radial-gradient(circle at left top, rgb(15, 23, 42), rgb(2, 6, 23)); color: rgb(229, 231, 235); cursor: pointer; white-space: nowrap; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s; }
+
+.card-button:hover:not(:disabled) { transform: translateY(-1px); border-color: rgba(56, 189, 248, 0.95); box-shadow: rgba(15, 23, 42, 0.95) 0px 10px 20px; }
+
+.card-button:disabled { opacity: 0.4; cursor: default; border-color: rgb(75, 85, 99); background: rgb(2, 6, 23); box-shadow: none; }
+
+.detail-wrapper { margin: 8px auto; max-width: 1160px; padding: 6px 8px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.7); background: radial-gradient(circle, rgb(2, 6, 23), rgb(2, 6, 23)); box-shadow: rgba(0, 0, 0, 0.9) 0px 18px 32px; }
+
+.detail-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+
+.detail-title { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--fg-muted); }
+
+.detail-badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 999px; border: 1px solid rgba(129, 140, 248, 0.9); color: var(--purple-neon); background: rgba(15, 23, 42, 0.98); text-transform: uppercase; letter-spacing: 0.12em; }
+
+.detail-main-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; color: rgb(229, 231, 235); }
+
+.detail-lines { font-size: 0.76rem; color: var(--fg-main); }
+
+.detail-line { margin-bottom: 2px; }
+
+.detail-hint { margin-top: 4px; font-size: 0.72rem; color: var(--fg-muted); }
+
+.log { margin-top: 6px; padding: 8px 10px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.5); background: radial-gradient(circle at left top, rgb(2, 6, 23), rgb(2, 6, 23)); font-size: 0.78rem; max-height: 180px; overflow-y: auto; line-height: 1.3; }
+
+.log-title { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--fg-muted); margin-bottom: 4px; }
+
+.log-line { color: rgb(229, 231, 235); margin-bottom: 1px; }
+  </style>
 </head>
 <body>
+  <main>
+    <section id="screen-home">
+      <div class="home-shell">
+        <div class="home-header">
+          <div class="logo-block">
+            <div class="logo-main">Essence Crown</div>
+            <div class="logo-sub">Shard Wars</div>
+          </div>
+          <div class="profile-placeholder">Profile: Commander TBD</div>
+        </div>
+        <div class="tile-grid">
+          <div class="menu-tile" id="tile-create-profile">Create Profile<span>Set your commander identity</span></div>
+          <div class="menu-tile" id="tile-solo-battle">Solo Battle<span>Practice against AI</span></div>
+          <div class="menu-tile" id="tile-campaign">Campaign<span>Story-driven clashes</span></div>
+          <div class="menu-tile" id="tile-multiplayer">Multiplayer<span>Challenge other players</span></div>
+          <div class="menu-tile" id="tile-deck-builder">Deck Builder<span>Forge your ultimate deck</span></div>
+          <div class="menu-tile" id="tile-collection">Collection<span>Browse your shards</span></div>
+          <div class="menu-tile" id="tile-shard-shop">Shard Shop<span>Acquire new power</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-battle" hidden>
+      <div class="battle-shell">
+        <div class="battle-topbar">
+          <h2>New Earth Command Bridge</h2>
+          <button class="ghost-btn" id="battle-back">Back to Menu</button>
+        </div>
+        <div id="board-root">
+          <div class="board-wrapper">
+            <h1>Essence Crown: New Earth</h1>
+            <div id="subtitle">KL • Essence • God Charges • Veiled Deck • Shards • Domains</div>
+            <div id="app">
+              <div class="top-bar">
+                <div class="controls">
+                  <button>Start Game (P1 Turn 1)</button>
+                  <button disabled>Attack With All Avatars</button>
+                  <button>Reset Game</button>
+                </div>
+                <div class="toggle-pill">
+                  <span>Mode:</span><span class="mode-label">Guided</span>
+                  <div class="toggle-switch guided"><div class="toggle-knob"></div></div>
+                </div>
+              </div>
+              <div class="turn-indicator">Turn: Not started • Click “Start Game (P1 Turn 1)”</div>
+              <div class="board">
+                <div class="player-section top">
+                  <div class="player-section-inner">
+                    <div class="player-header-row">
+                      <div class="player-id-block">
+                        <div class="player-label">Opposing Commander</div>
+                        <div class="player-name" id="p2-name">Player Two (P2)</div>
+                      </div>
+                    </div>
+                    <div class="player-stats-row">
+                      <div class="stat-pill essence" id="p2-essence">Essence: 21</div>
+                      <div class="stat-pill kl" id="p2-kl">KL: 3 / 31</div>
+                      <div class="stat-pill kl" id="p2-base-kl">Base KL: 3</div>
+                      <div class="stat-pill god" id="p2-god">God Charges: 0 / 3</div>
+                      <div class="stat-pill" id="p2-hand">Hand: 0</div>
+                      <div class="stat-pill" id="p2-veiled">Veiled: 8</div>
+                      <div class="stat-pill" id="p2-crypt">Crypt: 0</div>
+                    </div>
+                    <div class="meter-row">
+                      <div class="meter">
+                        <div class="meter-label">Essence Life Force</div>
+                        <div class="meter-track">
+                          <div class="meter-fill essence" id="p2-essence-meter" style="transform: scaleX(0.7);"></div>
+                        </div>
+                      </div>
+                      <div class="meter">
+                        <div class="meter-label">KL Flow</div>
+                        <div class="meter-track">
+                          <div class="meter-fill kl" id="p2-kl-meter" style="transform: scaleX(0.097);"></div>
+                          <div class="kl-threshold-marker" style="left: 41.9%;"></div>
+                          <div class="kl-cap-marker"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="god-charge-row">
+                      <div>God Charges</div>
+                      <div class="god-orbs" id="p2-orbs">
+                        <div class="god-orb"></div>
+                        <div class="god-orb"></div>
+                        <div class="god-orb"></div>
+                      </div>
+                    </div>
+                    <div class="zones-grid">
+                      <div class="zone-column">
+                        <div class="zone-card">
+                          <div class="zone-title">Veiled Deck</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p2-veiled-count">8 card(s)</div>
+                            <div class="zone-note">This mirrors the Veiled Deck stack on your physical mat.</div>
+                          </div>
+                        </div>
+                        <div class="zone-card compact">
+                          <div class="zone-title">Crypt (Discard / Fallen)</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p2-crypt-count">0 card(s)</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="zone-column">
+                        <div class="zone-card">
+                          <div class="zone-title">Deity / Essence Crown</div>
+                          <div class="zone-body">
+                            <div id="p2-deity">Null Regent – Essence 21</div>
+                            <div class="zone-note">This panel is your Essence Crown and Deity portrait on the mat.</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="zone-column">
+                        <div class="zone-card">
+                          <div class="zone-title">Shard / Relic Row</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p2-shard-count">0 in play</div>
+                            <div class="zone-note">Shards are your sun-fractures; they push KL toward the God Threshold.</div>
+                          </div>
+                        </div>
+                        <div class="zone-card compact">
+                          <div class="zone-title">Domain Lane</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p2-domain-count">0 domain(s)</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="center-block">
+                  <div class="center-strip">
+                    <div class="center-panel">
+                      <div class="center-title">New Earth Timeline</div>
+                      <div class="center-line" id="timeline-line">Turn 0 • KL threshold 13 • KL cap 31 • Max 3 God Charges per commander.</div>
+                      <div class="phase-bar">
+                        <div class="phase-pill active">Ready</div>
+                        <div class="phase-pill">Draw</div>
+                        <div class="phase-pill">KL Recalc</div>
+                        <div class="phase-pill">Main</div>
+                        <div class="phase-pill">Combat</div>
+                        <div class="phase-pill">End</div>
+                      </div>
+                      <div class="guided-hint">Guided: Follow the phases left-to-right each turn, like a built-in tutorial track.</div>
+                    </div>
+                    <div class="center-panel">
+                      <div class="center-title">Shard Wars Turn Flow</div>
+                      <div class="center-line">Ready → Draw → KL Recalc (Shards) → Main Actions → Combat → End. God Charges only accrue once KL ≥ 13 after Turn 3.</div>
+                    </div>
+                  </div>
+                  <div class="battlefield-panel">
+                    <div class="battlefield-inner">
+                      <div class="battlefield-header">
+                        <div class="battlefield-title">New Earth • Shared Battlefield</div>
+                        <div class="battlefield-title">Avatars from both commanders clash across the centerline.</div>
+                      </div>
+                      <div class="battlefield-center-label">Centerline / Clash Zone</div>
+                      <div class="centerline"></div>
+                      <div class="frontline-row-label">P2 Frontline (Opponent)</div>
+                      <div class="frontline-row" id="p2-frontline">
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                      </div>
+                      <div class="frontline-row-label">P1 Frontline (You)</div>
+                      <div class="frontline-row" id="p1-frontline">
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                        <div class="battle-slot empty">Empty Slot</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="player-section bottom">
+                  <div class="player-section-inner">
+                    <div class="player-header-row">
+                      <div class="player-id-block">
+                        <div class="player-label">Frontline Commander</div>
+                        <div class="player-name" id="p1-name">Player One (P1)</div>
+                      </div>
+                    </div>
+                    <div class="player-stats-row">
+                      <div class="stat-pill essence" id="p1-essence">Essence: 23</div>
+                      <div class="stat-pill kl" id="p1-kl">KL: 3 / 31</div>
+                      <div class="stat-pill kl" id="p1-base-kl">Base KL: 3</div>
+                      <div class="stat-pill god" id="p1-god">God Charges: 0 / 3</div>
+                      <div class="stat-pill" id="p1-hand">Hand: 0</div>
+                      <div class="stat-pill" id="p1-veiled">Veiled: 8</div>
+                      <div class="stat-pill" id="p1-crypt">Crypt: 0</div>
+                    </div>
+                    <div class="meter-row">
+                      <div class="meter">
+                        <div class="meter-label">Essence Life Force</div>
+                        <div class="meter-track">
+                          <div class="meter-fill essence" id="p1-essence-meter" style="transform: scaleX(0.767);"></div>
+                        </div>
+                      </div>
+                      <div class="meter">
+                        <div class="meter-label">KL Flow</div>
+                        <div class="meter-track">
+                          <div class="meter-fill kl" id="p1-kl-meter" style="transform: scaleX(0.097);"></div>
+                          <div class="kl-threshold-marker" style="left: 41.9%;"></div>
+                          <div class="kl-cap-marker"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="god-charge-row">
+                      <div>God Charges</div>
+                      <div class="god-orbs" id="p1-orbs">
+                        <div class="god-orb"></div>
+                        <div class="god-orb"></div>
+                        <div class="god-orb"></div>
+                      </div>
+                    </div>
+                    <div class="zones-grid">
+                      <div class="zone-column">
+                        <div class="zone-card">
+                          <div class="zone-title">Veiled Deck</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p1-veiled-count">8 card(s)</div>
+                            <div class="zone-note">This mirrors the Veiled Deck stack on your physical mat.</div>
+                          </div>
+                        </div>
+                        <div class="zone-card compact">
+                          <div class="zone-title">Crypt (Discard / Fallen)</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p1-crypt-count">0 card(s)</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="zone-column">
+                        <div class="zone-card">
+                          <div class="zone-title">Deity / Essence Crown</div>
+                          <div class="zone-body">
+                            <div id="p1-deity">Second Sun Herald – Essence 23</div>
+                            <div class="zone-note">This panel is your Essence Crown and Deity portrait on the mat.</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="zone-column">
+                        <div class="zone-card">
+                          <div class="zone-title">Shard / Relic Row</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p1-shard-count">0 in play</div>
+                            <div class="zone-note">Shards are your sun-fractures; they push KL toward the God Threshold.</div>
+                          </div>
+                        </div>
+                        <div class="zone-card compact">
+                          <div class="zone-title">Domain Lane</div>
+                          <div class="zone-body">
+                            <div class="zone-count-badge" id="p1-domain-count">0 domain(s)</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="hand-wrapper">
+                  <div class="hand-title">Active Hand — Start the game to draw from your Veiled Deck.</div>
+                  <div class="hand-cards" id="hand-cards"></div>
+                </div>
+
+                <div class="detail-wrapper">
+                  <div class="detail-title-row">
+                    <div class="detail-title">Focused Detail</div>
+                    <div class="detail-badge">Board</div>
+                  </div>
+                  <div class="detail-main-title" id="detail-title">New Earth Command Bridge</div>
+                  <div class="detail-lines" id="detail-lines">
+                    <div class="detail-line">This is the digital mirror of your 2-player Essence Crown playmat.</div>
+                    <div class="detail-line">Top: Opposing commander. Bottom: Frontline commander.</div>
+                    <div class="detail-line">Center: Shared New Earth battlefield where both frontlines clash.</div>
+                  </div>
+                  <div class="detail-hint">Guided: Click any zone, Deity panel, frontline slot, or hand card to see its lore + rules here.</div>
+                </div>
+
+                <div class="log">
+                  <div class="log-title">Combat Log</div>
+                  <div class="log-line" id="log-line">[T0] New game started.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Card data inlined from ec_cards_ionos.js
+    (function(){
+// Essence Crown: Shard Wars - Card Database (IONOS version)
+// Auto-generated from core set spreadsheet
+// Total: 205 playable cards + 11 deities
+// Last regenerated: 2025-12-05
+
+const CARD_BACK_IMAGE = 'https://cdn1.sharemyimage.com/2025/12/02/Back.png';
+
+
+const CARD_DATABASE = [
+    {
+        id: 'EC-003',
+        name: 'Second Sun Vanguard',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 2,
+        power: 3,
+        toughness: 2,
+        domain: 'Second Sun',
+        effect: 'When Second Sun Vanguard attacks for the first time each turn, it deals +1 Essence damage to the defending Deity. 3 Power / 2 Toughness',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/3.png',
+    },
+    {
+        id: 'EC-004',
+        name: 'Shardstorm Lancer',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 3,
+        power: 4,
+        toughness: 2,
+        domain: 'New Earth',
+        effect: 'On Play: Deal 1 Essence damage to target Deity. 4 Power / 2 Toughness',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/4.png',
+    },
+    {
+        id: 'EC-005',
+        name: 'Gray Threshold Adept',
+        type: 'Avatar',
+        rarity: 'Shard',
+        aspects: ['Gray'],
+        cost: 1,
+        power: 1,
+        toughness: 2,
+        domain: 'Threshold',
+        effect: 'On Play: You gain +1 KL this turn. (KL gained this way can exceed your current KL but not your KL maximum.)',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/5.png',
+    },
+    {
+        id: 'EC-006',
+        name: 'Abyssal Crownfeeder',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Null Abyss',
+        effect: 'Whenever Abyssal Crownfeeder deals Essence damage to a Deity, you gain 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/6.png',
+    },
+    {
+        id: 'EC-007',
+        name: 'New Earth Guardian',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 2,
+        power: 2,
+        toughness: 3,
+        domain: 'New Earth',
+        effect: 'Guardian (While this Avatar is on New Earth, your opponent must target it with their first attack each turn if able).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/7.png',
+    },
+    {
+        id: 'EC-008',
+        name: 'Solar Street Saint',
+        type: 'Avatar',
+        rarity: 'Shard',
+        aspects: ['Glow'],
+        cost: 1,
+        power: 2,
+        toughness: 1,
+        domain: 'Second Sun',
+        effect: 'On Play: If you have attacked this game, gain 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/8.png',
+    },
+    {
+        id: 'EC-009',
+        name: 'Crownline Courier',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Crownline',
+        effect: 'On Play: Look at the top 2 cards of your deck. Put 1 into your hand and the other on the bottom of your deck.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/9.png',
+    },
+    {
+        id: 'EC-010',
+        name: 'Radiant Shard Titan',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Glow'],
+        cost: 5,
+        power: 6,
+        toughness: 5,
+        domain: 'Second Sun',
+        effect: 'On Play: Your other Glow Avatars gain +1 Power until end of turn.
+When Radiant Shard Titan attacks, it deals 1 Essence damage to the defending Deity before combat damage.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/10.png',
+    },
+    {
+        id: 'EC-011',
+        name: 'Shard Medics of Solara',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 2,
+        power: 1,
+        toughness: 3,
+        domain: 'Solara',
+        effect: 'On Play: Restore 2 Essence to your Deity. When Shard Medics of Solara leaves New Earth, restore 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/11.png',
+    },
+    {
+        id: 'EC-012',
+        name: 'Solar Flare Surge',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 2,
+        domain: 'Second Sun',
+        effect: 'Deal 3 Essence damage to target Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/12.png',
+    },
+    {
+        id: 'EC-013',
+        name: 'Crown Equilibrium',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 2,
+        domain: 'Crown',
+        effect: 'Both Deities gain 2 Essence. Draw a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/13.png',
+    },
+    {
+        id: 'EC-014',
+        name: 'Essence Rally',
+        type: 'Spell',
+        rarity: 'Shard',
+        aspects: ['Glow'],
+        cost: 1,
+        domain: 'New Earth',
+        effect: 'Up to two Glow Avatars you control get +1 Power until end of turn. If you attacked this turn, gain 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/14.png',
+    },
+    {
+        id: 'EC-015',
+        name: 'Second Sun Blessing',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 2,
+        domain: 'Second Sun',
+        effect: 'Restore 3 Essence to your Deity. If you control 3 or more Glow Avatars, instead restore 4 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/15.png',
+    },
+    {
+        id: 'EC-016',
+        name: 'Shardline Charge',
+        type: 'Spell',
+        rarity: 'Shard',
+        aspects: ['Glow'],
+        cost: 1,
+        domain: 'New Earth',
+        effect: 'Target Avatar gains +2 Power and "When this Avatar deals Essence damage to a Deity this turn, draw a card."',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/16.png',
+    },
+    {
+        id: 'EC-017',
+        name: 'New Earth Resync',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 2,
+        domain: 'New Earth',
+        effect: 'Choose one:
+• Restore 2 Essence to your Deity, then you gain +1 KL this turn.
+• Restore 1 Essence to each Deity and draw a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/17.png',
+    },
+    {
+        id: 'EC-018',
+        name: 'KL Ignition',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 1,
+        domain: 'Crownline',
+        effect: 'You gain +2 KL this turn. At end of turn, lose 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/18.png',
+    },
+    {
+        id: 'EC-019',
+        name: 'Crown’s Protection Protocol',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 2,
+        domain: 'Crown',
+        effect: 'Choose up to two Avatars you control. They gain “This Avatar cannot be destroyed by Spells this turn.”',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/19.png',
+    },
+    {
+        id: 'EC-020',
+        name: 'Solar Rewrite',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 3,
+        domain: 'Second Sun / Nullgrid',
+        effect: 'Look at the top 4 cards of your deck. You may reveal up to 2 Glow or Gray cards from among them and put them into your hand. Put the rest on the bottom of your deck in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/20.png',
+    },
+    {
+        id: 'EC-021',
+        name: 'Nullblade Stalker',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 2,
+        power: 2,
+        toughness: 3,
+        domain: 'Nullgrid',
+        effect: 'Whenever Nullblade Stalker deals Essence damage to a Deity, that Deity’s controller loses 1 KL.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/21.png',
+    },
+    {
+        id: 'EC-022',
+        name: 'Grid Siphon Scribe',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 2,
+        power: 1,
+        toughness: 3,
+        domain: 'Nullgrid',
+        effect: 'On Play: Target opponent loses 1 KL. Whenever an opponent loses KL, Grid Siphon Scribe gets +1 Power until end of turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/22.png',
+    },
+    {
+        id: 'EC-023',
+        name: 'Shard Jailer of the Null',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 3,
+        power: 2,
+        toughness: 4,
+        domain: 'Null Abyss',
+        effect: 'On Play: Choose an Avatar an opponent controls with cost 2 or less. That Avatar cannot attack while Shard Jailer of the Null remains on New Earth.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/23.png',
+    },
+    {
+        id: 'EC-024',
+        name: 'Voidline Saboteur',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Nullgrid',
+        effect: 'On Play: Look at the top card of target opponent’s deck. You may place it on the bottom of their deck.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/24.png',
+    },
+    {
+        id: 'EC-025',
+        name: 'Crown Auditor',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Crownline',
+        effect: 'On Play: Look at the top 2 cards of your deck. You may reveal a Spell from among them and put it into your hand. Put the rest back in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/25.png',
+    },
+    {
+        id: 'EC-026',
+        name: 'Obsidian Shard Colossus',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Void'],
+        cost: 5,
+        power: 5,
+        toughness: 6,
+        domain: 'Null Abyss',
+        effect: 'On Play: Each opponent loses 2 Essence. Whenever Obsidian Shard Colossus attacks, you may drain 1 KL from the defending player.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/26.png',
+    },
+    {
+        id: 'EC-027',
+        name: 'Nullgrid Warden',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 2,
+        power: 1,
+        toughness: 4,
+        domain: 'Nullgrid',
+        effect: 'Guardian. Whenever Nullgrid Warden is dealt damage, its controller gains 1 KL.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/27.png',
+    },
+    {
+        id: 'EC-028',
+        name: 'Void Collapse',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 3,
+        domain: 'Null Abyss',
+        effect: 'Target opponent loses 2 Essence and 1 KL. If that opponent has 10 or less Essence, they lose an additional 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/28.png',
+    },
+    {
+        id: 'EC-029',
+        name: 'Grid Snuff',
+        type: 'Spell',
+        rarity: 'Shard',
+        aspects: ['Void'],
+        cost: 1,
+        domain: 'Nullgrid',
+        effect: 'Destroy target Avatar with cost 1 or less. If that Avatar was Glow, its controller loses 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/29.png',
+    },
+    {
+        id: 'EC-030',
+        name: 'Essence Leak',
+        type: 'Spell',
+        rarity: 'Shard',
+        aspects: ['Void'],
+        cost: 1,
+        domain: 'Null Abyss',
+        effect: 'Target opponent loses 2 Essence. You lose 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/30.png',
+    },
+    {
+        id: 'EC-031',
+        name: 'Null Directive',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 2,
+        domain: 'Nullgrid',
+        effect: 'Choose one: • Destroy target Avatar with cost 3 or less. • Target opponent discards a card at random.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/31.png',
+    },
+    {
+        id: 'EC-032',
+        name: 'Shard Confiscation',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 2,
+        domain: 'Crownline / Nullgrid',
+        effect: 'Look at target opponent’s hand. Choose a card with cost 3 or less. That player discards that card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/32.png',
+    },
+    {
+        id: 'EC-033',
+        name: 'KL Blackout',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 2,
+        domain: 'Null Abyss',
+        effect: 'Until your next turn, target opponent’s KL maximum is reduced by 2 (to a minimum of 1). Draw a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/33.png',
+    },
+    {
+        id: 'EC-034',
+        name: 'Grayscale Arbitration',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 3,
+        domain: 'Gray Court',
+        effect: 'Destroy target Avatar with cost 4 or more. Each Deity loses 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/34.png',
+    },
+    {
+        id: 'EC-035',
+        name: 'Crown Audit',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 1,
+        domain: 'Crownline',
+        effect: 'Look at the top 3 cards of your deck. Reveal a Void or Gray card from among them and put it into your hand. Put the rest on the bottom of your deck in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/35.png',
+    },
+    {
+        id: 'EC-042',
+        name: 'Shardline Sprinter',
+        type: 'Avatar',
+        rarity: 'Shard',
+        aspects: ['Glow'],
+        cost: 1,
+        power: 1,
+        toughness: 2,
+        domain: 'New Earth',
+        effect: 'Shardline Sprinter gets +1 Power while you control another attacking Avatar.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/42.png',
+    },
+    {
+        id: 'EC-043',
+        name: 'Second Sun Skyspear',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Second Sun',
+        effect: 'On Play: You may deal 1 damage to target Avatar. If that Avatar is destroyed this way, gain 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/43.png',
+    },
+    {
+        id: 'EC-044',
+        name: 'Crown Halo Escort',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow', 'Gray'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Crownline',
+        effect: 'Guardian. When Crown Halo Escort enters New Earth, restore 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/44.png',
+    },
+    {
+        id: 'EC-045',
+        name: 'Solar Courier Knight',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 2,
+        power: 3,
+        toughness: 1,
+        domain: 'Crownline / Logistics',
+        effect: 'On Play: You may draw a card, then discard a card.
+Whenever Solar Courier Knight deals Essence damage to a Deity, you may scry 1 (look at the top card of your deck; you may put it on the bottom).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/45.png',
+    },
+    {
+        id: 'EC-046',
+        name: 'Beacon of New Earth',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Glow'],
+        cost: 4,
+        power: 3,
+        toughness: 5,
+        domain: 'New Earth',
+        effect: 'On Play: Restore 3 Essence to your Deity. While Beacon of New Earth is on New Earth, your other Avatars get +0/+1.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/46.png',
+    },
+    {
+        id: 'EC-047',
+        name: 'Twin-Sun Duelist',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Second Sun',
+        effect: 'When Twin-Sun Duelist attacks, if you played a Spell this turn, it gains +1 Power until end of turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/47.png',
+    },
+    {
+        id: 'EC-048',
+        name: 'Streetlight Herald',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow', 'Gray'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Second Sun / Gray Court',
+        effect: 'On Play: If you have fewer cards in hand than an opponent, draw a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/48.png',
+    },
+    {
+        id: 'EC-049',
+        name: 'Radiant Crown Beast',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Glow', 'Beast'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Pet Sanctuary',
+        effect: 'On Play: If you control another Beast, restore 2 Essence to your Deity.
+Whenever Radiant Crown Beast attacks, you may give another attacking Beast +1 Power until end of turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/49.png',
+    },
+    {
+        id: 'EC-050',
+        name: 'Solara Gatekeeper',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Glow', 'Gray'],
+        cost: 4,
+        power: 4,
+        toughness: 4,
+        domain: 'Solara',
+        effect: 'Guardian. On Play: You may destroy target Avatar with cost 2 or less.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/50.png',
+    },
+    {
+        id: 'EC-051',
+        name: 'Nullgrid Tracker',
+        type: 'Avatar',
+        rarity: 'Shard',
+        aspects: ['Void'],
+        cost: 1,
+        power: 1,
+        toughness: 2,
+        domain: 'Nullgrid',
+        effect: 'On Play: Look at the top card of your deck. You may put it on the bottom of your deck.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/51.png',
+    },
+    {
+        id: 'EC-052',
+        name: 'Shard Interrogator',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 3,
+        power: 3,
+        toughness: 2,
+        domain: 'Null Abyss',
+        effect: 'On Play: Target opponent reveals their hand. Choose a non-Avatar card from it. That player discards that card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/52.png',
+    },
+    {
+        id: 'EC-053',
+        name: 'Abyssal Archivist',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void', 'Gray'],
+        cost: 3,
+        power: 2,
+        toughness: 3,
+        domain: 'Null Abyss / Gray Court',
+        effect: 'On Play: You may return a Spell card from your Crypt to your hand.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/1.png',
+    },
+    {
+        id: 'EC-054',
+        name: 'Crown Grid Warden',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 4,
+        power: 3,
+        toughness: 5,
+        domain: 'Nullgrid / Crownline',
+        effect: 'Guardian. Whenever an opponent draws their second card in a single turn, they lose 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/54.png',
+    },
+    {
+        id: 'EC-055',
+        name: 'Shardbreaker Inquisitor',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 3,
+        power: 4,
+        toughness: 2,
+        domain: 'Null Abyss',
+        effect: 'Whenever Shardbreaker Inquisitor destroys an Avatar, that Avatar’s controller loses 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/55.png',
+    },
+    {
+        id: 'EC-056',
+        name: 'Void Courier Shade',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 2,
+        power: 1,
+        toughness: 3,
+        domain: 'Logistics / Nullgrid',
+        effect: 'On Play: You may move 1 Essence from your Deity to target opponent’s Deity.
+Whenever you lose Essence outside of combat, Void Courier Shade gets +1 Power until end of turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/56.png',
+    },
+    {
+        id: 'EC-057',
+        name: 'Null Rift Hound',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void', 'Beast'],
+        cost: 2,
+        power: 3,
+        toughness: 1,
+        domain: 'Sanctuary Void',
+        effect: 'When Null Rift Hound enters New Earth, target opponent loses 1 Essence.
+When Null Rift Hound dies, you may drain 1 KL from target opponent.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/57.png',
+    },
+    {
+        id: 'EC-058',
+        name: 'Shardline Reaper',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 4,
+        power: 4,
+        toughness: 3,
+        domain: 'Null Abyss',
+        effect: 'On Play: Destroy target Avatar with cost 2 or less.
+Whenever Shardline Reaper attacks, each player loses 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/58.png',
+    },
+    {
+        id: 'EC-059',
+        name: 'Gridlock Titan',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Void', 'Gray'],
+        cost: 6,
+        power: 6,
+        toughness: 7,
+        domain: 'Nullgrid / Gray Court',
+        effect: 'On Play: Until your next turn, opponents cannot gain KL above their starting KL.
+Whenever an opponent spends KL, they lose 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/59.png',
+    },
+    {
+        id: 'EC-060',
+        name: 'Crown Ledger Keeper',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 2,
+        power: 1,
+        toughness: 3,
+        domain: 'Crownline',
+        effect: 'On Play: Draw a card, then discard a card.
+Whenever you discard a card, you may gain 1 KL this turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/60.png',
+    },
+    {
+        id: 'EC-061',
+        name: 'Gray Court Mediator',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 3,
+        power: 2,
+        toughness: 4,
+        domain: 'Gray Court',
+        effect: 'On Play: Each player restores 1 Essence.
+Whenever a Spell is played, you may have each Deity lose 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/61.png',
+    },
+    {
+        id: 'EC-062',
+        name: 'Shard Statistician',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Crownline',
+        effect: 'On Play: Look at the top 3 cards of your deck. You may reveal an Avatar from among them and put it into your hand. Put the rest back on top in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/62.png',
+    },
+    {
+        id: 'EC-063',
+        name: 'Pet Sanctuary Caretaker',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray', 'Beast'],
+        cost: 2,
+        power: 1,
+        toughness: 3,
+        domain: 'Pet Sanctuary',
+        effect: 'On Play: Restore 1 Essence to each Deity.
+Whenever a Beast you control dies, you may restore 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/63.png',
+    },
+    {
+        id: 'EC-064',
+        name: 'Grayline Arbiter',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 4,
+        power: 3,
+        toughness: 4,
+        domain: 'Gray Court',
+        effect: 'On Play: Choose an Avatar. Its Power becomes 2 and its Toughness becomes 2 until Grayline Arbiter leaves New Earth.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/64.png',
+    },
+    {
+        id: 'EC-065',
+        name: 'Crown Data Analyst',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 3,
+        power: 1,
+        toughness: 4,
+        domain: 'Crownline',
+        effect: 'On Play: Look at the top 5 cards of your deck. You may reveal up to 2 non-Avatar cards from among them and put them into your hand. Put the rest on the bottom of your deck in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/65.png',
+    },
+    {
+        id: 'EC-066',
+        name: 'Logistics Coordinator',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Logistics',
+        effect: 'On Play: You may move 1 Essence from one Deity to another (you choose the source and recipient).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/66.png',
+    },
+    {
+        id: 'EC-067',
+        name: 'Gray Shard Sentinel',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Gray Court',
+        effect: 'Guardian. Whenever Gray Shard Sentinel blocks, you may draw a card, then discard a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/67.png',
+    },
+    {
+        id: 'EC-068',
+        name: 'Crown Equilibrium Adept',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 3,
+        power: 2,
+        toughness: 3,
+        domain: 'Crownline',
+        effect: 'On Play: If your Deity has more Essence than an opponent’s Deity, you lose 2 Essence and draw 2 cards.
+Otherwise, restore 2 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/68.png',
+    },
+    {
+        id: 'EC-072',
+        name: 'Kaixu’s Shardborne Avatar',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Void'],
+        cost: 4,
+        power: 4,
+        toughness: 4,
+        domain: 'Shattered Sun',
+        effect: 'On Play: If your Deity is Demon Lord Kaixu, Crownshatter Sovereign, you may play this card for 3 KL instead.
+Whenever you play your second card in a turn, Kaixu’s Shardborne Avatar gets +2 Power until end of turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/72.png',
+    },
+    {
+        id: 'EC-073',
+        name: 'Parallel Self of Kaixu',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Void', 'Gray'],
+        cost: 5,
+        power: 3,
+        toughness: 5,
+        domain: 'Shattered Sun',
+        effect: 'On Play: Copy the Passive ability of your Deity until end of turn. (It triggers as though this Avatar were your Deity.)
+Whenever you activate a God Code, Parallel Self of Kaixu gains +3 Power and cannot be destroyed this turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/73.png',
+    },
+    {
+        id: 'EC-074',
+        name: 'Crownshatter Executioner',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Crownline / Null Abyss',
+        effect: 'Whenever you choose one or more modes or choices for a card’s effect, an opponent loses 1 Essence.
+On Play: If your Deity is Demon Lord Kaixu, Crownshatter Sovereign, destroy target Avatar with cost 3 or less.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/74.png',
+    },
+    {
+        id: 'EC-075',
+        name: 'Kaixu’s Edict: Board Reset',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Gray', 'Void'],
+        cost: 5,
+        domain: 'Shattered Sun',
+        effect: 'Destroy all Avatars. Each Deity loses 3 Essence.
+If your Deity is Demon Lord Kaixu, Crownshatter Sovereign, instead each opponent loses 5 Essence and you may keep one Avatar you control.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/75.png',
+    },
+    {
+        id: 'EC-076',
+        name: 'Shattered Sun Cataclysm',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Void', 'Gray'],
+        cost: 6,
+        domain: 'Shattered Sun',
+        effect: 'Each opponent sacrifices two Avatars, then loses 3 KL. Your Avatars gain +2 Power until end of turn.
+If your Deity is Demon Lord Kaixu, Crownshatter Sovereign, draw 2 cards.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/76.png',
+    },
+    {
+        id: 'EC-077',
+        name: 'Estifar’s Voidwing Alpha',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Void', 'Beast'],
+        cost: 4,
+        power: 4,
+        toughness: 3,
+        domain: 'Sanctuary Void',
+        effect: 'On Play: Create a 2/2 Void Beast Avatar token.
+Beasts you control have “When this Avatar dies, target opponent loses 1 Essence.”
+If your Deity is Estifar, Voidwing Regent, your first Beast each turn costs 1 less KL to play.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/77.png',
+    },
+    {
+        id: 'EC-078',
+        name: 'Moonpack Howler',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void', 'Beast'],
+        cost: 2,
+        power: 2,
+        toughness: 2,
+        domain: 'Sanctuary Void',
+        effect: 'Whenever another Beast enters New Earth under your control, Moonpack Howler gets +1 Power until end of turn.
+If your Deity is Estifar, Voidwing Regent, it also restores 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/78.png',
+    },
+    {
+        id: 'EC-079',
+        name: 'Sanctuary Packmother',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Void', 'Gray', 'Beast'],
+        cost: 5,
+        power: 3,
+        toughness: 5,
+        domain: 'Sanctuary Void',
+        effect: 'On Play: Create two 2/2 Void Beast Avatar tokens.
+At the beginning of your end step, if three or more Beasts died this turn, restore 3 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/79.png',
+    },
+    {
+        id: 'EC-080',
+        name: 'Estifar’s Call: Pack Ascension',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Void', 'Gray'],
+        cost: 4,
+        domain: 'Sanctuary Void',
+        effect: 'Create two 3/3 Void Beast Avatar tokens with Guardian.
+If your Deity is Estifar, Voidwing Regent, your Beasts get +1 Power and “When this Avatar dies, draw a card” until end of turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/80.png',
+    },
+    {
+        id: 'EC-081',
+        name: 'Voidwing Stampede',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 3,
+        domain: 'Sanctuary Void',
+        effect: 'Beasts you control get +2 Power until end of turn.
+Each Beast that deals Essence damage to a Deity this turn causes that Deity’s controller to lose 1 KL.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/1-1.png',
+    },
+    {
+        id: 'EC-082',
+        name: 'Lokaya’s Stillpoint Avatar',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Gray', 'Glow'],
+        cost: 4,
+        power: 2,
+        toughness: 5,
+        domain: 'Gray Court / New Earth',
+        effect: 'On Play: Tap up to two Avatars you don’t control. They do not untap during their controller’s next untap step.
+At the end of your turn, if no Avatar you control attacked this turn, restore 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/2-1.png',
+    },
+    {
+        id: 'EC-083',
+        name: 'Silent Crown Arbiter',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Gray'],
+        cost: 5,
+        power: 3,
+        toughness: 6,
+        domain: 'Gray Court',
+        effect: 'On Play: Choose up to two Spells. They cannot be played until your next turn.
+As long as Silent Crown Arbiter is on New Earth, players can play only one Spell per turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/3-1.png',
+    },
+    {
+        id: 'EC-084',
+        name: 'New Earth Monk of Stillness',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Glow', 'Gray'],
+        cost: 2,
+        power: 1,
+        toughness: 4,
+        domain: 'New Earth',
+        effect: 'Guardian.
+At the end of your turn, if no Avatar you control attacked this turn, you may draw a card, then discard a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/4-1.png',
+    },
+    {
+        id: 'EC-085',
+        name: 'Lokaya’s Edict: Be Still',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Gray'],
+        cost: 3,
+        domain: 'Gray Court',
+        effect: 'Tap up to three Avatars you don’t control. Those Avatars cannot attack during their controller’s next turn.
+If your Deity is Lokaya, Crown of Stillness, restore 3 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/5-1.png',
+    },
+    {
+        id: 'EC-086',
+        name: 'Crown of Quiet Worlds',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Gray', 'Glow'],
+        cost: 4,
+        domain: 'Gray Court / New Earth',
+        effect: 'Until your next turn, players cannot declare more than one attack per turn.
+If no Avatar you control attacks this turn, at the beginning of your next turn draw 2 cards and restore 2 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/6-1.png',
+    },
+    {
+        id: 'EC-087',
+        name: 'Second Sun Street Brawler',
+        type: 'Avatar',
+        rarity: 'Shard',
+        aspects: ['Glow'],
+        cost: 2,
+        power: 3,
+        toughness: 1,
+        domain: 'Second Sun',
+        effect: 'Whenever Second Sun Street Brawler deals Essence damage to a Deity, you gain +1 KL this turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/7-1.png',
+    },
+    {
+        id: 'EC-088',
+        name: 'New Earth Rally Captain',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Glow'],
+        cost: 3,
+        power: 2,
+        toughness: 4,
+        domain: 'New Earth',
+        effect: 'On Play: Until end of turn, Avatars you control get +1 Power.
+Whenever three or more Avatars you control attack in the same turn, restore 2 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/8-1.png',
+    },
+    {
+        id: 'EC-089',
+        name: 'Solara Crown Paladin',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Glow', 'Gray'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Solara / Crownline',
+        effect: 'Guardian.
+While Solara Crown Paladin is on New Earth, damage that would reduce your Deity’s Essence to 0 reduces it to 1 instead (once per game).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/9-1.png',
+    },
+    {
+        id: 'EC-090',
+        name: 'Sanctuary Sunpride',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Glow', 'Beast'],
+        cost: 4,
+        power: 4,
+        toughness: 4,
+        domain: 'Pet Sanctuary',
+        effect: 'On Play: Restore 2 Essence to your Deity.
+Beasts you control get +1 Power while attacking Deities.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/10-1.png',
+    },
+    {
+        id: 'EC-091',
+        name: 'Second Sun Charge Line',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Glow'],
+        cost: 2,
+        domain: 'Second Sun',
+        effect: 'Up to two target Avatars you control get +2 Power until end of turn.
+If both attack this turn, draw a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/11-1.png',
+    },
+    {
+        id: 'EC-092',
+        name: 'Essence Crown Strike',
+        type: 'Spell',
+        rarity: 'Shard',
+        aspects: ['Glow'],
+        cost: 1,
+        domain: 'Crownline / Second Sun',
+        effect: 'Deal 2 Essence damage to target Deity or Avatar.
+If you target a Deity, you lose 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/12-1.png',
+    },
+    {
+        id: 'EC-093',
+        name: 'New Earth Reprieve',
+        type: 'Spell',
+        rarity: 'Shard',
+        aspects: ['Glow', 'Gray'],
+        cost: 1,
+        domain: 'New Earth / Gray Court',
+        effect: 'Restore 2 Essence to your Deity.
+If an opponent has more Essence than you, restore 3 Essence instead.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/13-1.png',
+    },
+    {
+        id: 'EC-094',
+        name: 'Solar Uprising',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Glow'],
+        cost: 4,
+        domain: 'Second Sun / New Earth',
+        effect: 'Until end of turn, Avatars you control get +1 Power and
+“Whenever this Avatar deals Essence damage to a Deity this turn, that Deity loses 1 additional Essence.”',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/14-1.png',
+    },
+    {
+        id: 'EC-095',
+        name: 'Null Alley Cutthroat',
+        type: 'Avatar',
+        rarity: 'Shard',
+        aspects: ['Void'],
+        cost: 2,
+        power: 2,
+        toughness: 1,
+        domain: 'Nullgrid',
+        effect: 'Whenever Null Alley Cutthroat attacks and isn’t blocked, target opponent loses 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/15-1.png',
+    },
+    {
+        id: 'EC-096',
+        name: 'Abyss Courier Hunter',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Null Abyss / Logistics',
+        effect: 'On Play: Target opponent discards a card.
+If they cannot, they lose 2 Essence instead.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/16-1.png',
+    },
+    {
+        id: 'EC-097',
+        name: 'Shard Debt Collector',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void', 'Gray'],
+        cost: 4,
+        power: 3,
+        toughness: 4,
+        domain: 'Nullgrid / Crownline',
+        effect: 'On Play: Target opponent loses 1 Essence for each card in your Crypt, up to 3.
+Whenever an opponent discards a card, restore 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/2.png',
+    },
+    {
+        id: 'EC-098',
+        name: 'Abyssal Faultline Mage',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 4,
+        power: 3,
+        toughness: 4,
+        domain: 'Null Abyss',
+        effect: 'On Play: Choose one —
+• Destroy target Avatar with cost 3 or less.
+• Each opponent discards a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/18-1.png',
+    },
+    {
+        id: 'EC-099',
+        name: 'Void Ledger Wipe',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Void', 'Gray'],
+        cost: 3,
+        domain: 'Null Abyss / Gray Court',
+        effect: 'Each player discards two cards.
+Then you may return a Void or Gray card from your Crypt to your hand.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/3.png',
+    },
+    {
+        id: 'EC-100',
+        name: 'Essence Ransom',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Void'],
+        cost: 2,
+        domain: 'Nullgrid',
+        effect: 'Target opponent chooses one —
+• They lose 3 Essence.
+• They lose 1 KL and you draw 2 cards.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/20-1.png',
+    },
+    {
+        id: 'EC-101',
+        name: 'Nullgrid Surge',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 1,
+        domain: 'Nullgrid',
+        effect: 'Target opponent loses 1 Essence and 1 KL.
+If they have 10 or less Essence, they lose 1 additional Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/21-1.png',
+    },
+    {
+        id: 'EC-102',
+        name: 'Abyssal Echoes',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Void'],
+        cost: 2,
+        domain: 'Null Abyss',
+        effect: 'Return up to one Void Avatar and up to one Void Spell from your Crypt to your hand.
+Then lose 2 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/4.png',
+    },
+    {
+        id: 'EC-103',
+        name: 'Equity Scribe of Crownline',
+        type: 'Avatar',
+        rarity: 'Shard',
+        aspects: ['Gray'],
+        cost: 2,
+        power: 1,
+        toughness: 3,
+        domain: 'Crownline',
+        effect: 'On Play: If you have fewer cards in hand than an opponent, draw a card.
+Otherwise, discard a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/23-1.png',
+    },
+    {
+        id: 'EC-104',
+        name: 'Balancebreaker Advocate',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 3,
+        power: 2,
+        toughness: 3,
+        domain: 'Gray Court',
+        effect: 'On Play: The player with the highest Essence loses 2 Essence and the player with the lowest Essence gains 2 Essence. (You choose in ties.)',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/24-1.png',
+    },
+    {
+        id: 'EC-105',
+        name: 'Crownline Negotiator',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Gray'],
+        cost: 3,
+        power: 2,
+        toughness: 4,
+        domain: 'Crownline',
+        effect: 'Whenever an opponent loses Essence during your turn, you may gain 1 KL this turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/25-1.png',
+    },
+    {
+        id: 'EC-106',
+        name: 'Gray Court Archivist',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 4,
+        power: 2,
+        toughness: 5,
+        domain: 'Gray Court',
+        effect: 'On Play: Look at the top 4 cards of your deck. You may reveal up to 2 Gray cards from among them and put them into your hand.
+Put the rest on the bottom of your deck in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/26-1.png',
+    },
+    {
+        id: 'EC-107',
+        name: 'Gray Court Injunction',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Gray'],
+        cost: 2,
+        domain: 'Gray Court',
+        effect: 'Choose Avatar or Spell.
+Until your next turn, each player can play only one card of the chosen type each turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/27-1.png',
+    },
+    {
+        id: 'EC-108',
+        name: 'Scales of New Earth',
+        type: 'Spell',
+        rarity: 'Adept',
+        aspects: ['Gray', 'Glow'],
+        cost: 3,
+        domain: 'New Earth / Gray Court',
+        effect: 'Each player may restore up to 3 Essence to their Deity.
+For each opponent who does, draw a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/28-1.png',
+    },
+    {
+        id: 'EC-109',
+        name: 'Crownline Reallocator',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Gray', 'Void'],
+        cost: 2,
+        domain: 'Crownline / Nullgrid',
+        effect: 'Move up to 3 Essence among Deities as you choose.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/29-1.png',
+    },
+    {
+        id: 'EC-110',
+        name: 'Shard of Probabilities',
+        type: 'Spell',
+        rarity: 'Shard',
+        aspects: ['Gray'],
+        cost: 1,
+        domain: 'Gray Court',
+        effect: 'Look at the top 2 cards of your deck. Put one into your hand and the other on the bottom of your deck.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/30-1.png',
+    },
+    {
+        id: 'EC-111',
+        name: 'Shard War Envoy',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Glow', 'Void'],
+        cost: 3,
+        power: 3,
+        toughness: 3,
+        domain: 'Shattered Sun',
+        effect: 'On Play: Each player loses 1 Essence.
+Whenever you play both a Glow card and a Void card in the same turn, Shard War Envoy gets +2 Power until end of turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/31-1.png',
+    },
+    {
+        id: 'EC-112',
+        name: 'Null-Crown Diplomat',
+        type: 'Avatar',
+        rarity: 'Master',
+        aspects: ['Void', 'Gray'],
+        cost: 3,
+        power: 2,
+        toughness: 4,
+        domain: 'Nullgrid / Crownline',
+        effect: 'On Play: Target opponent discards a card unless they choose to restore 2 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/32-1.png',
+    },
+    {
+        id: 'EC-113',
+        name: 'Radiant Equilibrium Sage',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Gray'],
+        cost: 4,
+        power: 3,
+        toughness: 4,
+        domain: 'Second Sun / Gray Court',
+        effect: 'On Play: Set each Deity’s Essence to the average (rounded down) of all Deities’ Essence values.
+Whenever your Deity gains Essence, you may draw a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/33-1.png',
+    },
+    {
+        id: 'EC-114',
+        name: 'Shattered Triune Avatar',
+        type: 'Avatar',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Void', 'Gray'],
+        cost: 5,
+        power: 4,
+        toughness: 4,
+        domain: 'Shattered Sun',
+        effect: 'On Play: Choose one —
+• Draw 2 cards.
+• Target opponent discards 2 cards.
+• Restore 4 Essence to your Deity.
+Whenever you play your third card in a turn, you may choose one of these modes that hasn’t been chosen this game.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/34-1.png',
+    },
+    {
+        id: 'EC-115',
+        name: 'God Code Catalyst',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Void', 'Gray'],
+        cost: 3,
+        domain: 'Crownline / Shattered Sun',
+        effect: 'Until end of turn, whenever you gain KL, you gain that much +1 instead.
+If your KL would go above 13 this turn and you have not activated your Deity’s God Code yet, you may activate it as though its condition were met.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/35-1.png',
+    },
+    {
+        id: 'EC-116',
+        name: 'Crown Synchrony Protocol',
+        type: 'Spell',
+        rarity: 'Master',
+        aspects: ['Glow', 'Gray'],
+        cost: 2,
+        domain: 'Crownline / New Earth',
+        effect: 'Choose up to two Avatars you control.
+Until end of turn, whenever one of them deals Essence damage to a Deity, restore 1 Essence to your Deity and that Avatar gets +1 Power.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/36-1.png',
+    },
+    {
+        id: 'EC-117',
+        name: 'Relic of the Second Sun',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Glow'],
+        cost: 3,
+        domain: 'Second Sun',
+        effect: 'Until end of turn, whenever you play a Glow card, draw a card, then discard a card.
+If your Deity is Demon Lord Kaixu, Crownshatter Sovereign or Shattered Sun Chronicler, Glow Avatars you control also get +1 Power this turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/37-1.png',
+    },
+    {
+        id: 'EC-118',
+        name: 'Relic of the Voidwing',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Void'],
+        cost: 3,
+        domain: 'Sanctuary Void / Null Abyss',
+        effect: 'Until end of turn, whenever a Beast you control dies, target opponent loses 1 Essence and you gain +1 KL this turn.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/38-1.png',
+    },
+    {
+        id: 'EC-119',
+        name: 'Relic of Still Waters',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Gray'],
+        cost: 3,
+        domain: 'Gray Court / New Earth',
+        effect: 'Until your next turn, whenever an opponent declares an attack with exactly one Avatar, tap that Avatar and it does not attack. Restore 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/39-1.png',
+    },
+    {
+        id: 'EC-120',
+        name: 'Crown of Shard Unity',
+        type: 'Spell',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Void', 'Gray'],
+        cost: 4,
+        domain: 'Crownline / Shattered Sun',
+        effect: 'Choose up to three Avatars you control. They become Glow, Void, and Gray in addition to their other aspects until end of turn and get +1 Power.
+Draw a card for each different aspect among Avatars you control (maximum 3).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/40-1.png',
+    },
+    {
+        id: 'EC-121',
+        name: 'Sunbound Oath',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Choose a Deity you control. Until end of Cycle, Avatars aligned with that Deity get +1 Essence and +1 attack. If you control 3 or more Shards, draw 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/5.png',
+    },
+    {
+        id: 'EC-122',
+        name: 'Avatar’s Reprisal',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Target Avatar you control deals 3 Essence damage to an opposing Avatar. If that opposing Avatar would be defeated this way, you gain 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/6.png',
+    },
+    {
+        id: 'EC-123',
+        name: 'Relic Recall',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'Return target Relic from your Void to your hand. If you control a Domain, you may instead attach that Relic to an Avatar you control.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/7.png',
+    },
+    {
+        id: 'EC-124',
+        name: 'Domain Surge',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Search your Veiled Deck for a Domain card, reveal it, and put it into your hand. Then shuffle. If you already control a Domain, you may sacrifice it. If you do, you may immediately play the searched Domain without paying its Essence cost.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/8.png',
+    },
+    {
+        id: 'EC-125',
+        name: 'Crown of the First Shard',
+        type: 'Relic',
+        rarity: 'Master',
+        aspects: [],
+        cost: 2,
+        effect: 'Attach to a Deity or Avatar. Effects you control that claim Shards cost 1 less Essence. Whenever you claim a Shard, the bearer gains +1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/9.png',
+    },
+    {
+        id: 'EC-126',
+        name: 'Obsidian Sun Gauntlet',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Attach to an Avatar. The bearer gets +2 Essence and +1 attack. When this Avatar deals Essence damage to an opposing Avatar, move 1 card from your Void to the bottom of your Veiled Deck.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/10.png',
+    },
+    {
+        id: 'EC-127',
+        name: 'Mirror-Threaded Aegis',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Attach to an Avatar. The first time each Cycle this Avatar would take Essence damage, prevent 1 of that damage. If you control 3 or more Shards, this Avatar gains \\\'Crownbound — Opponents cannot target this Avatar with Spells.\\\'',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/11.png',
+    },
+    {
+        id: 'EC-128',
+        name: 'Voidwing Reliquary',
+        type: 'Relic',
+        rarity: 'Adept',
+        aspects: [],
+        cost: 1,
+        effect: 'Attach to a Supporting Avatar. That Avatar gains \\\'Sacrifice this Avatar: Draw 1 card, then return up to 1 Spell from your Void to your hand.\\\'',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/12.png',
+    },
+    {
+        id: 'EC-129',
+        name: 'Shattered Sun Citadel',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'When this Domain enters New Earth, each player may Manifest 1 Avatar from their hand with Essence Cost 3 or less. Your Avatars get +1 Essence while you control 3 or more Shards.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/13.png',
+    },
+    {
+        id: 'EC-130',
+        name: 'Mirrorfall Basin',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'The first Spell you cast each Cycle costs 1 less Essence. Whenever an Avatar leaves New Earth for the Void, its controller draws 1 card, then discards 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/14.png',
+    },
+    {
+        id: 'EC-131',
+        name: 'Void-Torn Horizon',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Avatars entering New Earth from the Void gain +2 Essence this Cycle. At each player’s End Phase, that player moves the top card of their Veiled Deck to the Void.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/15.png',
+    },
+    {
+        id: 'EC-132',
+        name: 'New Earth Nexus',
+        type: 'Domain',
+        rarity: 'Mythic',
+        aspects: [],
+        cost: 0,
+        effect: 'You may only include 1 copy of New Earth Nexus in your deck. When it enters New Earth, each player may move up to 2 cards from their Void to the bottom of their Veiled Deck. While this Domain is active, players cannot claim more than 1 Shard per Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/16.png',
+    },
+    {
+        id: 'EC-133',
+        name: 'Radiant Core Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Radiant Core Shard, gain 3 Essence. Crownbound — As long as you control this Shard, your healing Spells cost 1 less Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/17.png',
+    },
+    {
+        id: 'EC-134',
+        name: 'Obsidian Core Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Obsidian Core Shard, an opposing Avatar of your choice loses 2 Essence. Crownbound — As long as you control this Shard, your Avatars get +1 attack when attacking a damaged Avatar.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/18.png',
+    },
+    {
+        id: 'EC-135',
+        name: 'Mirror Core Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Mirror Core Shard, draw 1 card, then discard 1 card. Crownbound — Once per Cycle, when a Spell targets one of your Avatars, you may copy that Spell and choose new targets for the copy. The copy can only target your Avatars.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/19.png',
+    },
+    {
+        id: 'EC-136',
+        name: 'Null Core Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Null Core Shard, you may move 1 card from an opponent’s Void to the bottom of their Veiled Deck. Crownbound — Once per Cycle, you may pay 1 Essence: counter a Spell that targets a Shard you control.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/20.png',
+    },
+    {
+        id: 'EC-137',
+        name: 'Rite of Solar Ascension',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 6,
+        effect: 'Cast this only if you control 3 or more Shards. Manifest an Avatar from your hand or Void without paying its Essence cost. It enters New Earth with +3 Essence and gains \\\'Crownbound — This Avatar cannot be moved to the Void this Cycle.\\\'',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/21.png',
+    },
+    {
+        id: 'EC-138',
+        name: 'Rite of the Broken Crown',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 5,
+        effect: 'Each player chooses 1 Avatar they control and sacrifices the rest. Then each player loses 1 Essence for each Avatar they sacrificed this way.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/22.png',
+    },
+    {
+        id: 'EC-139',
+        name: 'Rite of Echoing Suns',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 4,
+        effect: 'Choose up to 2 Spells in your Void. Until end of Cycle, you may cast those Spells from your Void. Cards cast this way that would go to the Void are instead placed on the bottom of your Veiled Deck.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/23.png',
+    },
+    {
+        id: 'EC-140',
+        name: 'Rite of Void Coronation',
+        type: 'Rite',
+        rarity: 'Mythic',
+        aspects: [],
+        cost: 7,
+        effect: 'Cast this only if you control fewer Shards than an opponent. Claim 1 Shard. Then each opposing Avatar loses 2 Essence. If you control 4 or more Shards after this, your Deity gains \\\'Crownbound — Opponents cannot claim more than 1 Shard per Cycle.\\\'',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/24.png',
+    },
+    {
+        id: 'EC-141',
+        name: 'Sunflare Echo',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        power: 1,
+        toughness: 1,
+        effect: 'Token Avatar (cannot be included in decks). Essence 1, attack 1. Whenever this Avatar deals Essence damage, you may sacrifice it. If you do, draw 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/25.png',
+    },
+    {
+        id: 'EC-142',
+        name: 'Voidwing Shade',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        power: 1,
+        toughness: 1,
+        effect: 'Token Avatar (cannot be included in decks). Essence 1, attack 1. This Avatar cannot block. When it enters New Earth from the Void, it gains +1 attack this Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/26.png',
+    },
+    {
+        id: 'EC-143',
+        name: 'Mirrorling Fragment',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        power: 0,
+        toughness: 0,
+        effect: 'Token Avatar (cannot be included in decks). Essence 0, attack 0. When this Avatar is sacrificed, scry 2 (look at the top 2 cards of your Veiled Deck, put any number on the bottom and the rest back on top).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/27.png',
+    },
+    {
+        id: 'EC-144',
+        name: 'Shardbound Sentinel',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        power: 0,
+        toughness: 2,
+        effect: 'Token Avatar (cannot be included in decks). Essence 2, attack 0. Guardian (must be attacked first). When you claim a Shard, this Avatar gains +1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/28.png',
+    },
+    {
+        id: 'EC-145',
+        name: 'Sun Essence Reservoir',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'Enters play exhausted. Once per Cycle, you may exhaust this: generate 2 Sun Essence usable only to cast Avatars aligned with Shattered Sun.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/29.png',
+    },
+    {
+        id: 'EC-146',
+        name: 'Void Essence Well',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'Once per Cycle, you may lose 1 Essence: add 2 Void Essence usable only to cast Spells or Rites.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/30.png',
+    },
+    {
+        id: 'EC-147',
+        name: 'Balanced Essence Conduit',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'When this enters play, choose Sun or Void. It provides 1 Essence of the chosen type for your casts each Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/31.png',
+    },
+    {
+        id: 'EC-148',
+        name: 'Crown Fragment Battery',
+        type: 'Essence',
+        rarity: 'Master',
+        aspects: [],
+        cost: 0,
+        effect: 'If you control 3 or more Shards, this provides +1 generic Essence to all your casts each Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/32.png',
+    },
+    {
+        id: 'EC-149',
+        name: 'Lumen-Fox Companion',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 1,
+        power: 1,
+        toughness: 1,
+        effect: 'Attach to an Avatar you control. That Avatar gets +1 Essence. When that Avatar leaves New Earth, draw 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/33.png',
+    },
+    {
+        id: 'EC-150',
+        name: 'Voidwing Familiar',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 1,
+        power: 0,
+        toughness: 1,
+        effect: 'Attach to a Deity or Avatar. Once per Cycle, when you cast a Spell, you may look at the top card of your Veiled Deck. You may leave it there or move it to the Void.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/34.png',
+    },
+    {
+        id: 'EC-151',
+        name: 'Mirror Sprite Guide',
+        type: 'Avatar',
+        rarity: 'Arcane',
+        aspects: ['Companion'],
+        cost: 2,
+        power: 1,
+        toughness: 2,
+        effect: 'Attach to an Avatar. When this Companion enters, scry 2. Attached Avatar gains \\\'When this Avatar deals Essence damage to an opponent, you may scry 1.\\\'',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/35.png',
+    },
+    {
+        id: 'EC-152',
+        name: 'Shardkeeper Attendant',
+        type: 'Avatar',
+        rarity: 'Arcane',
+        aspects: ['Companion'],
+        cost: 2,
+        power: 1,
+        toughness: 3,
+        effect: 'Attach to a Deity. While you control this Companion, your first Shard claim each Cycle costs 1 less Essence or meets its condition with 1 fewer Avatar, whichever is relevant.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/36.png',
+    },
+    {
+        id: 'EC-153',
+        name: 'Crownflare Edict',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Choose one: Deal 2 Essence damage to an opposing Avatar, or heal 2 Essence to a Deity you control. If you control 2 or more Shards, you may choose both instead.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/37.png',
+    },
+    {
+        id: 'EC-154',
+        name: 'Shardpulse Invocation',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'Look at the top 3 cards of your Veiled Deck. You may reveal a Shard, Relic, or Domain among them and put it into your hand. Put the rest back on top of your Veiled Deck in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/38.png',
+    },
+    {
+        id: 'EC-155',
+        name: 'Solar Reversal',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Choose an Avatar on New Earth. Until end of Cycle, its attack and Essence values are swapped. If that Avatar is aligned with your Deity, draw 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/39.png',
+    },
+    {
+        id: 'EC-156',
+        name: 'Voidburst Countermarch',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Cast this only when an opponent casts a Spell. Counter that Spell unless its controller pays 2 Essence. If they pay, you may move the top card of their Veiled Deck to their Void.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/40.png',
+    },
+    {
+        id: 'EC-157',
+        name: 'Shardforged Diadem',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Attach to a Deity. While you control 3 or more Shards, Spells you cast cost 1 less Essence. Whenever you claim a Shard, you may draw 1 card, then discard 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/41.png',
+    },
+    {
+        id: 'EC-158',
+        name: 'Radiant Bastion Plate',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Attach to an Avatar. The bearer gets +3 Essence. When an opposing Spell targets the bearer, you may lose 1 Essence; if you do, counter that Spell.',
+    },
+    {
+        id: 'EC-159',
+        name: 'Nullglass Fetters',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'Attach to an opposing Avatar. That Avatar loses all printed abilities and cannot claim or protect Shards. At the start of its controller’s Cycle, they may pay 2 Essence to destroy this Relic.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/43.png',
+    },
+    {
+        id: 'EC-160',
+        name: 'Echo-Caged Codex',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Attach to a Deity. Once per Cycle, when a Spell you control is placed into your Void, you may pay 1 Essence. If you do, return that Spell to your hand instead.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/44.png',
+    },
+    {
+        id: 'EC-161',
+        name: 'Crownlit Expanse',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Avatars you control entering New Earth gain +1 Essence this Cycle. Once per Cycle, when you claim a Shard, you may Manifest an Avatar from your hand with Essence Cost 2 or less.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/45.png',
+    },
+    {
+        id: 'EC-162',
+        name: 'Abyssal Rift Terraces',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'At the start of each player’s Cycle, that player moves the top card of their Veiled Deck to their Void, then may return a card from their Void to the bottom of their Veiled Deck. Spells that interact with the Void cost 1 less Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/46.png',
+    },
+    {
+        id: 'EC-163',
+        name: 'Prism-Heart Concourse',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'When this Domain enters New Earth, each player may rearrange their Shard Line without changing how many Shards they control. Avatars attacking across different lanes (columns) gain +1 attack this Combat.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/47.png',
+    },
+    {
+        id: 'EC-164',
+        name: 'Silent Crown Archive',
+        type: 'Domain',
+        rarity: 'Mythic',
+        aspects: [],
+        cost: 0,
+        effect: 'You may only include 1 copy of Silent Crown Archive in your deck. When it enters New Earth, draw 2 cards, then discard 1 card. While this Domain is active, players cannot cast Spells during another player’s Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/48.png',
+    },
+    {
+        id: 'EC-165',
+        name: 'Ember Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Ember Crown Shard, deal 1 Essence damage to up to two different opposing Avatars. Crownbound — As long as you control this Shard, your Avatars get +1 attack when attacking a Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/49.png',
+    },
+    {
+        id: 'EC-166',
+        name: 'Tideglass Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Tideglass Crown Shard, heal 2 Essence to up to two different targets you control. Crownbound — At the start of your Cycle, if your Essence is lower than an opponent’s, heal 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/50.png',
+    },
+    {
+        id: 'EC-167',
+        name: 'Veilstorm Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Veilstorm Crown Shard, each player discards 1 card, then draws 1 card. Crownbound — Once per Cycle, when you cast a Spell, you may look at the top card of your Veiled Deck and leave it or move it to your Void.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/51.png',
+    },
+    {
+        id: 'EC-168',
+        name: 'Eclipse Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Eclipse Crown Shard, choose up to 1 Avatar and up to 1 Domain on New Earth; until end of Cycle, their abilities are blanked. Crownbound — Spells your opponents cast that target your Deity cost 1 more Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/52.png',
+    },
+    {
+        id: 'EC-169',
+        name: 'Rite of Twin Suns',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 5,
+        effect: 'Choose two different Avatars you control. Each gains +2 Essence and +1 attack until end of Cycle. If you control 3 or more Shards, those Avatars also gain Guardian this Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/53.png',
+    },
+    {
+        id: 'EC-170',
+        name: 'Rite of Fractured Mirrors',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 4,
+        effect: 'Choose an Avatar you control. Create a Token copy of it called Mirror Echo with 1 Essence and the same abilities until end of Cycle. Sacrifice Mirror Echo at the end of Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/54.png',
+    },
+    {
+        id: 'EC-171',
+        name: 'Rite of Crownfall Silence',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Until end of Cycle, players cannot cast Spells during combat. Draw 1 card. If you control at least 1 Shard, draw an additional card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/55.png',
+    },
+    {
+        id: 'EC-172',
+        name: 'Rite of Shard Requiem',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 6,
+        effect: 'Sacrifice a Shard you control. Destroy up to two Avatars on New Earth that each have Essence equal to or less than the number of Shards you controlled before this sacrifice.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/56.png',
+    },
+    {
+        id: 'EC-173',
+        name: 'Sunborn Emberling',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 1 Essence, 1 attack. When this Avatar enters New Earth, if it was created by a Spell, it gains +1 attack this Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/57.png',
+    },
+    {
+        id: 'EC-174',
+        name: 'Rift-Drift Shade',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 1 Essence, 0 attack. This Avatar cannot be blocked by Avatars with higher Essence. When it leaves New Earth, its controller mills 1 card (moves the top card of their Veiled Deck to their Void).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/58.png',
+    },
+    {
+        id: 'EC-175',
+        name: 'Prism Echo Construct',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 2 Essence, 0 attack. When this Avatar is created, scry 1 (look at the top card of your Veiled Deck; you may put it on the bottom).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/59.png',
+    },
+    {
+        id: 'EC-176',
+        name: 'Nullbrand Husk',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 0 Essence, 2 attack. This Avatar cannot gain Essence. When it deals Essence damage to a Deity, sacrifice it.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/60.png',
+    },
+    {
+        id: 'EC-177',
+        name: 'Shattered Sun Reserve',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'Once per Cycle, you may exhaust this: add 2 Essence usable only to cast Avatars aligned with Shattered Sun.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/61.png',
+    },
+    {
+        id: 'EC-178',
+        name: 'Luminous Wellspring',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'When this enters play, heal 1 Essence to your Deity. Once per Cycle, you may exhaust this to add 1 Essence usable for any card type.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/62.png',
+    },
+    {
+        id: 'EC-179',
+        name: 'Void-Engine Conduit',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'Once per Cycle, you may lose 1 Essence: add 2 Essence that can only be used to cast Spells or Rites.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/63.png',
+    },
+    {
+        id: 'EC-180',
+        name: 'Balanced Crown Matrix',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'At the start of your Cycle, choose Sun or Void. Until end of Cycle, this provides 1 Essence of the chosen type for your casts.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/64.png',
+    },
+    {
+        id: 'EC-181',
+        name: 'Starlit Fox Companion',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 1,
+        effect: 'Attach to an Avatar you control. Attached Avatar gets +1 Essence. When that Avatar deals Essence damage to a Deity, you may draw 1 card, then discard 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/65.png',
+    },
+    {
+        id: 'EC-182',
+        name: 'Crownwatch Seraph',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 2,
+        effect: 'Attach to a Deity. While attached, Spells that target your Deity cost opponents 1 more Essence. When you claim a Shard, heal 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/66.png',
+    },
+    {
+        id: 'EC-183',
+        name: 'Veilrunner Guide',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 2,
+        effect: 'Attach to an Avatar. Whenever that Avatar enters or leaves New Earth, scry 1. If you control 3 or more Shards, attached Avatar also gets +1 attack.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/67.png',
+    },
+    {
+        id: 'EC-184',
+        name: 'Shardwarden Familiar',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 3,
+        effect: 'Attach to an Avatar or Deity. While attached, the first time each Cycle you would lose a Shard, you may instead pay 2 Essence to prevent that loss.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/68.png',
+    },
+    {
+        id: 'EC-185',
+        name: 'Crownshock Decree',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Target Avatar loses 2 Essence. If you control a Domain, that Avatar also cannot attack this Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/69.png',
+    },
+    {
+        id: 'EC-186',
+        name: 'Shardweave Insight',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'Look at the top 3 cards of your Veiled Deck. You may reveal an Avatar or Companion among them and put it into your hand. Put the rest back in any order.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/70.png',
+    },
+    {
+        id: 'EC-187',
+        name: 'Solar Aegis Veil',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Until end of Cycle, prevent the next 3 Essence damage that would be dealt to you or an Avatar you control. If you control 2 or more Shards, draw 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/71.png',
+    },
+    {
+        id: 'EC-188',
+        name: 'Voidrift Grasp',
+        type: 'Spell',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Return target Avatar from New Earth to its owner’s hand. Then that player discards a card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/72.png',
+    },
+    {
+        id: 'EC-189',
+        name: 'Sunspine Halberd',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Attach to an Avatar. Attached Avatar gets +1 attack and \\\'When this Avatar defeats another Avatar, gain 1 Essence.\\\'',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/73.png',
+    },
+    {
+        id: 'EC-190',
+        name: 'Riftbound Shackles',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'Attach to an opposing Avatar. That Avatar enters and remains exhausted (cannot attack) unless its controller pays 1 Essence at the start of their Combat each Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/74.png',
+    },
+    {
+        id: 'EC-191',
+        name: 'Prism Crown Signet',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Attach to a Deity. Once per Cycle, when you cast a Spell, you may pay 1 Essence. If you do, draw 1 card, then discard 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/75.png',
+    },
+    {
+        id: 'EC-192',
+        name: 'Nullsteel Reliquary',
+        type: 'Relic',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Attach to a Deity or Avatar. As long as this Relic is attached, effects your opponents control cannot move cards from your Veiled Deck to your Void.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/76.png',
+    },
+    {
+        id: 'EC-193',
+        name: 'Dawnspire Plateau',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 1,
+        effect: 'At the start of your Cycle, you may heal 1 Essence to an Avatar you control. Whenever an Avatar you control is healed, it gets +1 attack this Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/77.png',
+    },
+    {
+        id: 'EC-194',
+        name: 'Abyssal Echo Courts',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'Spells that target cards in any Void cost 1 less Essence. At the start of each player’s End Phase, that player may move 1 card from their Void to the bottom of their Veiled Deck.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/78.png',
+    },
+    {
+        id: 'EC-195',
+        name: 'Glass Meridian Walk',
+        type: 'Domain',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 2,
+        effect: 'When this Domain enters New Earth, scry 2. Avatars that attack alone get +1 Essence until end of Combat.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/79.png',
+    },
+    {
+        id: 'EC-196',
+        name: 'Silent Shard Sanctum',
+        type: 'Domain',
+        rarity: 'Mythic',
+        aspects: [],
+        cost: 0,
+        effect: 'You may only include 1 copy of Silent Shard Sanctum in your deck. While this Domain is active, players cannot claim more than 2 Shards per Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/80.png',
+    },
+    {
+        id: 'EC-197',
+        name: 'Starflare Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Starflare Crown Shard, deal 2 Essence damage divided as you choose among up to two opposing Avatars. Crownbound — Your Avatars have +1 attack while attacking a player with more Shards than you.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/1acf423ea71c4f2aa.png',
+    },
+    {
+        id: 'EC-198',
+        name: 'Deepwake Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Deepwake Crown Shard, heal 2 Essence to your Deity. Crownbound — At the start of your Cycle, if you control 3 or more Shards, you may heal 1 Essence to an Avatar you control.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/2547c1124d72dae04.png',
+    },
+    {
+        id: 'EC-199',
+        name: 'Riftveil Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Riftveil Crown Shard, look at the top 2 cards of your Veiled Deck; you may move any number of them to your Void and the rest back on top. Crownbound — Spells you cast that reference the Void cost 1 less Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/381b3e1b1782cc682.png',
+    },
+    {
+        id: 'EC-200',
+        name: 'Gloomglass Crown Shard',
+        type: 'Shard',
+        rarity: 'Shard',
+        aspects: [],
+        effect: 'When you claim Gloomglass Crown Shard, an opponent of your choice discards a card. Crownbound — Once per Cycle, when an opponent discards a card, you may draw 1 card, then discard 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/42c08abdf80694f5d.png',
+    },
+    {
+        id: 'EC-201',
+        name: 'Rite of Sunfall Reprieve',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 4,
+        effect: 'Choose up to two Avatars you control. Each gains +2 Essence until end of Cycle. If you control 2 or more Shards, those Avatars also get Guardian this Cycle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/51e0aee3a07b7e6ec.png',
+    },
+    {
+        id: 'EC-202',
+        name: 'Rite of Voidbound March',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 5,
+        effect: 'Return up to two Avatars from your Void to your hand. If you returned two, you may Manifest one of them with Essence Cost 3 or less without paying its Essence cost.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/61b698ed7692d8f4e.png',
+    },
+    {
+        id: 'EC-203',
+        name: 'Rite of Mirror Crown',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 3,
+        effect: 'Until end of Cycle, whenever an opponent casts a Spell, you may pay 1 Essence. If you do, copy that Spell and choose new targets for the copy.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/7db52ee0b98440298.png',
+    },
+    {
+        id: 'EC-204',
+        name: 'Rite of Cracked Horizon',
+        type: 'Rite',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 6,
+        effect: 'Destroy all Domains on New Earth. Each player then may search their Veiled Deck for a Domain card, reveal it, put it into their hand, then shuffle.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/8da7bc6c39df03534.png',
+    },
+    {
+        id: 'EC-205',
+        name: 'Ember-Crown Wisp',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 1 Essence, 1 attack. When this Avatar is sacrificed, deal 1 Essence damage to any target.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/95827cfd0fb618439.png',
+    },
+    {
+        id: 'EC-206',
+        name: 'Shardmist Phantom',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 1 Essence, 0 attack. This Avatar cannot be blocked. At the end of your Cycle, sacrifice it unless you pay 1 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/1062ba973acd459fab.png',
+    },
+    {
+        id: 'EC-207',
+        name: 'Veil-Fragment Sprite',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 0 Essence, 1 attack. When this Avatar enters New Earth, draw 1 card, then discard 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/115c279b421d251ca7.png',
+    },
+    {
+        id: 'EC-208',
+        name: 'Crownforge Sentinel',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Token'],
+        effect: 'Token Avatar (cannot be included in decks). 2 Essence, 0 attack. Guardian. When this Avatar is defeated, you may heal 1 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/128b0f8160ffc4c0ab.png',
+    },
+    {
+        id: 'EC-209',
+        name: 'Shardline Reservoir',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'Once per Cycle, exhaust this: add 1 Essence for each Shard you control, usable only to cast Spells.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/1345df80ae817e9567.png',
+    },
+    {
+        id: 'EC-210',
+        name: 'Radiant Channel Node',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'When this enters play, if you control an Avatar, heal 1 Essence. Once per Cycle, exhaust this: add 1 Essence of any type.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/1480640dc97a1dcfab.png',
+    },
+    {
+        id: 'EC-211',
+        name: 'Voidstream Lattice',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'Once per Cycle, you may move the top card of your Veiled Deck to your Void. If you do, add 2 Essence usable only to cast Rites.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/154138d85980b19cca.png',
+    },
+    {
+        id: 'EC-212',
+        name: 'Balanced Shard Conduit',
+        type: 'Essence',
+        rarity: 'Arcane',
+        aspects: [],
+        cost: 0,
+        effect: 'At the start of your Cycle, choose Avatars or Spells. Until end of Cycle, the first card of the chosen kind you cast costs 1 less Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/164d6781514b0bc3a9.png',
+    },
+    {
+        id: 'EC-213',
+        name: 'Dawnflare Guide-Beast',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 1,
+        effect: 'Attach to an Avatar. Attached Avatar gets +1 Essence. When attached Avatar enters New Earth, scry 1.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/17c522abbe40d411fd.png',
+    },
+    {
+        id: 'EC-214',
+        name: 'Voidwing Herald',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 2,
+        effect: 'Attach to a Deity or Avatar. While attached, the first time each Cycle a card enters your Void from your Veiled Deck, you may draw 1 card and then discard 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/18e898b566450c9c7c.png',
+    },
+    {
+        id: 'EC-215',
+        name: 'Shardveil Attendant',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 2,
+        effect: 'Attach to a Deity. When you claim a Shard, heal 1 Essence to your Deity. If you control 4 or more Shards, attached Deity cannot be targeted by opposing Rites.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/1915661e93c3a54ac0.png',
+    },
+    {
+        id: 'EC-216',
+        name: 'Mirrorstep Familiar',
+        type: 'Avatar',
+        rarity: 'Adept',
+        aspects: ['Companion'],
+        cost: 3,
+        effect: 'Attach to an Avatar. Attached Avatar gets \\\'When this Avatar becomes the target of a Spell, you may move it to another open Avatar slot you control.\\\'',
+        image: 'https://cdn1.sharemyimage.com/2025/12/05/204af67c37a71deaf4.png',
+    },
+];
+
+const DEITY_DATABASE = [
+    {
+        id: 'EC-001',
+        name: 'Second Sun Herald',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Gray'],
+        essence: 23,
+        startingKL: 3,
+        domain: 'Second Sun',
+        effect: 'Passive – Solar Flow: At the start of your turn, if you control at least one Glow Avatar, gain +1 KL this turn.
+God Code – Crown of the Second Sun (once per game): When your KL would go above 13, instead set it to 13 and your Avatars gain +2 Power until end of turn. Target opponent loses 4 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/1.png',
+    },
+    {
+        id: 'EC-002',
+        name: 'Null Regent',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Void', 'Gray'],
+        essence: 23,
+        startingKL: 3,
+        domain: 'Nullgrid',
+        effect: 'Passive – Grid Drain: Whenever an enemy Avatar is destroyed, you may drain 1 KL from that Avatar’s controller.
+God Code – Crown of Absolute Zero (once per game): When your KL would go above 13, instead set it to 13 and target opponent loses 3 KL and 3 Essence. Then you may destroy up to one Avatar they control with cost 3 or less.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/2.png',
+    },
+    {
+        id: 'EC-036',
+        name: 'Crown Arbiter of Gray',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Gray'],
+        essence: 24,
+        startingKL: 3,
+        domain: 'Gray Court',
+        effect: 'Passive – Perfect Balance: At the end of each turn, if both Deities have the same Essence, you may draw a card.
+God Code – Final Arbitration (once per game): When your KL would go above 13, instead set it to 13 and activate this. Set each Deity’s Essence to the lower of the two values, then you gain 3 Essence.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/36.png',
+    },
+    {
+        id: 'EC-037',
+        name: 'Solar Beast Warden',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Beast'],
+        essence: 22,
+        startingKL: 3,
+        domain: 'Pet Sanctuary / New Earth',
+        effect: 'Passive – Packbond: Whenever a Beast Avatar enters New Earth under your control, restore 1 Essence to your Deity.
+God Code – Call of the Crown Pride (once per game): Create up to three 2/2 Glow Beast Avatars with Guardian on New Earth. Restore 3 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/37.png',
+    },
+    {
+        id: 'EC-038',
+        name: 'Zero Gear Conductor',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Gray', 'Void'],
+        essence: 23,
+        startingKL: 3,
+        domain: 'Zero Gear / Logistics',
+        effect: 'Passive – Calibrated Flow: Whenever you spend exactly all of your remaining KL to play a card, draw a card.
+God Code – Absolute Schedule Lock (once per game): Target opponent’s next turn, they cannot gain KL above their starting KL that turn and cannot draw more than 1 card.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/38.png',
+    },
+    {
+        id: 'EC-039',
+        name: 'Executive Aura Regent',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Gray'],
+        essence: 21,
+        startingKL: 4,
+        domain: 'Executive Crown',
+        effect: 'Passive – Presence of Wealth: Once per turn, when you play a Spell, you may gain 1 Essence.
+God Code – Golden Aura Cascade (once per game): Your Avatars gain +1 Power and “When this Avatar deals Essence damage to a Deity this turn, restore 1 Essence to your Deity.”',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/39.png',
+    },
+    {
+        id: 'EC-040',
+        name: 'Shattered Sun Chronicler',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Glow', 'Void', 'Gray'],
+        essence: 20,
+        startingKL: 3,
+        domain: 'Shattered Sun',
+        effect: 'Passive – Story of the Shards: Once per turn, when you play your second card that turn, draw a card.
+God Code – Canon Rewrite (once per game): Exile your hand. Draw 5 cards. Until end of turn, your Spells cost 1 less KL (minimum 0).',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/40.png',
+    },
+    {
+        id: 'EC-041',
+        name: 'Crown of the Pet Void',
+        type: 'Deity',
+        rarity: 'Mythic',
+        aspects: ['Void', 'Beast'],
+        essence: 22,
+        startingKL: 3,
+        domain: 'Sanctuary Void',
+        effect: 'Passive – Dark Bond: Whenever a Beast Avatar you control dies, target opponent loses 1 Essence.
+God Code – Sanctuary Eclipse (once per game): Destroy up to two non-Beast Avatars. For each Avatar destroyed this way, you may create a 3/3 Void Beast Avatar.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/41.png',
+    },
+    {
+        id: 'EC-069',
+        name: 'Demon Lord Kaixu, Crownshatter Sovereign',
+        type: 'Deity',
+        rarity: 'Arcane',
+        aspects: ['Glow', 'Void', 'Gray'],
+        essence: 22,
+        startingKL: 3,
+        domain: 'Shattered Sun / Crownline',
+        effect: 'Passive – Shard War Architect: Once per turn, when you play your second card that turn, choose two:
+• Each opponent loses 1 Essence.
+• You gain +1 KL this turn.
+• Draw a card.
+• Target Avatar you control gets +2 Power until end of turn.
+
+God Code – Final Shardstorm (once per game): When your KL would go above 13, instead set it to 13 and activate this.
+Each opponent sacrifices two Avatars if able. Each opponent loses 4 Essence. Until end of turn, your Avatars get +2 Power and “When this Avatar deals Essence damage to a Deity, that Deity loses that much Essence again.”',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/69.png',
+    },
+    {
+        id: 'EC-070',
+        name: 'Estifar, Voidwing Regent',
+        type: 'Deity',
+        rarity: 'Arcane',
+        aspects: ['Void', 'Beast', 'Gray'],
+        essence: 23,
+        startingKL: 3,
+        domain: 'Sanctuary Void / Null Abyss',
+        effect: 'Passive – Familiar Swarm: The first time each turn that a Beast or a card with cost 2 or less enters New Earth under your control, you may have each opponent lose 1 Essence and you gain +1 KL this turn.
+
+God Code – Pack of the Shattered Moon (once per game): When your KL would go above 13, instead set it to 13 and activate this effect.
+Create four 2/2 Void Beast Avatars with “When this Avatar dies, target opponent loses 1 Essence.” Your Beasts gain +1 Power and Guardian until end of turn. Restore 3 Essence to your Deity.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/70.png',
+    },
+    {
+        id: 'EC-071',
+        name: 'Lokaya, Crown of Stillness',
+        type: 'Deity',
+        rarity: 'Arcane',
+        aspects: ['Gray', 'Glow'],
+        essence: 25,
+        startingKL: 3,
+        domain: 'Gray Court / New Earth',
+        effect: 'Passive – Quiet Orbit: At the end of your turn, if no Avatar you control attacked this turn, you may restore 2 Essence to your Deity, then you may draw a card and discard a card.
+
+God Code – Stillpoint Rewrite (once per game): When your KL would go above 13, instead set it to 13 and activate this effect.
+Tap all Avatars you don’t control. Those Avatars cannot attack during their controller’s next turn. You restore 5 Essence and draw 3 cards.',
+        image: 'https://cdn1.sharemyimage.com/2025/12/02/71.png',
+    },
+];
+
+// Normalized combined list (used by engine)
+const ALL_CARDS = [...CARD_DATABASE, ...DEITY_DATABASE].map(card => ({
+    ...card,
+    // Normalize Avatar stats: power -> attack, toughness -> health, fall back to essence for deities
+    attack: card.attack ?? card.power ?? 0,
+    health: card.health ?? card.toughness ?? card.essence ?? 0,
+}));
+
+// Helper function to get all deities
+function getDeities() {
+    return DEITY_DATABASE;
+}
+
+// Helper function to get all non-deity cards
+function getPlayableCards() {
+    return CARD_DATABASE;
+}
+
+// Helper function to find a card by ID
+function getCardById(id) {
+    return ALL_CARDS.find(c => c.id === id);
+}
+
+// CommonJS export for Node/testing (ignored in browser)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { CARD_DATABASE, DEITY_DATABASE, CARD_BACK_IMAGE, ALL_CARDS, getDeities, getPlayableCards, getCardById };
+}
+      window.EC_CARDS = typeof ALL_CARDS !== 'undefined' ? ALL_CARDS : (typeof CARD_DATABASE !== 'undefined' ? CARD_DATABASE : []);
+      window.EC_DEITIES = typeof DEITY_DATABASE !== 'undefined' ? DEITY_DATABASE : [];
+      window.CARD_BACK_IMAGE = typeof CARD_BACK_IMAGE !== 'undefined' ? CARD_BACK_IMAGE : '';
+    })();
+  </script>
+
+  <script>
+    // Engine logic inlined from engine.zip
+    (function(){
+      const Zone = {
+        DEITY_ZONE: "DEITY_ZONE",
+        DOMAIN_ZONE: "DOMAIN_ZONE",
+        SHARD_ROW: "SHARD_ROW",
+        AVATAR_LINE: "AVATAR_LINE",
+        RELIC_SUPPORT_ZONE: "RELIC_SUPPORT_ZONE",
+        HAND: "HAND",
+        VEILED_DECK: "VEILED_DECK",
+        CRYPT: "CRYPT",
+        NULL_ZONE: "NULL_ZONE",
+      };
+
+      const GOD_THRESHOLD_KL = 13;
+      const ABSOLUTE_KL_CAP = 31;
+      const MIN_KL = 0;
+      const MAX_GOD_CHARGES = 3;
+      const MIN_TURN_FOR_GOD_CHARGE_SPEND = 4;
+
+      function recalculateKl(player) {
+        let kl = player.baseKl;
+        kl += player.shardRow.length;
+        if (kl > ABSOLUTE_KL_CAP) kl = ABSOLUTE_KL_CAP;
+        if (kl < MIN_KL) kl = MIN_KL;
+        return kl;
+      }
+
+      function checkGodThreshold(player, oldKl, newKl) {
+        if (player.klThresholdTriggeredThisTurn) return;
+        const crossedThreshold = oldKl < GOD_THRESHOLD_KL && newKl >= GOD_THRESHOLD_KL;
+        if (crossedThreshold) {
+          if (player.godCharges < MAX_GOD_CHARGES) player.godCharges += 1;
+          player.klThresholdTriggeredThisTurn = true;
+        }
+      }
+
+      function createPlayerFromSetup(setup) {
+        const { id, deity, veiledDeck } = setup;
+        const startingEssence = deity.startingEssence ?? 0;
+        const baseKl = deity.baseKl ?? 0;
+        return {
+          id,
+          deity,
+          essence: startingEssence,
+          baseKl,
+          currentKl: baseKl,
+          godCharges: 0,
+          klThresholdTriggeredThisTurn: false,
+          hand: [],
+          veiledDeck: [...veiledDeck],
+          crypt: [],
+          nullZone: [],
+          domainZone: null,
+          shardRow: [],
+          avatarLine: [],
+          relicSupportZone: [],
+          turnsTaken: 0,
+        };
+      }
+
+      function createGameFromSetups(setups, firstPlayerId) {
+        if (!setups || setups.length === 0) {
+          throw new Error("createGameFromSetups requires at least one PlayerSetup.");
+        }
+        const players = setups.map(createPlayerFromSetup);
+        const resolvedFirstPlayerId = firstPlayerId ?? players[0].id;
+        return {
+          players,
+          activePlayerId: "",
+          firstPlayerId: resolvedFirstPlayerId,
+          turnNumber: 0,
+        };
+      }
+
+      function getActivePlayer(state) {
+        const player = state.players.find((p) => p.id === state.activePlayerId);
+        if (!player) {
+          throw new Error(`Active player with id ${state.activePlayerId} not found in GameState.`);
+        }
+        return player;
+      }
+
+      function readyAllPermanents(player) {
+        const zones = [player.domainZone, player.shardRow, player.avatarLine, player.relicSupportZone];
+        for (const zone of zones) {
+          if (!zone) continue;
+          if (Array.isArray(zone)) {
+            zone.forEach((card) => {
+              card.tapped = false;
+            });
+          } else {
+            zone.tapped = false;
+          }
+        }
+      }
+
+      function drawCard(player) {
+        if (player.veiledDeck.length === 0) return;
+        const card = player.veiledDeck.shift();
+        card.zone = Zone.HAND;
+        player.hand.push(card);
+      }
+
+      function startPhase(state) {
+        const player = getActivePlayer(state);
+        readyAllPermanents(player);
+        const isFirstTurn = state.turnNumber === 1;
+        const isFirstPlayer = player.id === state.firstPlayerId;
+        const shouldSkipDraw = isFirstTurn && isFirstPlayer;
+        if (!shouldSkipDraw) drawCard(player);
+        player.klThresholdTriggeredThisTurn = false;
+        const oldKl = player.currentKl ?? player.baseKl;
+        const newKl = recalculateKl(player);
+        player.currentKl = newKl;
+        checkGodThreshold(player, oldKl, newKl);
+      }
+
+      function startTurn(state) {
+        if (state.players.length === 0) {
+          throw new Error("GameState has no players.");
+        }
+        if (state.turnNumber === 0) {
+          state.turnNumber = 1;
+          state.activePlayerId = state.firstPlayerId;
+        } else {
+          state.turnNumber += 1;
+          const currentIndex = state.players.findIndex((p) => p.id === state.activePlayerId);
+          const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % state.players.length;
+          state.activePlayerId = state.players[nextIndex].id;
+        }
+        startPhase(state);
+      }
+
+      function initBattle({ mode, rootElement, cards }) {
+        const pickDeck = () => cards.slice(0, 8).map((c, idx) => ({
+          cardId: `${c.id}-${idx + 1}`,
+          name: c.name,
+          klCost: c.cost ?? 0,
+          power: c.power ?? 0,
+          guard: c.toughness ?? 1,
+          zone: Zone.VEILED_DECK,
+        }));
+
+        const setups = [
+          { id: "P1", deity: { name: "Second Sun Herald", startingEssence: 23, baseKl: 3 }, veiledDeck: pickDeck() },
+          { id: "P2", deity: { name: "Null Regent", startingEssence: 21, baseKl: 3 }, veiledDeck: pickDeck() },
+        ];
+
+        const state = createGameFromSetups(setups, "P1");
+        startTurn(state);
+
+        const updateUi = () => {
+          const [p1, p2] = state.players;
+          const updatePlayer = (p, prefix) => {
+            const essenceEl = document.getElementById(`${prefix}-essence`);
+            if (essenceEl) essenceEl.textContent = `Essence: ${p.essence}`;
+            const klEl = document.getElementById(`${prefix}-kl`);
+            if (klEl) klEl.textContent = `KL: ${p.currentKl} / ${ABSOLUTE_KL_CAP}`;
+            const baseEl = document.getElementById(`${prefix}-base-kl`);
+            if (baseEl) baseEl.textContent = `Base KL: ${p.baseKl}`;
+            const godEl = document.getElementById(`${prefix}-god`);
+            if (godEl) godEl.textContent = `God Charges: ${p.godCharges} / ${MAX_GOD_CHARGES}`;
+            const handEl = document.getElementById(`${prefix}-hand`);
+            if (handEl) handEl.textContent = `Hand: ${p.hand.length}`;
+            const veiledEl = document.getElementById(`${prefix}-veiled`);
+            if (veiledEl) veiledEl.textContent = `Veiled: ${p.veiledDeck.length}`;
+            const veiledCount = document.getElementById(`${prefix}-veiled-count`);
+            if (veiledCount) veiledCount.textContent = `${p.veiledDeck.length} card(s)`;
+            const cryptEl = document.getElementById(`${prefix}-crypt`);
+            if (cryptEl) cryptEl.textContent = `Crypt: ${p.crypt.length}`;
+            const cryptCount = document.getElementById(`${prefix}-crypt-count`);
+            if (cryptCount) cryptCount.textContent = `${p.crypt.length} card(s)`;
+            const shardCount = document.getElementById(`${prefix}-shard-count`);
+            if (shardCount) shardCount.textContent = `${p.shardRow.length} in play`;
+            const domainCount = document.getElementById(`${prefix}-domain-count`);
+            if (domainCount) domainCount.textContent = `${p.domainZone ? 1 : 0} domain(s)`;
+            const nameEl = document.getElementById(`${prefix}-name`);
+            if (nameEl) nameEl.textContent = p.id === "P1" ? "Player One (P1)" : "Player Two (P2)";
+            const deityEl = document.getElementById(`${prefix}-deity`);
+            if (deityEl) deityEl.textContent = `${p.deity.name} – Essence ${p.essence}`;
+            const meter = document.getElementById(`${prefix}-essence-meter`);
+            if (meter) meter.style.transform = `scaleX(${Math.max(0, p.essence) / 30})`;
+            const klMeter = document.getElementById(`${prefix}-kl-meter`);
+            if (klMeter) klMeter.style.transform = `scaleX(${p.currentKl / ABSOLUTE_KL_CAP})`;
+            const orbs = document.querySelectorAll(`#${prefix}-orbs .god-orb`);
+            orbs.forEach((orb, idx) => {
+              orb.classList.toggle('charged', idx < p.godCharges);
+            });
+          };
+          updatePlayer(p1, 'p1');
+          updatePlayer(p2, 'p2');
+          const timeline = document.getElementById('timeline-line');
+          if (timeline) timeline.textContent = `Turn ${state.turnNumber} • KL threshold ${GOD_THRESHOLD_KL} • KL cap ${ABSOLUTE_KL_CAP} • Mode: ${mode}`;
+          const log = document.getElementById('log-line');
+          if (log) log.textContent = `[T${state.turnNumber}] ${state.activePlayerId} ready phase started.`;
+          const hand = document.getElementById('hand-cards');
+          if (hand) {
+            hand.innerHTML = '';
+            p1.hand.forEach(card => {
+              const btn = document.createElement('button');
+              btn.className = 'card-button';
+              btn.textContent = `${card.name} (KL ${card.klCost})`;
+              hand.appendChild(btn);
+            });
+          }
+        };
+
+        updateUi();
+
+        window.__EC_STATE__ = state;
+      }
+
+      window.ECGameEngine = {
+        Zone,
+        createPlayerFromSetup,
+        createGameFromSetups,
+        startTurn,
+        initBattle,
+      };
+    })();
+  </script>
+
+  <script>
+    // Screen glue logic
+    (function(){
+      const homeScreen = document.getElementById("screen-home");
+      const battleScreen = document.getElementById("screen-battle");
+      const boardRoot = document.getElementById("board-root");
+      const soloTile = document.getElementById("tile-solo-battle");
+      const campaignTile = document.getElementById("tile-campaign");
+      const backBtn = document.getElementById("battle-back");
+
+      function showHome(){
+        homeScreen.style.display = 'block';
+        battleScreen.style.display = 'none';
+      }
+
+      function showBattle(mode){
+        homeScreen.style.display = 'none';
+        battleScreen.style.display = 'block';
+        if(window.ECGameEngine && typeof ECGameEngine.initBattle === 'function'){
+          ECGameEngine.initBattle({ mode, rootElement: boardRoot, cards: window.EC_CARDS || [] });
+        } else {
+          console.error('ECGameEngine.initBattle not available.');
+        }
+      }
+
+      soloTile?.addEventListener('click', () => showBattle('solo'));
+      campaignTile?.addEventListener('click', () => showBattle('campaign'));
+      backBtn?.addEventListener('click', showHome);
+
+      showHome();
+    })();
+  </script>
 </body>
 </html>
