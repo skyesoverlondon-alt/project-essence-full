@@ -10,14 +10,8 @@ const turnIndicator = document.querySelector(".turn-indicator");
 const startButton = document.getElementById("start-game-btn");
 const resetButton = document.getElementById("reset-btn");
 const attackAllButton = document.getElementById("attack-all-btn");
-const homeScreen = document.getElementById("screen-home");
-const battleScreen = document.getElementById("screen-battle");
-const backButton = document.getElementById("back-to-menu");
-const menuMessage = document.getElementById("menu-message");
-const menuTiles = document.querySelectorAll("[data-battle-mode], [data-action]");
 
 let gameState = null;
-let lastMode = "solo";
 
 function normalizeCard(baseCard, ownerId, zone = Zone.VEILED_DECK) {
   const power = baseCard.power ?? baseCard.attack ?? 0;
@@ -153,72 +147,8 @@ function handleAttackAll() {
   turnIndicator.textContent = `Attack declared by ${attacker.id} against ${defender.id} (UI placeholder).`;
 }
 
-function setMenuMessage(message) {
-  if (menuMessage) {
-    menuMessage.textContent = message;
-  }
-}
-
-function showHome() {
-  if (homeScreen) homeScreen.hidden = false;
-  if (battleScreen) battleScreen.hidden = true;
-  setMenuMessage("Select a tile to continue.");
-}
-
-function startBattle(mode = "solo") {
-  lastMode = mode;
-  setupGame();
-  const modeLabel = document.querySelector(".mode-label");
-  if (modeLabel) {
-    modeLabel.textContent = mode === "campaign" ? "Campaign" : "Guided";
-  }
-  if (turnIndicator) {
-    turnIndicator.textContent = `Mode: ${mode} • Ready to start`;
-  }
-  if (attackAllButton) {
-    attackAllButton.disabled = true;
-  }
-  refreshBoard();
-}
-
-function showBattle(mode = "solo") {
-  if (homeScreen) homeScreen.hidden = true;
-  if (battleScreen) battleScreen.hidden = false;
-  startBattle(mode);
-}
-
-function handleMenuTile(tile) {
-  const battleMode = tile.dataset.battleMode;
-  const action = tile.dataset.action;
-  if (battleMode) {
-    showBattle(battleMode);
-    return;
-  }
-  const copy = {
-    profile: "Profile setup will let you choose your name and avatar soon.",
-    multiplayer: "Multiplayer lobbies will unlock in a future update.",
-    deckbuilder: "Deck Builder will let you forge decks from your collection.",
-    collection: "Collection view will showcase all unlocked shards.",
-    shop: "Shard Shop will open for cosmetics and boosts soon.",
-  };
-  if (action && copy[action]) {
-    setMenuMessage(copy[action]);
-  }
-}
-
 startButton?.addEventListener("click", handleStart);
-resetButton?.addEventListener("click", () => {
-  setupGame();
-  if (turnIndicator) {
-    turnIndicator.textContent = `Mode: ${lastMode} • Ready to start`;
-  }
-});
+resetButton?.addEventListener("click", handleReset);
 attackAllButton?.addEventListener("click", handleAttackAll);
 
-menuTiles.forEach((tile) => {
-  tile.addEventListener("click", () => handleMenuTile(tile));
-});
-
-backButton?.addEventListener("click", showHome);
-
-showHome();
+setupGame();
