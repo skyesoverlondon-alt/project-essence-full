@@ -1,31 +1,581 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Essence Crown: Shard Wars</title>
-    <style>
-        /* Minimal placeholder to maintain a clean, blank page */
-        :root {
-            color-scheme: dark;
-            background-color: #050012;
-        }
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: #050012;
-            color: #f6c453;
-            font-family: Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .message {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Essence Crown: Shard Wars</title>
+  <link rel="stylesheet" href="new-board.css">
+  <style>
+    :root {
+      --bg: #050510;
+      --panel: #0b0b1f;
+      --accent: #c084fc;
+      --accent-2: #22d3ee;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(76, 29, 149, 0.25), transparent 45%),
+                  radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.22), transparent 40%),
+                  var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header.app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      background: rgba(7, 7, 18, 0.9);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 800;
+      color: var(--text);
+      text-shadow: 0 0 22px rgba(192, 132, 252, 0.55);
+    }
+
+    .brand span {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .profile-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      border-radius: 12px;
+    }
+
+    .profile-chip .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #7c3aed, #22d3ee);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      color: #0b0b1f;
+    }
+
+    .profile-meta {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    main { flex: 1; }
+
+    .screen {
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    #screen-home { display: block; }
+    #screen-battle[hidden], #screen-home[hidden] { display: none; }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.16), rgba(34, 197, 235, 0.1));
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+    }
+
+    .hero p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .hero .cta-row { display: flex; gap: 10px; }
+
+    .pill-btn {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(192, 132, 252, 0.6);
+      background: rgba(124, 58, 237, 0.18);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .pill-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
+    }
+
+    .menu-grid {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .menu-tile {
+      background: rgba(10, 12, 27, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: left;
+      min-height: 140px;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .menu-tile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(34, 197, 235, 0.1));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .menu-tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+      border-color: rgba(192, 132, 252, 0.6);
+    }
+
+    .menu-tile:hover::before { opacity: 1; }
+
+    .tile-title { margin: 0 0 4px; letter-spacing: 0.04em; }
+    .tile-desc { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .tile-badge {
+      align-self: flex-start;
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(192, 132, 252, 0.5);
+      color: var(--text);
+    }
+
+    .menu-message {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(14, 165, 233, 0.08);
+      border: 1px solid rgba(34, 197, 235, 0.35);
+      color: var(--text);
+    }
+
+    .menu-footer {
+      margin-top: 30px;
+      padding: 14px 12px;
+      color: var(--muted);
+      border-top: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    /* Battle screen framing */
+    #screen-battle .battle-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    #screen-battle .battle-header h2 { margin: 0; letter-spacing: 0.06em; }
+
+    #screen-battle .back-btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    #screen-battle .back-btn:hover { background: rgba(124, 58, 237, 0.2); transform: translateY(-1px); }
+
+    .board-shell {
+      background: rgba(6, 8, 18, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+    }
+  </style>
 </head>
 <body>
-    <div class="message">Game board UI removed.</div>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">ESSENCE CROWN <span>SHARD WARS</span></div>
+      <div class="header-actions">
+        <div class="profile-chip">
+          <div class="avatar">EC</div>
+          <div class="profile-meta">
+            <strong id="menu-player-name">Commander</strong>
+            <small id="menu-player-rank">Ready to deploy</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="screen-home" class="screen">
+        <div class="hero">
+          <div>
+            <h1>Essence Crown Command Bridge</h1>
+            <p>Choose your path: build your profile, battle solo, advance the campaign, or manage your decks and collection.</p>
+            <div class="cta-row">
+              <button class="pill-btn" data-action="profile">Create Profile</button>
+              <button class="pill-btn" data-battle-mode="solo">Jump into Solo Battle</button>
+            </div>
+          </div>
+          <div class="hero-badge">
+            <div class="tile-badge">Season 1</div>
+            <p class="tile-desc" style="margin-top:8px;">Shard Wars Protocols Online</p>
+          </div>
+        </div>
+
+        <div class="menu-grid">
+          <div class="menu-tile" data-action="profile">
+            <div>
+              <h3 class="tile-title">CREATE PROFILE</h3>
+              <p class="tile-desc">Customize your commander identity and avatar.</p>
+            </div>
+            <div class="tile-badge">Start Here</div>
+          </div>
+          <div class="menu-tile" data-battle-mode="solo">
+            <div>
+              <h3 class="tile-title">SOLO BATTLE</h3>
+              <p class="tile-desc">Fight AI opponents with the new command bridge.</p>
+            </div>
+            <div class="tile-badge">Practice</div>
+          </div>
+          <div class="menu-tile" data-battle-mode="campaign">
+            <div>
+              <h3 class="tile-title">CAMPAIGN</h3>
+              <p class="tile-desc">Challenge deity bosses and push the story forward.</p>
+            </div>
+            <div class="tile-badge">Story</div>
+          </div>
+          <div class="menu-tile" data-action="multiplayer">
+            <div>
+              <h3 class="tile-title">MULTIPLAYER</h3>
+              <p class="tile-desc">Prepare for ranked and casual PvP (coming soon).</p>
+            </div>
+            <div class="tile-badge">Online</div>
+          </div>
+          <div class="menu-tile" data-action="deckbuilder">
+            <div>
+              <h3 class="tile-title">DECK BUILDER</h3>
+              <p class="tile-desc">Forge your perfect deck from available shards.</p>
+            </div>
+          </div>
+          <div class="menu-tile" data-action="collection">
+            <div>
+              <h3 class="tile-title">COLLECTION</h3>
+              <p class="tile-desc">Browse unlocked cards and cosmetics.</p>
+            </div>
+          </div>
+          <div class="menu-tile" data-action="shop">
+            <div>
+              <h3 class="tile-title">SHARD SHOP</h3>
+              <p class="tile-desc">Spend shards on cosmetics and boosts.</p>
+            </div>
+            <div class="tile-badge">Shop</div>
+          </div>
+        </div>
+
+        <div id="menu-message" class="menu-message">Select a tile to continue.</div>
+        <div class="menu-footer">Season build: IonOS Command Bridge</div>
+      </section>
+
+      <section id="screen-battle" class="screen" hidden>
+        <div class="battle-header">
+          <h2>Battle Bridge</h2>
+          <div class="battle-actions">
+            <button id="back-to-menu" class="back-btn">← Back to Menu</button>
+          </div>
+        </div>
+        <div class="board-shell">
+          <div id="subtitle">KL • Essence • God Charges • Veiled Deck • Shards • Domains</div>
+          <div id="app">
+            <div class="top-bar">
+              <div class="controls">
+                <button id="start-game-btn">Start Game (P1 Turn 1)</button>
+                <button id="attack-all-btn" disabled>Attack With All Avatars</button>
+                <button id="reset-btn">Reset Game</button>
+              </div>
+              <div class="toggle-pill">
+                <span>Mode:</span>
+                <span class="mode-label">Guided</span>
+                <div class="toggle-switch guided">
+                  <div class="toggle-knob"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="turn-indicator">Turn: Not started • Click “Start Game (P1 Turn 1)”</div>
+
+            <div class="board">
+              <div class="player-section top">
+                <div class="player-section-inner">
+                  <div class="player-header-row">
+                    <div class="player-id-block">
+                      <div class="player-label">Opposing Commander</div>
+                      <div class="player-name" id="top-player-name">Player Two (P2)</div>
+                    </div>
+                  </div>
+                  <div class="player-stats-row">
+                    <div class="stat-pill essence">Essence: <span id="top-essence">21</span></div>
+                    <div class="stat-pill kl">KL: <span id="top-kl">3</span> / 31</div>
+                    <div class="stat-pill kl">Base KL: <span id="top-base-kl">3</span></div>
+                    <div class="stat-pill god">God Charges: <span id="top-god">0</span> / 3</div>
+                    <div class="stat-pill">Hand: <span id="top-hand">0</span></div>
+                    <div class="stat-pill">Veiled: <span id="top-veiled">8</span></div>
+                    <div class="stat-pill">Crypt: <span id="top-crypt">0</span></div>
+                  </div>
+                  <div class="meter-row">
+                    <div class="meter">
+                      <div class="meter-label">Essence Life Force</div>
+                      <div class="meter-track">
+                        <div class="meter-fill essence" id="top-essence-meter"></div>
+                      </div>
+                    </div>
+                    <div class="meter">
+                      <div class="meter-label">KL Flow</div>
+                      <div class="meter-track">
+                        <div class="meter-fill kl" id="top-kl-meter"></div>
+                        <div class="kl-threshold-marker"></div>
+                        <div class="kl-cap-marker"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="god-charge-row">
+                    <div>God Charges</div>
+                    <div class="god-orbs">
+                      <div class="god-orb" data-top-god="1"></div>
+                      <div class="god-orb" data-top-god="2"></div>
+                      <div class="god-orb" data-top-god="3"></div>
+                    </div>
+                  </div>
+                  <div class="zones-grid">
+                    <div class="zone-column">
+                      <div class="zone-card">
+                        <div class="zone-title">Veiled Deck</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="top-veiled-count">8 card(s)</div>
+                          <div class="zone-note">This mirrors the Veiled Deck stack on your physical mat.</div>
+                        </div>
+                      </div>
+                      <div class="zone-card compact">
+                        <div class="zone-title">Crypt (Discard / Fallen)</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="top-crypt-count">0 card(s)</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="zone-column">
+                      <div class="zone-card">
+                        <div class="zone-title">Deity / Essence Crown</div>
+                        <div class="zone-body">
+                          <div id="top-deity">Null Regent – Essence 21</div>
+                          <div class="zone-note">This panel is your Essence Crown and Deity portrait on the mat.</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="zone-column">
+                      <div class="zone-card">
+                        <div class="zone-title">Shard / Relic Row</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="top-shard-count">0 in play</div>
+                          <div class="zone-note">Shards are your sun-fractures; they push KL toward the God Threshold.</div>
+                        </div>
+                      </div>
+                      <div class="zone-card compact">
+                        <div class="zone-title">Domain Lane</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="top-domain-count">0 domain(s)</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="center-block">
+                <div class="center-strip">
+                  <div class="center-panel">
+                    <div class="center-title">New Earth Timeline</div>
+                    <div class="center-line" id="center-line">Turn 0 • KL threshold 13 • KL cap 31 • Max 3 God Charges per commander.</div>
+                    <div class="phase-bar">
+                      <div class="phase-pill active">Ready</div>
+                      <div class="phase-pill">Draw</div>
+                      <div class="phase-pill">KL Recalc</div>
+                      <div class="phase-pill">Main</div>
+                      <div class="phase-pill">Combat</div>
+                      <div class="phase-pill">End</div>
+                    </div>
+                    <div class="guided-hint">Guided: Follow the phases left-to-right each turn, like a built-in tutorial track.</div>
+                  </div>
+                  <div class="center-panel">
+                    <div class="center-title">Shard Wars Turn Flow</div>
+                    <div class="center-line">Ready → Draw → KL Recalc (Shards) → Main Actions → Combat → End</div>
+                    <div class="phase-bar soft">
+                      <div class="phase-pill">Ready</div>
+                      <div class="phase-pill">Draw</div>
+                      <div class="phase-pill">KL Recalc</div>
+                      <div class="phase-pill">Main</div>
+                      <div class="phase-pill">Combat</div>
+                      <div class="phase-pill">End</div>
+                    </div>
+                    <div class="guided-hint">Combat basics: Assign blockers from back to front, then resolve damage simultaneously.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="player-section bottom">
+                <div class="player-section-inner">
+                  <div class="player-header-row">
+                    <div class="player-id-block">
+                      <div class="player-label">Your Command Bridge</div>
+                      <div class="player-name" id="bottom-player-name">Player One (P1)</div>
+                    </div>
+                    <div class="action-buttons">
+                      <button class="action">Play Shard</button>
+                      <button class="action">Play Avatar</button>
+                      <button class="action">Play Relic/Support</button>
+                    </div>
+                  </div>
+                  <div class="player-stats-row">
+                    <div class="stat-pill essence">Essence: <span id="bottom-essence">23</span></div>
+                    <div class="stat-pill kl">KL: <span id="bottom-kl">3</span> / 31</div>
+                    <div class="stat-pill kl">Base KL: <span id="bottom-base-kl">3</span></div>
+                    <div class="stat-pill god">God Charges: <span id="bottom-god">0</span> / 3</div>
+                    <div class="stat-pill">Hand: <span id="bottom-hand">0</span></div>
+                    <div class="stat-pill">Veiled: <span id="bottom-veiled">8</span></div>
+                    <div class="stat-pill">Crypt: <span id="bottom-crypt">0</span></div>
+                  </div>
+                  <div class="meter-row">
+                    <div class="meter">
+                      <div class="meter-label">Essence Life Force</div>
+                      <div class="meter-track">
+                        <div class="meter-fill essence" id="bottom-essence-meter"></div>
+                      </div>
+                    </div>
+                    <div class="meter">
+                      <div class="meter-label">KL Flow</div>
+                      <div class="meter-track">
+                        <div class="meter-fill kl" id="bottom-kl-meter"></div>
+                        <div class="kl-threshold-marker"></div>
+                        <div class="kl-cap-marker"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="god-charge-row">
+                    <div>God Charges</div>
+                    <div class="god-orbs">
+                      <div class="god-orb" data-bottom-god="1"></div>
+                      <div class="god-orb" data-bottom-god="2"></div>
+                      <div class="god-orb" data-bottom-god="3"></div>
+                    </div>
+                  </div>
+                  <div class="zones-grid">
+                    <div class="zone-column">
+                      <div class="zone-card">
+                        <div class="zone-title">Veiled Deck</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="bottom-veiled-count">10 card(s)</div>
+                          <div class="zone-note">This mirrors the Veiled Deck stack on your physical mat.</div>
+                        </div>
+                      </div>
+                      <div class="zone-card compact">
+                        <div class="zone-title">Crypt (Discard / Fallen)</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="bottom-crypt-count">0 card(s)</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="zone-column">
+                      <div class="zone-card">
+                        <div class="zone-title">Deity / Essence Crown</div>
+                        <div class="zone-body">
+                          <div id="bottom-deity">Second Sun Herald – Essence 23</div>
+                          <div class="zone-note">This panel is your Essence Crown and Deity portrait on the mat.</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="zone-column">
+                      <div class="zone-card">
+                        <div class="zone-title">Shard / Relic Row</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="bottom-shard-count">0 in play</div>
+                          <div class="zone-note">Shards are your sun-fractures; they push KL toward the God Threshold.</div>
+                        </div>
+                      </div>
+                      <div class="zone-card compact">
+                        <div class="zone-title">Domain Lane</div>
+                        <div class="zone-body">
+                          <div class="zone-count-badge" id="bottom-domain-count">0 domain(s)</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="ec_cards_ionos.js"></script>
+  <script type="module" src="scripts/game-bootstrap.js"></script>
 </body>
 </html>
